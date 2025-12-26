@@ -1,0 +1,688 @@
+* {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .phoneContainer {
+    width: 358px;
+    height: 575px;
+    max-width: 100vw;
+    max-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  }
+  
+  @media (max-width: 500px) {
+    html, body {
+      position: fixed;
+      background-color: #000;
+    }
+    
+    .phoneContainer {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      box-shadow: none;
+    }
+  }
+  
+  /* ========== ВЕРХНЯ ЧАСТИНА - ГЕРОЙ ========== */
+  .heroInfoSection {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  
+  /* Шапка */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 8px;
+    border-radius: 10px;
+  }
+  
+  .playerName {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  .heroNameDisplay {
+    flex: 1;
+    text-align: center;
+    color: white;
+    font-size: 19px;
+    font-weight: bold;
+  }
+  
+  .closeBtn {
+    width: 32px;
+    height: 32px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .closeBtn:active {
+    transform: scale(0.9);
+  }
+  
+  /* Карточка героя */
+  .heroCard {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 10px;
+  }
+  
+  /* Фото героя */
+  .heroPhoto {
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    padding: 4px;
+    box-sizing: border-box;
+  }
+  
+  .heroImg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  
+  /* Статистика */
+  .heroStats {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  
+  .statItem {
+    background: white;
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: 1px solid #dee2e6;
+    min-height: 40px;
+  }
+  
+  .statItem img {
+    height: 20px;
+    width: auto;
+  }
+  
+  .statLabel {
+    font-size: 9px;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .statItem span {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  /* Опис героя */
+  .heroDescription {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+    min-height: 70px;
+  }
+  
+  .descriptHeroes {
+    font-size: 13px;
+    color: #495057;
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+    padding-right: 70px;
+  }
+  
+  .choiceHeroesBtn,
+  .ChoiceHeroesBtnYes {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 65px;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .choiceHeroesBtn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+  }
+  
+  .ChoiceHeroesBtnYes {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+  }
+  
+  .choiceHeroesBtn:active,
+  .ChoiceHeroesBtnYes:active {
+    transform: scale(0.95);
+  }
+  
+  /* ========== СЕРЕДНЯ ЧАСТИНА - ЗДІБНОСТІ ========== */
+  .abilitiesSection {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    margin-top: 2px;
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  
+  .abilitiesIcons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .abilityIcon {
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #667eea;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+  
+  .abilityIcon:active {
+    transform: scale(0.95);
+  }
+  
+  .abilityIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .abilityInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 10px;
+  }
+  
+  .nameEfectBaza {
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  
+  .discriptionEfect {
+    flex: 1;
+    font-size: 13px;
+    color: #495057;
+    line-height: 1.4;
+    overflow-y: auto;
+    margin-bottom: 6px;
+  }
+  
+  .detalEfectBtn {
+    width: 100%;
+    height: 32px;
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+  }
+  
+  .detalEfectBtn:active {
+    transform: scale(0.95);
+  }
+  
+  /* ========== НИЖНЯ ЧАСТИНА - ВИБІР ГЕРОЇВ ========== */
+  .heroSelectionSection {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    margin-top: 2px;
+    padding: 8px 8px 80px 8px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  
+  /* Вибрані герої */
+  .selectedHeroes {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  
+  .selectedSlot {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+  
+  .selectedSlot:active {
+    transform: scale(0.95);
+  }
+  
+  .selectedSlot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .slotLabel {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  
+  /* Сітка героїв */
+  .heroesGridContainer {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 8px;
+  }
+  
+  .heroesGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  
+  .heroTile {
+    aspect-ratio: 1 / 1;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .heroTile:active {
+    transform: scale(0.9);
+    border-color: #667eea;
+  }
+  
+  .heroTile img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+ /* ========== МОДАЛЬНЕ ВІКНО ========== */
+ .modalWindowHeroes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  
+  .modalContainer {
+    width: 100%;
+    max-width: 360px;
+    height: 75vh;
+    max-height: 500px;
+    background: white;
+    border-radius: 16px;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+  
+  .modalHeader {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .modalBoxImgEfect {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 2px solid white;
+    object-fit: cover;
+  }
+  
+  .modalNameEfect {
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 35px;
+  }
+  
+  .BtnModalCloseWindow {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  
+  .BtnModalCloseWindow:active {
+    transform: scale(0.9);
+  }
+  
+  .modalBody {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex: 1;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    border-radius: 0 0 16px 16px;
+  }
+  
+  .modalLevel {
+    padding: 14px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .modalLevel:last-child {
+    border-bottom: none;
+    margin-bottom: 10px;
+  }
+  
+  .modalLevel:nth-child(1) {
+    background: linear-gradient(135deg, #e3f2fd, #ffffff);
+  }
+  
+  .modalLevel:nth-child(2) {
+    background: linear-gradient(135deg, #bbdefb, #f8f9fa);
+  }
+  
+  .modalLevel:nth-child(3) {
+    background: linear-gradient(135deg, #90caf9, #f1f3f5);
+  }
+  
+  .modalLevel:nth-child(4) {
+    background: linear-gradient(135deg, #64b5f6, #e9ecef);
+  }
+  
+  .modalLevelTitle {
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  
+  .modalTextEfectOne,
+  .modalTextEfectTwo,
+  .modalTextEfectThree,
+  .modalTextEfectFour {
+    font-size: 11px;
+    line-height: 1.5;
+    color: #495057;
+  }
+  
+  /* Scrollbar */
+  .modalBody::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .modalBody::-webkit-scrollbar-track {
+    background: #f1f3f5;
+  }
+  
+  .modalBody::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+  }
+  
+  .modalBody::-webkit-scrollbar-thumb:active {
+    background: #764ba2;
+  }
+  
+  /* Мобільні стилі */
+  @media (max-width: 500px) {
+    .modalWindowHeroes {
+      padding: 8px;
+    }
+    
+    .modalContainer {
+      height: 80vh;
+      max-height: none;
+    }
+    
+    .modalHeader {
+      padding: 8px;
+    }
+    
+    .modalBoxImgEfect {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .modalNameEfect {
+      font-size: 13px;
+    }
+    
+    .modalLevel {
+      padding: 12px;
+    }
+    
+    .modalLevelTitle {
+      font-size: 12px;
+    }
+    
+    .modalTextEfectOne,
+    .modalTextEfectTwo,
+    .modalTextEfectThree,
+    .modalTextEfectFour {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+  }
+  
+  /* Scrollbar */
+  .modalBody::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .modalBody::-webkit-scrollbar-track {
+    background: #f1f3f5;
+  }
+  
+  .modalBody::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+  }
+  
+  .modalBody::-webkit-scrollbar-thumb:active {
+    background: #764ba2;
+  }
+  
+  /* Мобільні стилі */
+  @media (max-width: 500px) {
+    .modalWindowHeroes {
+      padding: 5px;
+    }
+    
+    .modalContainer {
+      max-height: 85vh;
+      border-radius: 12px;
+    }
+    
+    .modalHeader {
+      padding: 8px;
+    }
+    
+    .modalBoxImgEfect {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .modalNameEfect {
+      font-size: 13px;
+    }
+    
+    .modalLevel {
+      padding: 12px;
+    }
+    
+    .modalLevelTitle {
+      font-size: 12px;
+    }
+    
+    .modalTextEfectOne,
+    .modalTextEfectTwo,
+    .modalTextEfectThree,
+    .modalTextEfectFour {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+  }
+  
+  /* Scrollbar */
+  .modalBody::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .modalBody::-webkit-scrollbar-track {
+    background: #f1f3f5;
+  }
+  
+  .modalBody::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+  }
+  
+  .modalBody::-webkit-scrollbar-thumb:active {
+    background: #764ba2;
+  }
+  
+  /* Мобільні стилі */
+@media (max-width: 500px) {
+    .modalWindowHeroes {
+      padding: 15px 10px;
+    }
+    
+    .modalContainer {
+      max-height: calc(100vh - 30px);
+    }
+    
+    .modalBody {
+      max-height: calc(100vh - 180px);
+    }
+    
+    .modalBoxImgEfect {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .modalNameEfect {
+      font-size: 14px;
+    }
+    
+    .modalLevel {
+      padding: 12px;
+    }
+    
+    .modalTextEfectOne,
+    .modalTextEfectTwo,
+    .modalTextEfectThree,
+    .modalTextEfectFour {
+      font-size: 11px;
+    }
+  }

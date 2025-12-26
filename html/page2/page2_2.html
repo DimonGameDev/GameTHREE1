@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="page2_2.css">
+</head>
+<body>
+  <div class="phoneContainer">
+    
+    <!-- Контейнер з вибором гравців -->
+    <div class="containerTop">
+      
+      <!-- Гравець 1 -->
+      <div class="PlayerLine" id="playerOne">
+        <div class="playerNumber">1</div>
+        
+        <!-- Вибір раси -->
+        <div class="sectionRace">
+          <button class="arrowBtn" id="btnP1RaceLeft">◀</button>
+          <div class="raceContent">
+            <div class="raceImg" id="imgP1Race">
+              <img src="../../img/units/orc/titleOrc.jpg" alt="Раса">
+            </div>
+            <div class="raceName" id="nameP1Race">Орки</div>
+          </div>
+          <button class="arrowBtn" id="btnP1RaceRight">▶</button>
+        </div>
+        
+        <!-- Середній сегмент: Тип + Клан -->
+        <div class="sectionMiddle">
+          <!-- Вибір типу -->
+          <div class="boxType">
+            <button class="arrowBtn small" id="btnP1TypeLeft">◀</button>
+            <div class="typeName" id="nameP1Type">Гравець</div>
+            <button class="arrowBtn small" id="btnP1TypeRight">▶</button>
+          </div>
+          
+          <!-- Вибір клану -->
+          <div class="boxAlliance">
+            <button class="arrowBtn small" id="btnP1AllianceLeft">◀</button>
+            <div class="allianceBox">
+              <span class="allianceLabel">Клан</span>
+              <span class="allianceNumber" id="allianceP1">1</span>
+            </div>
+            <button class="arrowBtn small" id="btnP1AllianceRight">▶</button>
+          </div>
+        </div>
+        
+        <!-- Права частина: 2 кнопки -->
+        <div class="sectionButtons">
+          <button class="btnHeroes" id="btnHeroesP1">Герої</button>
+          <button class="btnReady" id="btnReadyP1">Готов</button>
+        </div>
+      </div>
+      
+      <!-- Гравець 2 -->
+      <div class="PlayerLine" id="playerTwo">
+        <div class="playerNumber">2</div>
+        
+        <div class="sectionRace">
+          <button class="arrowBtn" id="btnP2RaceLeft">◀</button>
+          <div class="raceContent">
+            <div class="raceImg" id="imgP2Race">
+              <img src="../../img/units/orc/titleOrc.jpg" alt="Раса">
+            </div>
+            <div class="raceName" id="nameP2Race">Орки</div>
+          </div>
+          <button class="arrowBtn" id="btnP2RaceRight">▶</button>
+        </div>
+        
+        <div class="sectionMiddle">
+          <div class="boxType">
+            <button class="arrowBtn small" id="btnP2TypeLeft">◀</button>
+            <div class="typeName" id="nameP2Type">Гравець</div>
+            <button class="arrowBtn small" id="btnP2TypeRight">▶</button>
+          </div>
+          
+          <div class="boxAlliance">
+            <button class="arrowBtn small" id="btnP2AllianceLeft">◀</button>
+            <div class="allianceBox">
+              <span class="allianceLabel">Клан</span>
+              <span class="allianceNumber" id="allianceP2">1</span>
+            </div>
+            <button class="arrowBtn small" id="btnP2AllianceRight">▶</button>
+          </div>
+        </div>
+        
+        <div class="sectionButtons">
+          <button class="btnHeroes" id="btnHeroesP2">Герої</button>
+          <button class="btnReady" id="btnReadyP2">Готов</button>
+        </div>
+      </div>
+      
+      <!-- Гравець 3 -->
+      <div class="PlayerLine" id="playerThree">
+        <div class="playerNumber">3</div>
+        
+        <div class="sectionRace">
+          <button class="arrowBtn" id="btnP3RaceLeft">◀</button>
+          <div class="raceContent">
+            <div class="raceImg" id="imgP3Race">
+              <img src="../../img/units/orc/titleOrc.jpg" alt="Раса">
+            </div>
+            <div class="raceName" id="nameP3Race">Орки</div>
+          </div>
+          <button class="arrowBtn" id="btnP3RaceRight">▶</button>
+        </div>
+        
+        <div class="sectionMiddle">
+          <div class="boxType">
+            <button class="arrowBtn small" id="btnP3TypeLeft">◀</button>
+            <div class="typeName" id="nameP3Type">Гравець</div>
+            <button class="arrowBtn small" id="btnP3TypeRight">▶</button>
+          </div>
+          
+          <div class="boxAlliance">
+            <button class="arrowBtn small" id="btnP3AllianceLeft">◀</button>
+            <div class="allianceBox">
+              <span class="allianceLabel">Клан</span>
+              <span class="allianceNumber" id="allianceP3">2</span>
+            </div>
+            <button class="arrowBtn small" id="btnP3AllianceRight">▶</button>
+          </div>
+        </div>
+        
+        <div class="sectionButtons">
+          <button class="btnHeroes" id="btnHeroesP3">Герої</button>
+          <button class="btnReady" id="btnReadyP3">Готов</button>
+        </div>
+      </div>
+      
+      <!-- Гравець 4 -->
+      <div class="PlayerLine" id="playerFour">
+        <div class="playerNumber">4</div>
+        
+        <div class="sectionRace">
+          <button class="arrowBtn" id="btnP4RaceLeft">◀</button>
+          <div class="raceContent">
+            <div class="raceImg" id="imgP4Race">
+              <img src="../../img/units/orc/titleOrc.jpg" alt="Раса">
+            </div>
+            <div class="raceName" id="nameP4Race">Орки</div>
+          </div>
+          <button class="arrowBtn" id="btnP4RaceRight">▶</button>
+        </div>
+        
+        <div class="sectionMiddle">
+          <div class="boxType">
+            <button class="arrowBtn small" id="btnP4TypeLeft">◀</button>
+            <div class="typeName" id="nameP4Type">Гравець</div>
+            <button class="arrowBtn small" id="btnP4TypeRight">▶</button>
+          </div>
+          
+          <div class="boxAlliance">
+            <button class="arrowBtn small" id="btnP4AllianceLeft">◀</button>
+            <div class="allianceBox">
+              <span class="allianceLabel">Клан</span>
+              <span class="allianceNumber" id="allianceP4">2</span>
+            </div>
+            <button class="arrowBtn small" id="btnP4AllianceRight">▶</button>
+          </div>
+        </div>
+        
+        <div class="sectionButtons">
+          <button class="btnHeroes" id="btnHeroesP4">Герої</button>
+          <button class="btnReady" id="btnReadyP4">Готов</button>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Нижня панель з налаштуваннями -->
+    <div class="containerDown">
+      
+      <div class="settingsBox">
+        <div class="settingItem">
+          <button class="arrowBtn small">◀</button>
+          <div class="settingValue">
+            <div class="settingLabel">Gold</div>
+            <div class="settingNumber">1000</div>
+          </div>
+          <button class="arrowBtn small">▶</button>
+        </div>
+        
+        <div class="settingItem">
+          <button class="arrowBtn small">◀</button>
+          <div class="settingValue">
+            <div class="settingLabel">Units</div>
+            <div class="settingNumber">10</div>
+          </div>
+          <button class="arrowBtn small">▶</button>
+        </div>
+      </div>
+      
+      <div class="navigationBtns">
+        <button class="navBtn back">Назад</button>
+        <button class="navBtn next">Далі</button>
+      </div>
+      
+    </div>
+    
+  </div>
+ 
+  <script src="page2_2.js"></script>
+</body>
+</html>

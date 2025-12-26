@@ -1,0 +1,58 @@
+/* === HEALTH BAR ДЛЯ ЮНІТІВ === */
+.unit-wrapper {
+    position: absolute;
+    pointer-events: none;
+}
+
+.unit-health-bar {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 4px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.unit-health-fill {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 2px;
+}
+
+/* Кольори в залежності від HP */
+.health-high {
+    background-color: #00ff00;
+    box-shadow: 0 0 3px #00ff00;
+}
+
+.health-medium {
+    background-color: #ffff00;
+    box-shadow: 0 0 3px #ffff00;
+}
+
+.health-low {
+    background-color: #ff4500;
+    box-shadow: 0 0 3px #ff4500;
+}
+
+.health-critical {
+    background-color: #ff0000;
+    box-shadow: 0 0 4px #ff0000;
+    animation: health-pulse 0.5s infinite;
+}
+
+@keyframes health-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+
+
+/* Колір health bar для неактивних гравців */
+.unit-health-fill.inactive-player-health {
+    background: linear-gradient(90deg, #0066FF, #0099FF) !important; /* 🔵 Яскравий синій */
+}

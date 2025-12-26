@@ -1,0 +1,366 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a1a; /* Темний фон навколо телефону */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+  
+.phoneContainer {
+  width: 358px;
+  height: 575px;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Для реальних мобільних пристроїв */
+@media (max-width: 500px) {
+  html, body {
+    position: fixed;
+    background-color: #000;
+  }
+  
+  .phoneContainer {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    box-shadow: none;
+  }
+}
+
+
+
+
+
+
+.container {
+  width: 90%;
+  height: 90%; /* ⬅️ Змінили з 78% на 90% */
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+  
+  .infoLine {
+    width: 100%;
+    height: 10%;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .infoTablo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .choseTablo {
+    width: 100%;
+    height: 17%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    transition: all 0.3s ease;
+  }
+  
+  .choseTablo:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+  
+  .tabloFive {
+    height: 20%;
+    border-bottom: none;
+    background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .infoBox {
+    width: 33%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 10px;
+  }
+  
+  .boxMenu {
+    width: 100%;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  
+  .boxImg {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+  }
+  
+  .boxImg:hover {
+    transform: scale(1.1);
+  }
+  
+  .boxImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .boxName {
+    font-weight: 600;
+    width: 45%;
+    text-align: center;
+    color: #495057;
+    font-size: 16px;
+  }
+  
+  .btnMenu {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btnMenu:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btnMenu:active {
+    transform: scale(0.95);
+  }
+  
+  .btnMenu::before {
+    content: '◀';
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .btnRightRasa::before {
+    content: '▶';
+  }
+  
+  .btnLeftRasa {
+    transform: scaleX(-1);
+  }
+  
+  .boxChuseTyp {
+    width: 80%;
+    height: 40%;
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #495057;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .boxChuseTyp:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+  }
+  
+  .boxChuseUnit {
+    width: 80%;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #28a745;
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border-radius: 12px;
+    border: 2px solid #c3e6cb;
+  }
+  
+  .boxNumbrGold {
+    width: 45%;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffc107;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-radius: 12px;
+    border: 2px solid #ffeaa7;
+  }
+  
+  .zatychka {
+    height: 20%;
+    font-size: 12px;
+    color: #6c757d;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .playerOne {
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 192, 203, 0.1));
+    border-left: 4px solid #ff6b6b;
+  }
+  
+  .playerTwo {
+    background: linear-gradient(135deg, rgba(173, 216, 230, 0.3), rgba(135, 206, 235, 0.1));
+    border-left: 4px solid #4ecdc4;
+  }
+  
+  .playerThree {
+    background: linear-gradient(135deg, rgba(144, 238, 144, 0.3), rgba(152, 251, 152, 0.1));
+    border-left: 4px solid #45b7d1;
+  }
+  
+  .playerFour {
+    background: linear-gradient(135deg, rgba(255, 255, 153, 0.3), rgba(255, 255, 102, 0.1));
+    border-left: 4px solid #f9ca24;
+  }
+  
+  .nextStoreWindow3 {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+  
+  .btnWind {
+    width: 25%;
+    height: 60%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .btnWind:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btnWind:active {
+    transform: translateY(0);
+  }
+  
+  .Back {
+    background: linear-gradient(135deg, #6c757d, #495057);
+  }
+  
+  .Next {
+    background: linear-gradient(135deg, #28a745, #20c997);
+  }
+  
+  /* Додаткові анімації */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .choseTablo {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  /* Адаптивність */
+  @media (max-width: 768px) {
+    .container {
+      width: 95%;
+      height: 85%;
+    }
+    
+    .infoTablo {
+      font-size: 14px;
+    }
+    
+    .boxName {
+      font-size: 14px;
+    }
+    
+    .btnWind {
+      font-size: 16px;
+    }
+  }
+  
+  
+  .boxHeroesChoice {
+    width: 33%;
+    height: 100%;
+    background-color: #28a745;
+    border-radius: 5%;
+  }
+  
+  .boxHeroesChoiceTitleBtn {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #000;
+    border-radius: 5%;
+    background-color: #46dd28;
+    cursor: pointer;
+  }
+  
+  
+  
+  

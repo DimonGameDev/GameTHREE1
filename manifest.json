@@ -1,0 +1,22 @@
+{
+    "name": "Version of War. Version 1.0",
+    "short_name": "Version of War",
+    "description": "Strategy game with heroes and units. Version 1.0.",
+    "start_url": "/GameTHREE1/html/page1/page1.html",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "/GameTHREE1/img/image.jpg",
+        "sizes": "192x192",
+        "type": "image/jpeg"
+      },
+      {
+        "src": "/GameTHREE1/img/image.jpg",
+        "sizes": "512x512",
+        "type": "image/jpeg"
+      }
+    ]
+  }

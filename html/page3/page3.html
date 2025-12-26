@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="MAP.css"> -->
+    <link rel="stylesheet" href="page3.css">
+    <link rel="stylesheet" href="css/batleSystem.css">
+    <link rel="stylesheet" href="css/healthUnits.css">
+    <link rel="stylesheet" href="css/auraUnits.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <!-- верхня лінія -->
+                <!-- верхня лінія -->
+                <div class="topLine">
+                    <!-- прапор + юніти + золото -->
+                    <div class="itemsTopLine flagSection">
+                        <div class="FlagColorPlayer">
+                            <div class="flagTopNumberPlayer"></div>
+                            <div class="flagCenter">
+                                <div class="cauntNowUnits">0</div>/<div class="maxUnits"></div>
+                            </div>
+                            <div class="flagBottom">
+                                <img class="imgGold" src="../../img/map/infoTablo/gold/gold.png" />
+                                <div class="goldNumber"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- картинка клітинки -->
+                    <div class="itemsTopLine imageSection">
+                        <div class="cellImgInfo">
+                            <img src="../../img/map/grass/grass.jpeg"/>
+                            <img class="imgArmor" src="../../img/map/infoTablo/armor/armor.png"/>
+                            <div class="tabloPlusArmor"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ім'я + характеристики -->
+                    <div class="itemsTopLine statsSection">
+                        <!-- Ім'я юніта -->
+                        <div class="unitNameBox">
+                            <span class="daniUnitsName"></span>
+                        </div>
+                        
+                        <!-- Сітка характеристик 2x3 -->
+                        <div class="statsGrid">
+                            <!-- Рядок 1 -->
+                            <div class="statItem">
+                                <img src="../../img/map/infoTablo/swords/swords.png" title="Атака"/>
+                                <span class="daniUnitsAtack"></span>
+                            </div>
+                            <div class="statItem">
+                                <img src="../../img/map/infoTablo/armor/armor.png" title="Броня"/>
+                                <span class="daniUnitsArmor"></span>
+                            </div>
+                            <div class="statItem">
+                                <img src="../../img/map/infoTablo/HP/hp.png" title="Здоров'я"/>
+                                <div style="display: flex; align-items: center; gap: 1px;">
+                                    <span class="daniUnitsHp"></span><span>/</span><span class="daniUnitsHpNew"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Рядок 2 -->
+                            <div class="statItem">
+                                <span class="statIcon">👟</span>
+                                <span class="daniUnitsStep"></span>
+                            </div>
+                            <div class="statItem">
+                                <span class="statIcon">🎯</span>
+                                <span class="daniUnitsRange"></span>
+                            </div>
+                            <div class="statItem">
+                                <span class="statIcon">💥</span>
+                                <span class="daniUnitsCrit"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Мана + settings -->
+                    <div class="itemsTopLine manaSection">
+                        <div class="manaUnits">
+                            <span class="manaUnitsNow"></span>
+                            <span class="manaUnitsThreshold"></span>
+                        </div>
+                        <div class="settings">⚙️</div>
+                    </div>
+                </div>
+        <div class="window">
+            <!-- модальне вікно накладених ефекти юнітів -->
+            <div class="modalEfectUnits-backdrop"></div>
+            <div class="modalEfectUnits">
+                <div class="modEfeUnitsTopLine">
+                    Накладені ефекти :
+                    <div class="BoxModEfeUnitsTopLineClose">
+                        <img src="../../img/map/button/closeModal/closeModal.png" />
+                    </div>
+                </div>
+                <div class="modEfeUnitsItemsContainer">
+                    <div class="modEfeUnitsItems"> 
+                        <div class="modEfeUnitsItemsTitle">
+                            <img src="../../img/map/button/closeModal/closeModal.png" />
+                            <span>Назва ефекту</span>
+                            
+                            <div class="modEfeUnitsItmsColdwin">3</div>
+                        </div>
+                        <div class="modEfeUnitsItemsDescription">Опис ефекту</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="overlay"></div>
+
+            <!-- модальне вікно інформації про ЮНІТІВ -->
+           
+
+           <!-- кнопка покупки замку -->
+            <div class="btnBuyCastle">
+                <img src="../../img/map/btnCastleGold/btnCastleGold.jpg" />
+            </div>
+
+            <!-- кнопка покупки юніта в замку -->
+            <div class="ModalBtnBuyUnits">
+                <div class="topLineBtnBuyUnits">
+                   КУПИТИ
+                </div>
+                <div class="modalBtnBuyUnitsName">
+                    <span></span>
+                </div>
+            
+
+            </div>
+
+
+               
+                
+                
+
+
+            <div class="map"> 
+            </div>
+        </div>
+
+      
+        <!-- нижня лінія -->
+        <div class="bottomLine">
+            <div id="BtnMagicUnitsTablo" class="itemsBottomLine">
+                <div>ефекти всіх</div>
+            </div>
+            <div id="BtnEfectUnitsTablo" class="itemsBottomLine">
+                <div>юнітів</div>
+            </div>
+            <div id="BtnEfectHeroesTablo" class="itemsBottomLine">
+                <div class="ManaHeroesTablo"></div>
+                <div>Ефекти героїв</div>
+            </div>
+            <div id="BtnAttackTablo" class="itemsBottomLine">
+                <div>Атака</div>
+            </div>
+            <div id="BtnNextTablo" class="itemsBottomLine">
+                <div>Далі</div>
+            </div>
+            <div id="BtnNextMoveGameTablo" class="itemsBottomLine">
+                <div>Хід</div>
+            </div>
+            
+            <!-- кнопка захопити хатку золота -->
+            <div class="BtnActiveHauseGoldCapture">
+                Захопити
+            </div>
+            <!-- кнопка закінчити хід цим юнітом-->
+            <div class="BtnActiveUnitEndTurn">
+                <!-- <img src="../../img/map/button/endTurnUnit/btnEndTurnUnit.jpeg" /> -->
+                Закінчити хід цим юнітом
+            </div>
+            
+           <!-- МОДАЛЬНЕ ВІКНО МАГАЗИНУ -->
+<div class="ModalWindowsShop">
+    <div class="modalTopLine">
+        <div class="modalBtnLineInfo">інфо</div>
+        <div class="modalNameRace">Назва</div>
+        <div class="modalBtnLineClose">Закрити</div>
+    </div>
+
+    <div class="modalBottomLine">
+        <div class="scrollWrapper">
+            <div class="modalItem"> 
+                <div class="unitLevelNow ">10</div>
+                <div class="imgBoxModal">
+                    <img src=""/>
+                </div>
+                <div class="TEXTmodalBox">
+                    <div class="textBoxModalLeft">
+                        <div class="textModal">
+                            <span id="modalName">Дімон</span>
+                        </div>
+
+                        <div class="textModal">Хід: 
+                            <span id="modalStep">3</span>
+                        </div>
+                        <div class="textModal">Дальн.: 
+                            <span id="modalRange">1</span>
+                        </div>
+                    </div>
+                    <div class="textBoxModalRight">
+                        <div class="textModal modalArmor">
+                            <img src="../../img/map/infoTablo/armor/armor.png" />
+                            <span>20</span>
+                        </div>
+                        <div class="textModal modalHells">
+                            <img src="../../img/map/infoTablo/HP/hp.png"/>
+                            <span>100</span>
+                        </div>
+                        <div class="textModal modalAtacks">
+                            <img src="../../img/map/infoTablo/swords/swords.png" />
+                            <span>35</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modalCoin">230</div>
+            </div>
+        </div>
+    </div>
+</div>
+            
+        </div>  <!-- закриває bottomLine -->
+
+<!-- модальне вікно ефекти всіх , вікно з ліва -->
+<div class="ModalMagicUnits">
+    <div class="modMagicItem">
+        <img id="modMagicItem-1" src="" />
+    </div>
+    <div class="modMagicItem">
+        <img id="modMagicItem-2" src="" />
+    </div>
+    <div class="modMagicItem">
+        <img id="modMagicItem-3" src="" />
+    </div>
+    
+</div>
+<div class="modMagicBoxText">
+       <div class="modMagicBoxTextTitle">
+            <div class="ModMagicNumberLevel">1</div>
+            <div class="ModMagicNameNextLevel">Назва ефекту</div>
+            <div class="ModMagicCloseModalMagic">
+                <img src="../../img/map/button/closeModal/closeModal.png" />
+            </div>
+       </div>
+       <div class="modMagicBoxTextDescription">Опис ефекту</div>
+       <div class="BtnModalMagicCentralActive">Активація</div>
+</div>
+
+<!-- модальне вікно ефекти всіх , вікно з право -->
+<!-- <div class="ModalMagicCentralBox">
+    <div class="ModalMagicCentralBoxTopLine">
+        <div class="ModMagicCenNameAbility">Жопа сраки</div>
+        <div class="ModMagicCenNumLevel">1</div>
+    </div>
+    <div class="ModMagicCenBottomLine">
+        <div class="ModMagicCenDescription">Опис ефекту</div>
+        <div class="ModMagicCenNameType">Активне</div>
+    </div>
+    <div class="BtnModalMagicCentralActive">Активація</div>
+</div> -->
+
+
+    </div>  <!-- закриває container -->
+
+    
+
+
+     <!-- модальне вікно героїв ----------------------------------------->
+     <div class="modalEfectHeroes-backdrop"></div>
+     <div class="modalEfectHeroes">
+         <div class="modEfeHeroesTopLine">
+             <div class="modEfeHerShoseHeroes">
+                 <img id="heroImgHero-1" src="../../img/heroes/heroesList/tuveran/blue/tuveranBlue.png" />
+                 <img id="heroImgHero-2" src="../../img/heroes/heroesList/timer/blue/timerBlue.png" />
+                 <img id="heroImgHero-3" src="../../img/heroes/heroesList/darest/blue/darestBlue.png" />
+             </div>
+             <span class="modEfeHerNameHeroes">імя героя</span> 
+             <div class="BoxModEfeHeroesTopLineClose">
+                 <img src="../../img/map/button/closeModal/closeModal.png" />
+             </div>
+         </div>
+         <div class="modEfeHerCenterLine">
+             <div class="modEfeHerCenterLeft">
+                 <img src="../../img/heroes/heroesList/tuveran/blue/tuveranBlue.png" />
+             </div>
+             <div class="modEfeHerCenterRight">
+                 <div class="modEfeHerCenterRightTop">
+                     <div class="modEfeHerItemStep">
+                         Step :
+                         <span></span>
+                     </div>
+                     <div class="modEfeHerItemRange">
+                         Range :
+                         <span></span>
+                     </div>
+                 </div>
+                 <div class="modEfeHerCenterRightCenter">
+                     <div class="modEfeHerItemAttack">
+                         <img src="../../img/map/infoTablo/swords/swords.png" />
+                         <span></span>
+                     </div>
+                     <div class="modEfeHerItemHp">
+                         <img src="../../img/map/infoTablo/HP/hp.png" />
+                         <span></span>/
+                         <span class="modEfeHerItemHpNew">100</span>
+                     </div>
+                     <div class="modEfeHerItemArmor">
+                         <img src="../../img/map/infoTablo/armor/armor.png" />
+                         <span></span>
+                     </div>
+                 </div>
+                 <div class="modEfeHerCenterRightBottom">
+                     <div class="modEfeHerItemCriticalStrike">
+                         шанс кріта:
+                         <span></span>
+                     </div>
+                     <div class="modEfeHerItemCriticalBlow">
+                         Удар :
+                         <span></span>
+                     </div>
+                     
+                 </div>
+             </div>
+         </div>
+         <div class="modEfeHerTextLine">
+             <div class="modEfeHerTextLineTitle">
+                
+                 <div class="modEfeHerTextLineTitleImg">
+                     <img id="heroImgEfect-1" src="../../img/heroes/heroesList/tuveran/blue/tuveranBlue.png" />
+                     <img id="heroImgEfect-2" src="../../img/heroes/heroesList/timer/blue/timerBlue.png" />
+                     <img id="heroImgEfect-3" src="../../img/heroes/heroesList/darest/blue/darestBlue.png" />
+                     <!-- <img id="heroImgEfect-4" src="../../img/heroes/heroesList/artemis/artemis.jpg" /> -->
+                 </div>
+                 <span>назва здібності</span>
+             </div>
+             <div class="modEfeHerTextLineDescription">
+                <div class="typeAbility"></div>
+                 <span></span>
+                 
+             </div>
+         </div>
+         <div class="modEfeHerTextLineBottom">
+             <div class="modEfeHerLinBotItem">
+                 <div class="modEfeHerLinBotItemTop">
+                     Рівень 1
+                     <span id="efectHeroBtn-1" class="modEfeHerActiveBtn" data-level="1"></span>
+                 </div>
+                 <div  class="modEfeHerLinBotItemBottomText">
+                     <span id="efectHeroText-1">Опис рівня тут буде опис рівня і можна було і попроще</span>
+                 </div>
+             </div>
+             <div class="modEfeHerLinBotItem">
+                 <div class="modEfeHerLinBotItemTop">
+                     Рівень 2
+                     <span id="efectHeroBtn-2" class="modEfeHerActiveBtn" data-level="2"></span>
+                 </div>
+                 <div  class="modEfeHerLinBotItemBottomText">
+                     <span id="efectHeroText-2">Опис рівня тут буде о ріа було і попроще</span>
+                 </div>
+             </div>
+             <div class="modEfeHerLinBotItem">
+                 <div class="modEfeHerLinBotItemTop">
+                     Рівень 3
+                     <span id="efectHeroBtn-3"  class="modEfeHerActiveBtn" data-level="3"></span>
+                 </div>
+                 <div  class="modEfeHerLinBotItemBottomText">
+                     <span id="efectHeroText-3">Опис рівня тут буде опис рівня</span>
+                 </div>
+             </div>
+             <div class="modEfeHerLinBotItem">
+                 <div class="modEfeHerLinBotItemTop">
+                     Рівень 4
+                     <span id="efectHeroBtn-4" class="modEfeHerActiveBtn" data-level="4"></span>
+                 </div>
+                 <div  class="modEfeHerLinBotItemBottomText">
+                     <span id="efectHeroText-4">Опис рівня тут буде опис рівня
+                         Опис рівня тут буде опис рівня
+                     </span>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+    <!-- <div class="overlayPerevirka">
+        <div class="itemPerevirka">1</div>
+        <div class="itemPerevirka">2</div>
+        <div class="itemPerevirka">3</div>
+        <div class="itemPerevirka">4</div>
+    </div> -->
+    <div class="ModalInfoUnits"> 
+                
+        <div class="LineNameRace">
+         <div class="arrowLeft">назад</div>
+         <div class="nameRase">Назва</div>
+         <div class="arrowRight">вперед</div>
+         <div class="closeWindows">закр</div>
+         
+        </div>
+        
+        <div class="topContainer">
+         
+         <div class="boxImg">
+          <img src="../../img/heroes/heroesList/tuveran/blue/tuveranBlue.png" />
+         </div>
+         
+         <div class="boxNameText">
+          <div class="boxNameUnit">
+           <!-- <div class="arrowLeftUnits">назад</div> -->
+           <div class="nameUnits">юніт</div>
+           <!-- <div class="arrowRightUnits">вперед</div> -->
+          </div>
+          <div class="textUnit">
+           <div class="dani">
+            Дальність ходу: <span class="step"></span>
+           </div>
+           <div class="dani">Дальність атаки:  <span class="range"></span></div>
+           <div class="dani">Броня: <span class="armor"></span></div>
+           <div class="dani">Кількість хп: <span class="hp"></span></div>
+           <div class="dani">Атака: <span class="attack"></span></div>
+          </div>
+         </div>
+        </div>
+        
+        <div class="centerContainer">
+         <!-- <div class="BazaEfect">
+          Базові можливості та ефекти
+          
+         </div> -->
+         <div class="discripText">
+          <p></p>
+         </div>
+         
+        </div>
+        
+        <div class="bottomContainer">
+         
+         <!-- <div class="leftSide"> -->
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel leftSideOneImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel leftSideOneName"></div>
+            <div class="numberLevel leftSideOneNumber"></div>
+           </div>
+           <div class="discriptionLevel leftSideOneDescription"></div>
+          </div>
+          
+          <div class="nextLevel"> 
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel leftSideTwoImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel leftSideTwoName"></div>
+            <div class="numberLevel leftSideTwoNumber"></div>
+           </div>
+           <div class="discriptionLevel leftSideTwoDescription"></div>
+          </div>
+          
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel leftSideThreeImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel leftSideThreeName"></div>
+            <div class="numberLevel leftSideThreeNumber"></div>
+           </div>
+           <div class="discriptionLevel leftSideThreeDescription"></div> 
+          </div>
+          
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel leftSideFourImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel leftSideFourName"></div>
+            <div class="numberLevel leftSideFourNumber"></div>
+           </div>
+           <div class="discriptionLevel leftSideFourDescription"></div> 
+          </div>
+          
+         <!-- </div> -->
+         <!--закінчення лівого блоку -->
+         
+         
+         <!-- <div class="rightSide"> -->
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel RightOneImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel RightOneName"></div>
+            <div class="numberLevel RightOneNumber"></div>
+           </div>
+           <div class="discriptionLevel RightOneDescription"></div>
+          </div>
+          
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel RightTwoImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel RightTwoName"></div>
+            <div class="numberLevel RightTwoNumber"></div>
+           </div>
+           <div class="discriptionLevel RightTwoDescription"></div>
+          </div>
+          
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel RightThreeImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel RightThreeName"></div>
+            <div class="numberLevel RightThreeNumber"></div>
+           </div>
+           <div class="discriptionLevel RightThreeDescription"></div>
+          </div>
+          
+          <div class="nextLevel">
+           <div class="lineNameMagic">
+            <div class="imgBoxLevel RightFourImg">
+             <img src=""/>
+            </div>
+            <div class="nameNextLevel RightFourName"></div>
+            <div class="numberLevel RightFourNumber"></div>
+           </div>
+           <div class="discriptionLevel RightFourDescription"></div>
+          </div>
+          
+         <!-- </div> -->
+         <!--закінчення правого блоку -->
+         
+        </div>
+        
+        <!--закінчення bottomContainer -->
+        <!-- <div class="activationUpgrades">
+          <div class="activationUpgradesCoin">100</div>
+          <div class="activationUpgradesBtn">активація</div>
+        </div> -->
+        <div class="BazaCloseModal">закрить</div>
+        
+        <div class="modalBazaMethods">
+        
+          <div class="bazaContent">
+           <div class="imgBazaBox">
+            <img src=""/>
+           </div>
+           <div class="bazaTextAndName">
+            <div class="bazaName"></div>
+            <div class="bazaText"></div>
+           </div>
+          </div>
+          
+          
+        </div>
+        
+    </div>
+    
+
+
+    <script src="../../js/page3/globals/globals.js"></script> <!-- глобальні змінні -->
+    <script src="../../js/page3/mapData/map/gameLogicMap/tileEffectsSystem.js"></script>
+
+    <script src="../../js/asset/abilities/abilities.js"></script>
+    <script src="../../js/asset/abilities/AbilityClass.js"></script>
+    <script src="../../js/asset/abilities/effectsManager.js"></script> <!-- це файл для ефектів аур -->
+   <!-- юніти -->
+   <script src="../../js/asset/units/unitsOrc/orcWarriorLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcArcherLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcShamanLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcHorsesLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcPikenerLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcHorsemanLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcCatapultLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcBearLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcMagLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcMinotaurLevel.js"></script>
+   <script src="../../js/asset/units/unitsOrc/orcWispLevel.js"></script>
+   <!-- люди -->
+   <script src="../../js/asset/units/unitsPipl/piplWarriorLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplArcherLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplShamanLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplHorsesLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplPikenerLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplHorsemanLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplCatapultLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplWerewolfLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplEngineerLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplAssassinLevel.js"></script>
+   <script src="../../js/asset/units/unitsPipl/piplWispLevel.js"></script>
+   <!-- ельфи -->
+   <script src="../../js/asset/units/unitsElf/elfWarriorLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfArcherLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfShamanLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfHorsesLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfPikenerLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfHorsemanLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfCatapultLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfDarkelfLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfWitchLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfGolemLevel.js"></script>
+   <script src="../../js/asset/units/unitsElf/elfWispLevel.js"></script>
+   <!-- демони -->
+   <script src="../../js/asset/units/unitsDemon/demonWarriorLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonArcherLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonShamanLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonHorsesLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonPikenerLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonHorsemanLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonCatapultLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonCerberusLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonSpiritLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonSupervisorLevel.js"></script>
+   <script src="../../js/asset/units/unitsDemon/demonWispLevel.js"></script>
+   <!-- жуки -->
+   <script src="../../js/asset/units/unitsBeetle/beetleWarriorLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleArcherLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleShamanLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleHorsesLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetlePikenerLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleHorsemanLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleCatapultLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleScarabLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleUterusLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleArmoredLevel.js"></script>
+   <script src="../../js/asset/units/unitsBeetle/beetleWispLevel.js"></script>
+    <!-- <script src="../../js/asset/units/upgradesUnit.js"></script> -->
+
+    <script src="../../js/asset/units/unitColorSystem.js"></script>
+    <script src="../../js/asset/units/units2.js"></script>
+    <!-- <script src="../../js/asset/abilities/copyAbilities.js"></script> -->
+
+    <script src="../../js/asset/heroes/heroesAbilities2.js"></script>
+    <script src="../../js/asset/heroes/HeroAuraSystem.js"></script>
+    <script src="../../js/asset/heroes/HeroActiveAbilitySystem.js"></script>
+    <script src="../../js/asset/heroes/heroesAbilityUpgrade.js"></script>
+    <script src="../../js/asset/heroes/heroesList.js"></script>
+    <script src="../../js/asset/heroes/heroesManaSystem.js"></script>
+    
+
+    <script src="../../js/page3/mapData/map/gameLogicMap/shopHandler.js"></script>
+   
+    <script src="../../js/page3/mapData/map/gameLogicMap/gameSaveSystem.js"></script>
+    <script src="../../js/page3/mapData/map/loadingMap.js"></script> <!--завантажує карту -->
+    <script src="../../js/page3/mapData/map/gameLogicMap/healthBarSystem.js"></script> <!--система health bar -->
+
+    <script src="../../js/page3/mapData/map/loadingHeroesOnMap.js"></script> <!--завантажує героїв на карту -->
+    
+    <script src="../../js/page3/mapData/map/gameLogicMap/cellClickHandler.js"></script> <!--обробник кліку на карті -->
+    <script src="../../js/page3/mapData/map/gameLogicMap/castleClickHandler.js"></script> <!--обробник кліку на замку -->
+    <script src="../../js/page3/mapData/moveMap/moveMap.js"></script> <!--ходить по карті -->
+
+    
+    <script src="../../js/page3/mapData/map/gameLogicMap/nextTurn.js"></script> <!--наступний хід -->
+    <script src="../../js/page3/mapData/map/gameLogicMap/buyUnitsInCastle.js"></script> <!--покупка юніта в замку -->
+    <script src="../../js/page3/mapData/map/gameLogicMap/shopInfoModal.js"></script> <!--модальне вікно інформації про юніта -->
+
+
+    <script src="../../js/page3/mapData/map/gameLogicMap/unitSelection.js"></script> <!--вибір юніта -->
+    <script src="../../js/page3/mapData/map/mapData.js"></script>
+    
+    <script src="../../js/page3/mapData/battleSystem/attackSystem.js"></script> <!--система атаки -->
+    <script src="../../js/asset/units/unitVisualState.js"></script> <!--візуальний стан юнітів -->
+
+    <script src="../../js/page3/mapData/mapBtn/unitsEffectsModal.js"></script> <!--модальне вікно ефекти всіх юнітів -->
+    <script src="../../js/page3/mapData/mapBtn/heroesModal.js"></script> <!--модальне вікно ефекти героїв -->
+    <script src="../../js/page3/mapData/mapBtn/magicUnitsModal.js"></script> <!--модальне вікно ефекти всіх -->
+
+    <!-- Система прогресу юнітів -->
+    <script src="../../js/asset/units/unitProgreesSystem.js"></script>
+    <script src="../../js/asset/units/upgradesUnitsLogic/upgradesUnitsLogic.js"></script>
+    <script src="../../js/page3/mapData/map/gameLogicMap/goldHauseCapture.js"></script>
+    <script src="../../js/page3/mapData/mapBtn/nextUnitButton.js"></script> <!--кнопка "Далі" -->
+
+    
+
+
+    
+</body>
+</html>

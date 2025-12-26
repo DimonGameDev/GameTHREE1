@@ -1,0 +1,2267 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+} 
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+} 
+
+.container {
+    width: 358px;
+    height: 575px;
+    max-width: 100vw;
+    max-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    border-radius: 0;
+} 
+
+.topLine {
+    width: 100%;
+    height: 12%; 
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 2px solid rgba(109, 140, 202, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 0 5px;
+} 
+
+.window {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    background-color: #0f3460;
+}
+
+.map {
+    display: grid;
+    grid-template-columns: repeat(29, 60px);
+    grid-template-rows: repeat(29, 60px);
+    width: 1740px;
+    height: 1740px;
+    background-color: #0f3460;
+    overflow: hidden;  
+    position: absolute;
+    top: 0;
+    left: 0;
+    image-rendering: pixelated;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+} 
+
+.bottomLine {
+    width: 100%;
+    height: 12%; 
+    background: rgba(255, 255, 255, 0.95);
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    color: #000000;
+    font-size: 16px;
+    flex-shrink: 0;
+    border-top: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.bottomLine.dimmed {
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.bottomLine.dimmed .itemsBottomLine {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+@media (max-width: 500px) {
+    html, body {
+        position: fixed;
+        background-color: #000;
+    }
+    
+    .container {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+} 
+
+.cell {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; 
+    transition: none !important;
+    
+    /* 🔧 Відключення anti-aliasing для чітких країв */
+    /* image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges; */
+    
+    /* 🔧 Відключення subpixel rendering */
+    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    
+    /* 🔧 ВАЖЛИВО: overflow visible щоб червоний курсор не обрізався */
+    overflow: visible;
+    
+    /* 🔧 НЕ додаємо transform тут, тільки на .map */
+}
+
+
+.itemsTopLine {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.flagSection {
+    width: 18%;
+}
+
+.imageSection {
+    width: 18%;
+}
+
+.statsSection {
+    width: 38%;
+    gap: 3px;
+}
+
+.manaSection {
+    width: 26%;
+}
+
+.FlagColorPlayer {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 153, 153);
+    box-shadow: inset 0px 0px 8px black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.flagTopNumberPlayer {
+    font-size: 18px;
+    color: white;
+    width: 100%;
+    height: 33%;
+    margin-left: 25%;
+}
+
+.flagCenter {
+    width: 100%;
+    height: 33%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    font-size: 14px;
+    color: white;
+}
+
+.cauntNowUnits, .maxUnits {
+    font-weight: bold;
+}
+
+.flagBottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    width: 100%;
+    height: 33%;
+}
+
+.flagBottom img {
+    height: 20px;
+    width: 20px;
+    object-fit: contain;
+}
+
+.goldNumber {
+    font-weight: bold;
+}
+
+.cellImgInfo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+} 
+
+.cellImgInfo > img:first-child {
+    width: 103%;
+    height: 103%;
+    object-fit: contain;
+}
+
+.imgArmor {
+    position: absolute;
+    bottom: 0px; 
+    left: 0px;    
+    width: 25px;  
+    height: 25px;
+    object-fit: contain;
+} 
+
+.tabloPlusArmor {
+    position: absolute;
+    bottom: 2px;
+    left: 28px;   
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8); 
+} 
+
+/* Ім'я юніта */
+.unitNameBox {
+    width: 100%;
+    height: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 6px;
+    padding: 2px;
+}
+
+.daniUnitsName {
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Сітка характеристик 3x2 */
+.statsGrid {
+    width: 100%;
+    height: 68%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2px;
+}
+
+.statItem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 1px;
+}
+
+.statItem img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.statIcon {
+    font-size: 13px;
+}
+
+.statItem span:not(.statIcon) {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.statItem .daniUnitsHp,
+.statItem .daniUnitsHpNew {
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.itemsBottomLine {
+    width: 20%;
+    height: 90%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.itemsBottomLine:active {
+    transform: scale(0.95);
+}
+
+
+.manaUnits {
+    width: 100%;
+    height: 40%;
+    background-color: red;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.unitLevelNow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20%;  /* замість 10% */
+    height: 20%; /* замість 10% */
+    background-color: rgb(81, 255, 0);
+    /* Додайте ці властивості для правильного відображення тексту: */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 3px;
+    z-index: 10;
+    color: #000;
+}
+
+
+.settings {
+    width: 100%;
+    height: 60%;
+    background-color: blue;
+}
+
+
+/* МОДАЛЬНЕ ВІКНО ЕФЕКТІВ ЮНІТІВ */
+.modalEfectUnits {
+    width: 90%;
+    max-width: 400px; /* 👈 ДОДАНО */
+    height: 44vh; /* 👈 ЗМІНЕНО на vh замість % */
+    max-height: 500px; /* 👈 ДОДАНО */
+    background-color: rgba(101, 93, 207, 0.95);
+    border-radius: 10px;
+    position: absolute; /* 👈 ЗМІНЕНО з absolute на fixed */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; /* 👈 ПІДВИЩЕНО */
+    display: none;
+    
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    overflow: hidden;
+    
+    /* 👇 ДОДАНО - блокування подій */
+    pointer-events: all;
+
+}
+
+.modalEfectUnits img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Backdrop для модального вікна ефектів юнітів */
+.modalEfectUnits-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    pointer-events: all; 
+    touch-action: none; /* 👈 ДОДАЙТЕ - блокує всі touch жести */
+    overscroll-behavior: contain;
+}
+
+.modalEfectUnits-backdrop.active {
+    display: block;
+}
+
+.modEfeUnitsTopLine {
+    width: 100%;
+    height: 10%;
+    background-color: rgb(29, 25, 241);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    
+}
+
+.BoxModEfeUnitsTopLineClose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15%;
+    height: 100%;
+}
+
+.BoxModEfeUnitsTopLineClose img {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.modEfeUnitsItemsContainer {
+    width: 100%;
+    height: calc(100% - 60px); /* 👈 Віднімаємо висоту топ-лінії */
+    min-height: 0;
+    background-color: blue;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    
+    /* Для мобільних */
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    
+}
+
+.modEfeUnitsItems {
+    width: 100%;
+    min-height: 150px; /* 👈 ЗМІНЕНО з height: 40% */
+    height: auto; /* 👈 ДОДАНО */
+    background-color: yellow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 1px solid black;
+    flex-shrink: 0;
+}
+
+.modEfeUnitsItemsTitle {
+    width: 100%;
+    height: 20%;
+    background-color: rgb(194, 132, 132);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.modEfeUnitsItemsTitle img {
+    height: 100%;
+    width: 15%;
+    object-fit: cover;
+}
+
+.modEfeUnitsItmsColdwin {
+    width: 10%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.modEfeUnitsItemsDescription {
+    width: 100%;
+    height: 80%;
+    background-color: rgb(75, 163, 79);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+}
+
+
+.modalEfectHeroes-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    pointer-events: all; 
+    touch-action: none;
+    overscroll-behavior: contain;
+}
+
+.modalEfectHeroes-backdrop.active {
+    display: block;
+}
+
+/* МОДАЛЬНЕ ВІКНО ЕФЕКТІВ ГЕРОЇВ */
+.modalEfectHeroes {
+    width: 29%;
+    max-width: 345px;
+    height: 45vh;  /* Змінено на vh для кращої роботи на мобільних */
+    max-height: 430px;
+    background-color: rgba(101, 93, 207, 0.95);
+    border-radius: 10px;
+    position: fixed;  /* ЗМІНЕНО з absolute на fixed */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;  /* ДОДАНО */
+    pointer-events: all;  /* ДОДАНО */
+    
+    /* Для мобільних */
+    overscroll-behavior: contain;
+}
+
+.modEfeHeroesTopLine {
+    width: 100%;
+    height: 10%;
+    background-color: rgba(50, 50, 100, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    border-bottom: 1px solid black;
+}
+
+.modEfeHerShoseHeroes {
+    width: 42%;
+    height: 100%;
+    background-color: transparent; /* Змінено з blue на transparent */
+    display: flex;
+    border: 1px solid black;
+}
+
+.modEfeHerNameHeroes {
+    flex: 1;  /* Займає доступний простір */
+    text-align: center;
+    white-space: nowrap;  /* Не переносить текст */
+    overflow: hidden;
+    text-overflow: ellipsis;  /* Додає ... якщо текст довгий */
+    padding: 0 10px;
+}
+
+.modEfeHerShoseHeroes img {
+    width: 33%;
+    height: 100%;
+    object-fit: contain; /* Змінено з cover на contain, щоб зображення не обрізалось */
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Додано рамку для кращої видимості */
+}
+
+.BoxModEfeHeroesTopLineClose {
+    width: 15%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.BoxModEfeHeroesTopLineClose img {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+.modEfeHerCenterLine {
+    width: 100%;
+    height: 33%;
+    background-color: green;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modEfeHerCenterLeft {
+    width: 42%;
+    height: 100%;
+    background-color: rgb(231, 164, 164);
+}
+
+.modEfeHerCenterLeft img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modEfeHerCenterRight {
+    width: 58%;
+    height: 100%;
+    background-color: blue;
+    display: flex;
+    flex-direction: column;
+}
+
+.modEfeHerCenterRightTop {
+    width: 100%;
+    height: 33%;
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  
+}
+
+.modEfeHerItemStep {
+    width: 50%;
+    height: 100%;
+    border-right: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modEfeHerCenterRightCenter {
+    width: 100%;
+    height: 33%;
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.modEfeHerItemAttack {
+    width: 25%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #000;
+}
+.modEfeHerItemAttack img {
+    height: 60%;
+    object-fit: cover;
+}
+
+.modEfeHerItemHp {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #000;
+}
+
+.modEfeHerItemHp img {
+    height: 60%;
+    object-fit: cover;
+}
+
+.modEfeHerItemArmor {
+    width: 25%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #000;
+}
+
+.modEfeHerItemArmor img {
+    height: 60%;
+    object-fit: cover;
+}
+
+.modEfeHerCenterRightBottom {
+    width: 100%;
+    height: 33%;
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modEfeHerItemCriticalStrike {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #000;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.modEfeHerItemCriticalBlow {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #000;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.modEfeHerTextLineDescription {
+    display: flex;
+    align-items: start;
+    justify-content: flex-start;  /* Змінено з center */
+    flex-direction: column;
+    
+    /* ДОДАЙТЕ ЦІ РЯДКИ для скролу: */
+    overflow-y: auto;  /* Додає вертикальний скрол при переповненні */
+    max-height: 100%;  /* Обмежує висоту розміром батьківського елементу */
+    padding: 5px 10px; /* Відступи для тексту від країв */
+    
+    /* Опціонально - стилізація скролбару: */
+    scrollbar-width: thin;  /* Для Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;  /* Для Firefox */
+}
+
+/* Стилізація скролбару для Chrome/Safari */
+.modEfeHerTextLineDescription::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modEfeHerTextLineDescription::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modEfeHerTextLineDescription::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.modEfeHerTextLineDescription::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.typeAbility {
+    font-size: 23px;
+    font-weight: bold;
+    color: rgb(218, 104, 96);
+}
+
+.modEfeHerTextLine {
+    width: 100%;
+    height: 25%;
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    color: white;
+    border-bottom: 1px solid black;
+}
+
+.modEfeHerTextLineTitle {
+    width: 100%;
+    height: 40%;
+    background-color: red;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.modEfeHerTextLineTitleImg {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: start;
+}
+.modEfeHerTextLineTitleImg img {
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.modEfeHerTextLineTitle span {
+    width: 50%;
+    height: 100%;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modEfeHerTextLineBottom {
+    width: 100%;
+    height: 32%;
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;      
+    overflow-x: hidden;
+    flex-shrink: 0;
+}
+
+.modEfeHerLinBotItem {
+    width: 100%;
+
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+}
+
+.modEfeHerLinBotItemTop {
+    width: 100%;
+
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+
+    font-weight: bold;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modEfeHerActiveBtn {
+    width: 50%;
+    height: 100%;
+    background-color: green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+.modEfeHerLinBotItemBottomText {
+    width: 100%;
+
+    background: linear-gradient(to right, #00d4ff, #7b2ff7, #f107a3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+   
+}
+
+.btnBuyCastle {
+    width: 12%;
+    height: 10%;
+    background-color: red;
+    position: absolute;
+    left: 7%;
+    bottom: 5%;
+    display: none;
+    z-index: 20;
+    }
+
+
+    /* -------------------------------------------- */
+.btnBuyCastle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+.ModalBtnBuyUnits {
+    width: 25%;
+    height: 50px;
+    position: absolute;
+    z-index: 20;
+    left: 17%;
+    transform: translateX(-50%);
+    bottom: 50%;
+    display: none;
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.ModalBtnBuyUnits:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.ModalBtnBuyUnits:active {
+    transform: translateX(-50%) translateY(0);
+}
+
+.topLineBtnBuyUnits {
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.modalBtnBuyUnitsName {
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* МОДАЛЬНЕ ВІКНО МАГАЗИНУ */
+.ModalWindowsShop {
+    width: 100%;
+    height: 400%;
+    background-color: green;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    display: none;
+
+}
+
+.modalTopLine {
+    width: 100%;
+    height: 20%;
+    background-color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 3px solid white;
+    }
+
+.modalBtnLineInfo {
+    width: 20%;
+    height: 100%;
+    background-color: rgb(15, 194, 158);
+}
+        
+.modalNameRace {
+    width: 40%;
+    height: 100%;    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 500;
+    color: white;
+}
+
+.modalBtnLineClose {
+    width: 20%;
+    height: 100%;
+    background-color: rgb(15, 194, 158);
+
+}
+
+.modalBottomLine {
+    width: 100%;
+    height: 80%;
+    background-color: rgb(70, 130, 79);
+    display: flex;
+     
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+   
+    overscroll-behavior-x: none;   
+    overscroll-behavior-y: none;
+}
+
+.scrollWrapper {
+    height: 97%;
+    width: 100%;
+    display: flex;
+    flex-shrink: 0;
+    /* background-color: rgb(142, 199, 146); */
+    /* border: 3px solid white; */
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 10px;
+    gap: 10px;
+}
+
+.modalItem {
+    width: 135px;
+    height: 97%;
+    background-color: green;
+    border: 1px solid red;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* margin-right: 10px; */
+    position: relative;
+}
+
+
+.unitNameModal {
+    width: 90%;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    padding: 4px;
+    background: rgba(102, 126, 234, 0.15);
+    border-radius: 4px;
+    margin: 3px 0;
+}
+
+.statsModalGrid {
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 3px;
+    margin-bottom: 5px;
+}
+
+.statModalItem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    padding: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.statModalItem img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+}
+
+.statModalItem.gold {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    grid-column: span 3;
+}
+
+.modalItem.selected {
+    box-shadow: inset 0px 0px 14px black;
+    background-color: rgba(250, 249, 246, 0.7);
+    border: 1px solid white;
+}
+   
+   
+.modalItem:hover {
+   box-shadow: inset 0px 0px 14px black;
+   background-color: rgba(250, 249, 246, 0.7);
+   border: 1px solid white;
+}
+
+.imgBoxModal {
+    width: 80%;
+    height: 45%;
+    text-align: center;
+    }
+    
+    .imgBoxModal img {
+        width: 100%;
+    height: 100%;
+    object-fit: contain;
+    }
+    
+    .TEXTmodalBox {
+    width: 100%;
+    height: 35%;
+    display: flex;
+    }
+    
+    .textBoxModalLeft {
+    width: 60%;
+    height: 100%;
+    background-color: yellow;
+    }
+    
+    .textBoxModalRight {
+    width: 40%;
+    height: 100%;
+    background-color: gray;
+    }
+    
+.textModal {
+    width: 100%;
+    height: 33%;
+    background-color: rgb(208, 199, 199);
+    display: flex;
+    /* align-items: center; */
+    justify-content: space-between;
+}
+
+.textModal span {
+    margin-right: 10%;
+    /* width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center; */
+}
+    
+.modalArmor img {
+    width: 30%;
+    height: 100%;
+}
+    
+.modalCoin {
+    width: 60%;
+    height: 20%;
+    font-size: 32px;
+    font-weight: 600;display: flex;
+    justify-content: center;
+    align-items: center;
+    
+} 
+
+/* -------------------------------------------- */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6);
+    z-index: 30;
+    display: none; 
+  }
+
+/* модальне вікно інформації про ЮНІТІВ */
+/* модальне вікно інформації про ЮНІТІВ */
+/* модальне вікно інформації про ЮНІТІВ */
+/* модальне вікно інформації про ЮНІТІВ */
+.ModalInfoUnits {
+    /* Базові стилі для мобільних - залишаємо великим */
+    width: 95%;
+    height: 96%;
+    background-color: rgba(52, 221, 14, 0.9);
+    border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 60;
+    display: none;
+    align-items: center;
+    flex-direction: column;
+    touch-action: none;
+}
+
+/* Для планшетів - трохи менше */
+@media (min-width: 481px) and (max-width: 768px) {
+    .ModalInfoUnits {
+        width: 85%;
+        height: 90%;
+        max-width: 600px;
+    }
+}
+
+/* Для малих десктопів та великих планшетів */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .ModalInfoUnits {
+        width: 70%;
+        height: 85%;
+        max-width: 700px;
+        max-height: 650px;
+    }
+}
+
+/* Для звичайних десктопів - компактніше */
+@media (min-width: 1025px) {
+    .ModalInfoUnits {
+        width: 450px;  /* Фіксована ширина як на мобільному */
+        height: 650px; /* Фіксована висота */
+        max-width: 90vw; /* Але не більше 90% екрану */
+        max-height: 90vh;
+        border-radius: 15px;
+    }
+}
+
+/* Для великих десктопів - можна трохи більше */
+@media (min-width: 1440px) {
+    .ModalInfoUnits {
+        width: 500px;
+        height: 700px;
+    }
+}
+
+.LineNameRace {
+    width: 100%;
+    height: 7%;
+    background-color: green;
+    display: flex;
+   }
+   
+   .arrowLeft, .arrowRight {
+    width: 20%;
+    height: 100%;
+    background-color: red;
+   }
+   
+   .nameRase {
+    width: 45%;
+    height: 100%;
+    background-color: gray;
+    font-size: 30px;
+    font-weight: 600;
+    display: flex;
+     align-items: center;
+     justify-content: center;
+   }
+   
+   .closeWindows {
+    width: 15%;
+    height: 100%;
+    background-color: green;
+   }
+   
+   .topContainer {
+    width: 100%;
+    height: 25%;
+    background-color: green;
+    border-top: 2px solid white;
+    display: flex;
+   }
+   
+   .boxImg {
+    width: 40%;
+    height: 100%;
+    background-color: red;
+   }
+   
+   .boxImg img {
+    height: 100%;
+    width: 100%;
+   }
+   
+   .boxNameText {
+    width: 60%;
+    height: 100%;
+    background-color: gray;
+    display: flex;
+     align-items: center;
+     justify-content: center;
+    flex-direction: column;
+    box-sizing: border-box;
+    
+   }
+   
+   .boxNameUnit {
+    width: 100%;
+    height: 20%;
+    background-color: red;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+   }
+   
+   /* .arrowLeftUnits {
+    width: 25%;
+    height: 100%;
+    background-color: #333;
+   } */
+   
+   .nameUnits {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(149, 149, 220);
+    display: flex;
+     align-items: center;
+     justify-content: center;
+    font-size: 25px;
+   }
+   
+   /* .arrowRightUnits {
+    width: 25%;
+    height: 100%;
+   } */
+   
+   .textUnit {
+    width: 100%;
+    height: 80%;
+    background-color: green;
+    display: flex;
+     align-items: center;
+     justify-content: center;
+    flex-direction: column;
+    
+   }
+   
+   .dani {
+    width: 100%;
+    height: 19%;
+    background-color: yellow;
+    /* border: 1px solid #999; */
+    box-sizing: border-box;
+   }
+   
+   .centerContainer {
+    width: 100%;
+    height: 15%;
+    background-color: gray;
+    border-top: 2px solid white;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+   }
+   
+   .BazaEfect {
+    width: 24%;
+    height: 80%;
+    background-color: green;
+    border-right: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5%;
+    margin-left: 3%;
+    box-shadow: 0px 5px 5px #333;
+    letter-spacing: -1px;
+    line-height: 0.9;
+    cursor: pointer;
+   }
+   
+   
+   
+   .discripText {
+    width: 76%;
+    height: 100%;
+   }
+   
+   .bottomContainer {
+    width: 100%;
+    height: 50%;
+    background-color: rgb(125, 232, 106);
+    border: 2px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    
+    overflow-y: scroll; /* scroll замість auto для кращої роботи на iOS */
+    overflow-x: hidden;
+    
+ }
+   
+   
+   .leftSide, .rightSide {
+     width: 49%;
+     height: 100%;
+     background-color: green;
+     border-left: 1px solid black;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     /* overflow-y: auto;  
+     overflow-x: hidden; */
+   
+   }
+   
+   .nextLevel {
+     width: 90%;
+     min-height: 140px; /* замість відсотків */
+     background-color: gray;
+     border: 2px solid black;
+     margin: 10px 0; 
+    display: flex;
+     flex-direction: column;
+    justify-content: space-between;
+    border-radius: 5%;
+    overflow: hidden;
+   }
+   
+   .changeNextLevel {
+    box-shadow: 0px 0px 20px black;
+    border: 4px solid black;
+   }
+   
+   .lineNameMagic {
+    width: 100%;
+    height: 25%;
+    background-color: white;
+    display: flex;
+   }
+   
+   .imgBoxLevel {
+    width: 20%;
+    /* aspect-ratio: 1 / 1; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.imgBoxLevel img {
+    /* width: 100%; */
+    height: 100%;
+    object-fit: cover;
+}
+   
+   .nameNextLevel {
+    width: 60%;
+    height: 100%;
+    background-color: yellow;
+    display: flex;
+     align-items: center;
+     justify-content: center;
+    font-size: 15px;
+   }
+   
+   .numberLevel {
+    width: 20%;
+    height: 100%;
+    display: flex;
+     align-items: center;
+     justify-content: center;
+    font-size: 17px;
+   }
+   
+   .discriptionLevel {
+    width: 100%;
+    height: 75%;
+    background-color: grey;
+    border-top: 2px solid black;
+   }
+   
+   .modalBazaMethods {
+    width: 65%;
+    height: 40%;
+    
+    border-radius: 4%;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow-y: auto;     /* вмикає вертикальний скрол */
+    overflow-x: hidden;
+    z-index: 11;
+    display: none;
+   }
+   
+   .overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100vw;
+     height: 100vh;
+     background: rgba(0,0,0,0.6);
+     z-index: 10;
+     display: none; /* по замовчуванню приховано */
+   }
+   
+   .BazaCloseModal {
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    z-index: 11;
+    display: none;
+    border-radius: 8%;
+   }
+   
+   .boxBazaMethods {
+    width: 100%;
+    display: flex;
+     align-items: center;
+     justify-content: flex-start;
+    flex-direction: column;
+    overflow-y: auto;     /* вмикає вертикальний скрол */
+    overflow-x: hidden;   /* ховає горизонтальний */
+    z-index: 5;
+   }
+   
+   .bazaContent {
+    width: 99%;
+    height: 100px;
+    background-color: yellow;
+    border: 2px solid red; 
+    display: flex;
+   }
+   
+   .imgBazaBox {
+    width: 24%;
+    height: 90%;
+    
+   }
+   
+   .imgBazaBox img{
+    width: 100%;
+    height: 70%;
+   }
+   
+   .bazaTextAndName {
+    width: 76%;
+    height: 100%;
+    background-color: green;
+    display: flex;
+     align-items: center;
+     justify-content: center;
+    flex-direction: column;
+   }
+   
+   .bazaName {
+    width: 100%;
+    height: 20%;
+    background-color: yellow;
+    text-align: center;
+   }
+   
+   .bazaText {
+    width: 100%;
+    height: 80%;
+    background-color: red;
+    text-align: center;
+   }
+   
+   .activationUpgrades {
+     width: 35%;
+     height: 5%;
+     background-color: #ff9999;
+     display: flex;
+   }
+   
+   .activationUpgradesCoin {
+     /* width: 30%; */
+     height: 100%;
+     background-color: #b1c027;
+     font-size: 20px;
+     font-weight: 600;
+     color: rgb(0, 0, 0);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     
+     cursor: pointer;
+   }
+   
+   .activationUpgradesBtn {
+     /* width: 70%; */
+     height: 100%;
+     background-color: #2ad200;
+     font-size: 20px;
+     font-weight: 600;
+     color: rgb(0, 0, 0);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     cursor: pointer;
+   }
+
+   /* МОДАЛЬНЕ ВІКНО ЕФЕКТІВ ВСІХ */
+   .ModalMagicUnits {
+    width: 20%;
+    height: 50%;
+    background-color: rgba(101, 93, 207, 0.9);
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    z-index: 3;
+    display: none;  /* ⬅️ Тільки це залишити */
+    align-items: center;
+    /* justify-content: center; */
+    flex-direction: column;
+   }
+
+
+   .modMagicItem {
+    width: 100%;
+    height: 25%;
+    background-color: red;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+   }
+
+ .modMagicItem img {
+    height: 90%;
+    object-fit: cover;
+ }
+
+ .modMagicBoxText {
+    position: absolute;  /* ⬅️ ЗМІНЕНО: fixed замість absolute */
+    bottom: 23%;
+    left: 58%;  /* ⬅️ ЗМІНЕНО: центруємо */
+    transform: translateX(-50%);  /* ⬅️ ДОДАНО: центрування */
+    width: 63%;  /* ⬅️ ЗМІНЕНО: адаптивна ширина */
+    max-width: 320px;  /* ⬅️ ДОДАНО: максимальна ширина */
+    height: 30%;
+    max-height: 180px;  /* ⬅️ ДОДАНО: максимальна висота */
+    background-color: green;
+    border: 1px solid black;
+    display: none;
+    flex-direction: column;
+    z-index: 2000;  /* ⬅️ ПІДВИЩЕНО: щоб було поверх всього */
+}
+
+/* Для мобільних пристроїв */
+/* @media (max-width: 500px) {
+    .modMagicBoxText {
+        width: 85vw;
+        height: 25vh;
+        bottom: 15%;
+        max-width: none;
+    }
+} */
+ .modMagicBoxTextTitle {
+    width: 100%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: yellow;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+ }
+
+ .ModMagicNumberLevel {
+    width: 20%;
+    height: 100%;
+    background-color: red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+ }
+
+ .ModMagicNameNextLevel {
+    width: 60%;
+    height: 100%;
+    background-color: blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+ }
+
+ .ModMagicCloseModalMagic {
+    width: 20%;
+    height: 100%;
+    background-color: green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+ }
+ .ModMagicCloseModalMagic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+ }
+
+ .modMagicBoxTextDescription {
+    width: 100%;
+    height: 80%;
+    background-color: rgb(0, 255, 26);
+    text-align: left;  /* ⬅️ ЗМІНЕНО: ліворуч для зручності читання */
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;  /* ⬅️ ДОДАНО: відступи щоб текст не прилипав */
+    overflow-y: auto;  /* ⬅️ ДОДАНО: вертикальний скрол */
+    overflow-x: hidden;  /* ⬅️ ДОДАНО: без горизонтального скролу */
+    box-sizing: border-box;  /* ⬅️ ДОДАНО: щоб padding не розширював елемент */
+    word-wrap: break-word;  /* ⬅️ ДОДАНО: перенос довгих слів */
+ }
+
+ /* МОДАЛЬНЕ ВІКНО ЕФЕКТІВ ВСІХ , ВІКНО З ПРАВА */
+ .ModalMagicCentralBox {
+    width: 70%;
+    height: 40%;
+    background-color: rgba(101, 93, 207, 0.9);
+    position: absolute;
+    bottom: 13%;
+    right: 7%;
+    z-index: 2;
+    display: none;
+   }
+
+/* КНОПКА АКТИВАЦІЇ ВІКНА ЕФЕКТА */
+   .BtnModalMagicCentralActive {
+    width: 60%;
+    height: 20%;
+    background-color: red;
+    border: 1px solid black;
+    position: absolute;
+    bottom: -25%;
+    right: 50%;
+    transform: translateX(50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    z-index: 2;
+   }
+
+   .ModalMagicCentralBoxTopLine {
+    width: 100%;
+    height: 20%;
+    background-color: red;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+   }
+
+   .ModMagicCenNumLevel {
+    margin-left: 5%;
+   }
+
+   .ModMagicCenBottomLine {
+    width: 100%;
+    height: 80%;
+    background-color: blue;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    font-size: 20px;
+    color: white;
+   }
+
+/* ВИБІР ЮНІТА НА КАРТІ */
+
+.moveCellMap {
+    background-color: rgba(255, 255, 0, 0.5) !important;
+    border: 1px solid yellow !important;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 50px rgba(255, 255, 0, 0.5) !important;
+    
+    /* 🔧 ДОДАНО: Чіткий рендеринг border на мобільних */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+.moveCellMap:hover {
+    background-color: rgba(255, 255, 0, 0.7) !important; /* ⬅️ ЗМІНІТЬ на жовтий */
+}
+/* --------------------------------------------------------------------------- */
+/* Виділення вибраного юніта */
+/* Виділення вибраного юніта */
+/* Виділення вибраного юніта - пунктирна обводка ЗОВНІ */
+/* Виділення вибраного юніта - кути як в Age of Empires */
+.cell.selected-unit {
+    position: relative;
+}
+
+.cell.selected-unit::before {
+    content: '';
+    position: absolute;
+    top: 0;    /* 🔧 ЗМІНЕНО: 0 замість -5px */
+    left: 0;   /* 🔧 ЗМІНЕНО: 0 замість -5px */
+    right: 0;  /* 🔧 ЗМІНЕНО: 0 замість -5px */
+    bottom: 0; /* 🔧 ЗМІНЕНО: 0 замість -5px */
+    
+    /* 🔧 Використовуємо кути ВСЕРЕДИНІ клітинки */
+    background:
+        linear-gradient(to right, red 0%, red 100%) 0 0 / 20px 4px no-repeat,
+        linear-gradient(to bottom, red 0%, red 100%) 0 0 / 4px 20px no-repeat,
+        linear-gradient(to left, red 0%, red 100%) 100% 0 / 20px 4px no-repeat,
+        linear-gradient(to bottom, red 0%, red 100%) 100% 0 / 4px 20px no-repeat,
+        linear-gradient(to right, red 0%, red 100%) 0 100% / 20px 4px no-repeat,
+        linear-gradient(to top, red 0%, red 100%) 0 100% / 4px 20px no-repeat,
+        linear-gradient(to left, red 0%, red 100%) 100% 100% / 20px 4px no-repeat,
+        linear-gradient(to top, red 0%, red 100%) 100% 100% / 4px 20px no-repeat;
+    
+    pointer-events: none;
+    z-index: 20;
+}
+
+
+
+/* КНОПКА ЗАХОПИТИ ХАТКУ ЗОЛОТА */
+.BtnActiveHauseGoldCapture {
+    position: absolute;
+    right: 7%;
+    top: -84%;
+    width: 25%;
+    height: 55%;
+    background-color: rgb(21, 0, 255);
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    z-index: 2;
+    border-radius: 6%;
+    display: none;
+}
+
+
+/* КНОПКА ЗАКІНЧИТИ ХІД ЦИМ ЮНІТОМ */
+.BtnActiveUnitEndTurn {
+    position: absolute;
+    left: 7%;
+    top: -84%;
+    width: 40%;
+    height: 77%;
+    display: none; /* За замовчуванням схована */
+    cursor: pointer;
+    background: linear-gradient(145deg, #2c3e50, #34495e);
+    border: 2px solid #95a5a6;
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    /* display: flex; */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    /* display: none; */
+}
+
+.BtnActiveUnitEndTurn:hover {
+    background: linear-gradient(145deg, #34495e, #3d566e);
+    border-color: #ecf0f1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.BtnActiveUnitEndTurn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+/* ==================== АДАПТИВНІСТЬ ДЛЯ МОДАЛЬНИХ ВІКОН ==================== */
+
+
+
+/* Вікно магазину (Shop Modal) */
+@media (max-width: 768px) {
+    /* Модальне вікно інформації про юнітів */
+    .ModalInfoUnits {
+        width: 95%;
+        height: 97%;
+        border-radius: 8px;
+    }
+    
+    .LineNameRace {
+        height: 50px;
+        min-height: 50px;
+    }
+    
+    .nameRase {
+        font-size: 22px;
+    }
+    
+    /* ✅ Залишаємо горизонтальну компоновку */
+    .topContainer {
+        height: 25%;
+        min-height: 140px;
+        /* НЕ додаємо flex-direction: column! */
+    }
+    
+    /* ✅ Картинка залишається 40% ширини */
+    .boxImg {
+        width: 40%;
+        height: 100%;
+    }
+    
+    .boxNameText {
+        width: 60%;
+        height: 100%;
+        padding: 5px;
+    }
+    
+    .nameUnits {
+        font-size: 18px;
+    }
+    
+    .dani {
+        font-size: 13px;
+        padding: 4px;
+        min-height: 22px;
+    }
+    
+    .centerContainer {
+        height: auto;
+        min-height: 60px;
+        padding: 10px 5px;
+    }
+    
+    .BazaEfect {
+        font-size: 11px;
+        padding: 5px;
+    }
+    
+    .bottomContainer {
+        height: auto;
+        flex: 1;
+        min-height: 200px;
+    }
+    
+    .nextLevel {
+        min-height: 90px;
+        margin: 5px 0;
+    }
+    
+    .lineNameMagic {
+        height: 30%;
+    }
+    
+    .nameNextLevel {
+        font-size: 12px;
+    }
+    
+    .numberLevel {
+        font-size: 13px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    /* Модальне вікно інформації про юнітів */
+    .ModalInfoUnits {
+        width: 80%;
+        height: 80%;
+        border-radius: 8px;
+    }
+    
+    .LineNameRace {
+        height: 45px;
+        min-height: 45px;
+    }
+    
+    .arrowLeft, .arrowRight {
+        width: 22%;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .nameRase {
+        width: 40%;
+        font-size: 16px;
+    }
+    
+    .closeWindows {
+        width: 16%;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* ✅ Залишаємо горизонтальну компоновку */
+    .topContainer {
+        height: 22%;
+        min-height: 120px;
+        /* НЕ додаємо flex-direction: column! */
+    }
+    
+    /* ✅ Картинка залишається 40% ширини */
+    .boxImg {
+        width: 40%;
+        height: 100%;
+    }
+    
+    .boxNameText {
+        width: 60%;
+    }
+    
+    .boxNameUnit {
+        height: 25px;
+        min-height: 25px;
+    }
+    
+    .nameUnits {
+        font-size: 15px;
+    }
+    
+    .dani {
+        height: auto;
+        min-height: 20px;
+        font-size: 11px;
+        padding: 2px 4px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .centerContainer {
+        min-height: 45px;
+        font-size: 11px;
+        padding: 5px;
+    }
+    
+    .BazaEfect {
+        width: 30%;
+        font-size: 9px;
+        line-height: 1.1;
+        text-align: center;
+        padding: 3px;
+    }
+    
+    .discripText {
+        width: 68%;
+        font-size: 11px;
+    }
+    
+    .bottomContainer {
+        min-height: 150px;
+        padding: 5px 0;
+    }
+    
+    .nextLevel {
+        min-height: 160px;
+        margin: 3px 0;
+        width: 95%;
+    }
+    
+    .lineNameMagic {
+        height: 35%;
+    }
+    
+    .imgBoxLevel {
+        width: 25%;
+    }
+    
+    .nameNextLevel {
+        width: 55%;
+        font-size: 10px;
+        line-height: 1.1;
+    }
+    
+    .numberLevel {
+        width: 20%;
+        font-size: 11px;
+    }
+    
+    .discriptionLevel {
+        
+        font-size: 10px;
+        padding: 2px;
+    }
+}
+
+/* Модальне вікно ефектів юнітів */
+@media (max-width: 768px) {
+    .modalEfectUnits {
+        width: 90%;
+        max-width: 400px;
+    }
+    
+    .modEfeUnitsTopLine {
+        font-size: 18px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modalEfectUnits {
+        width: 95%;
+        max-width: none;
+    }
+    
+    .modEfeUnitsTopLine {
+        font-size: 16px;
+        padding: 8px;
+    }
+    
+    .modEfeUnitsItems {
+        font-size: 12px;
+    }
+}
+
+/* Модальне вікно героїв */
+@media (max-width: 768px) {
+    .modalEfectHeroes {
+        width: 90%;
+        max-width: 500px;
+        height: 75vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .modalEfectHeroes {
+        width: 95%;
+        max-width: none;
+        height: 80vh; 
+    }
+    
+    .modEfeHeroesTopLine {
+        height: auto;
+        min-height: 70px;  /* Збільшено для мобільних */
+        padding: 8px;
+        font-size: 16px;  /* ДОДАНО - менший шрифт */
+    }
+    
+    .modEfeHerShoseHeroes {
+        width: 35%;  /* ДОДАНО - зменшено ширину на мобільних */
+    }
+    
+    .modEfeHerNameHeroes {
+        font-size: 14px;  /* ДОДАНО - менший шрифт для назви */
+    }
+}
+
+/* Покращення читабельності на малих екранах */
+@media (max-width: 480px) {
+    /* Збільшуємо зони натискання для мобільних */
+    .arrowLeft, .arrowRight, .closeWindows,
+    .modalBtnLineInfo, .modalBtnLineClose {
+        min-height: 44px; /* Рекомендована мінімальна висота для touch targets */
+        cursor: pointer;
+    }
+    
+    /* Покращуємо відступи для кращого читання */
+    .textUnit {
+        padding: 5px;
+    }
+    
+    /* Оптимізація скролу для мобільних */
+    .bottomContainer {
+        -webkit-overflow-scrolling: touch; /* Плавний скрол для iOS */
+        scroll-behavior: smooth;
+    }
+}
+
+/* Ландшафтна орієнтація для мобільних */
+@media (max-width: 768px) and (orientation: landscape) {
+    .ModalInfoUnits {
+        height: 100%;
+    }
+    
+    .topContainer {
+        flex-direction: row; /* Повертаємо горизонтальну орієнтацію */
+        height: 35%;
+    }
+    
+    .boxImg {
+        width: 40%;
+        height: 100%;
+    }
+    
+    .boxNameText {
+        width: 60%;
+    }
+    
+    .bottomContainer {
+        height: 45%;
+    }
+}
+
+
+/* ============================================ */
+/* ВИДІЛЕННЯ ЮНІТІВ АКТИВНОГО ГРАВЦЯ */
+/* ============================================ */
+
+/* Всі юніти за замовчуванням (чужі) - трохи затемнені */
+/* ============================================ */
+/* ПІДСВІЧУВАННЯ КЛІТИНОК ПІД ЮНІТАМИ АКТИВНОГО ГРАВЦЯ */
+/* ============================================ */
+
+/* Базові стилі юнітів - без змін */
+/* Базові стилі юнітів - без змін */
+.cellPlayer {
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9))
+            drop-shadow(0 0 6px rgba(0, 0, 0, 0.7));
+    /* transition: all 0.3s ease; */ /* <-- закоментуйте або видаліть цей рядок */
+}
+
+/* Клітинки під юнітами активного гравця - ледь помітне біле світіння */
+.cell.active-player-cell {
+    box-shadow: inset 0 0 17px 4px rgba(255, 255, 255, 0.5);
+    transition: none !important; 
+}
+
+/* 🔧 ДОДАНО: Відключаємо box-shadow на мобільних */
+@media (max-width: 768px) {
+    .cell.active-player-cell {
+        box-shadow: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Якщо юніт вибраний - червоні кути поверх світіння */
+.cell.selected-unit.active-player-cell::before {
+    z-index: 12;
+}
