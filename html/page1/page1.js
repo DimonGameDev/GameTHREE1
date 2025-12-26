@@ -26,6 +26,7 @@ function textBlock() {
 
 
 //тут перехід на наступну сторінку
+//тут перехід на наступну сторінку
 btNlocalGame.onclick = () => {
- window.location.href = "../page2/page2_2.html"
-}
+    window.location.href = "/GameTHREE1/html/page2/page2_2.html"
+  }
