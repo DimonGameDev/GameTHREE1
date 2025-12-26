@@ -8,15 +8,17 @@
     "theme_color": "#000000",
     "orientation": "portrait",
     "icons": [
-      {
-        "src": "/GameTHREE1/img/image.jpg",
-        "sizes": "192x192",
-        "type": "image/jpeg"
-      },
-      {
-        "src": "/GameTHREE1/img/image.jpg",
-        "sizes": "512x512",
-        "type": "image/jpeg"
-      }
-    ]
+  {
+    "src": "/GameTHREE1/img/image.jpg",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "any maskable"
+  },
+  {
+    "src": "/GameTHREE1/img/image.jpg",
+    "sizes": "512x512", 
+    "type": "image/png",
+    "purpose": "any maskable"
+  }
+]
   }
