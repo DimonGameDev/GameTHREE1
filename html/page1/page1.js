@@ -27,5 +27,5 @@ function textBlock() {
 
 //тут перехід на наступну сторінку
 btNlocalGame.onclick = () => {
- window.location.href = "../page2/page2.html"
+ window.location.href = "../page2/page2_2.html"
 }
