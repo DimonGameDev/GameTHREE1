@@ -35,7 +35,19 @@
 
 
   <script src="page1.js"></script>
-	
+	<script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/GameTHREE1/service-worker.js')
+          .then((registration) => {
+            console.log('✅ Service Worker зареєстровано:', registration);
+          })
+          .catch((error) => {
+            console.log('❌ Помилка реєстрації Service Worker:', error);
+          });
+      });
+    }
+  </script>
 	
  </body>
 
