@@ -62,32 +62,7 @@ function initSettingsModal() {
         });
     }
     
-    // 2. ЗАВАНТАЖИТИ ГРУ
-    const loadGameBtn = document.querySelector('#loadGameBtn');
-    if (loadGameBtn) {
-        loadGameBtn.addEventListener('click', () => {
-            console.log('📂 Натиснуто "Завантажити гру"');
-            
-            if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
-                const confirm = window.confirm(
-                    '⚠️ УВАГА!\n\n' +
-                    'Завантаження збереженої гри перезапише поточний прогрес.\n\n' +
-                    'Продовжити?'
-                );
-                
-                if (confirm) {
-                    // Перезавантажуємо сторінку з параметром
-                    window.location.href = 'page3.html?loadSave=true';
-                }
-            } else {
-                alert('❌ Немає збереженої гри!');
-            }
-            
-            settingsModal.classList.remove('active');
-        });
-    }
-    
-    // 3. НОВА ГРА
+    // 2. НОВА ГРА
     const newGameBtn = document.querySelector('#newGameBtn');
     if (newGameBtn) {
         newGameBtn.addEventListener('click', () => {
@@ -97,7 +72,7 @@ function initSettingsModal() {
                 '⚠️ УВАГА!\n\n' +
                 'Розпочати нову гру?\n\n' +
                 'Поточний прогрес буде втрачено.\n' +
-                '(Збережена гра залишиться)'
+                '(Не забудьте зберегти!)'
             );
             
             if (confirm) {
@@ -109,7 +84,7 @@ function initSettingsModal() {
         });
     }
     
-    // 4. ВИХІД В МЕНЮ
+    // 3. ВИХІД В МЕНЮ
     const exitGameBtn = document.querySelector('#exitGameBtn');
     if (exitGameBtn) {
         exitGameBtn.addEventListener('click', () => {
