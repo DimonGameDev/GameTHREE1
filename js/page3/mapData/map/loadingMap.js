@@ -26,14 +26,15 @@ let maxUnitsOnField = 0;     // Максимальна кількість юні
 // Спочатку перевіряємо чи є збережена гра
 let loadedFromSave = false;
 
+// Перевіряємо чи користувач прийшов з page1 з підтвердженням
+const urlParams = new URLSearchParams(window.location.search);
+const autoLoadSave = urlParams.get('loadSave') === 'true';
+
 if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
-    console.log('🔍 ТЕСТ: Знайдено збережену гру!');
-    console.log('🔍 ТЕСТ: Зараз показую діалог...');
     
-    const userChoice = confirm('🎮 Знайдено збережену гру!\n\nПродовжити збережену гру?');
-    console.log('🔍 ТЕСТ: Вибір користувача:', userChoice);
-    
-    if (userChoice) {
+    if (autoLoadSave) {
+        // Користувач вже підтвердив на page1 - завантажуємо без питань
+        console.log('📂 Автоматичне завантаження збереженої гри (підтверджено на page1)');
         loadedFromSave = true;
         const savedState = window.loadGameState();
         
@@ -87,9 +88,73 @@ if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
             
             console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
         }
+        
     } else {
-        window.deleteSavedGame();
-        console.log('🗑️ Збережену гру видалено, починаємо нову');
+        // Звичайний діалог (якщо користувач прийшов не з page1)
+        console.log('🔍 ТЕСТ: Знайдено збережену гру!');
+        console.log('🔍 ТЕСТ: Зараз показую діалог...');
+        
+        const userChoice = confirm('🎮 Знайдено збережену гру!\n\nПродовжити збережену гру?');
+        console.log('🔍 ТЕСТ: Вибір користувача:', userChoice);
+        
+        if (userChoice) {
+            loadedFromSave = true;
+            const savedState = window.loadGameState();
+            
+            if (savedState) {
+                console.log('📂 Відновлюю стан гри...');
+                
+                // Відновлюємо мета-дані
+                currentPlayerIndex = savedState.currentPlayerIndex;
+                currentRound = savedState.currentRound;
+                
+                // Відновлюємо гравців
+                players = savedState.players;
+
+                const castleImages = [
+                    "../../img/map/castle/red/castleRed.jpeg",
+                    "../../img/map/castle/blue/castleBlue.jpeg",
+                    "../../img/map/castle/green/castleGreen.jpeg",
+                    "../../img/map/castle/yellow/castleYellow.jpeg"
+                ];
+                const neutralCastleImage = "../../img/map/castle/castleStartFon/castleStartFon.jpeg";
+                
+                castles.forEach(castle => {
+                    const cells = map.querySelectorAll('.cell');
+                    cells.forEach(cell => {
+                        const cellX = parseInt(cell.dataset.x);
+                        const cellY = parseInt(cell.dataset.y);
+                        
+                        if (cellX === castle.x && cellY === castle.y) {
+                            const originalIndex = castle.playerIndex;
+                            const activePlayer = players.find(p => p.originalIndex === originalIndex);
+                            
+                            if (activePlayer) {
+                                cell.style.backgroundImage = `url(${castleImages[originalIndex]})`;
+                            } else {
+                                cell.style.backgroundImage = `url(${neutralCastleImage})`;
+                            }
+                        }
+                    });
+                });
+                
+                console.log('🏰 Замки оновлено');
+                
+                // Відновлюємо захоплені хатки
+                if (savedState.capturedGoldHouses) {
+                    window.capturedGoldHouses = savedState.capturedGoldHouses;
+                }
+                
+                // Відновлюємо юнітів
+                unitsOnMap = savedState.units;
+                window.unitsOnMap = unitsOnMap;
+                
+                console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
+            }
+        } else {
+            window.deleteSavedGame();
+            console.log('🗑️ Збережену гру видалено, починаємо нову');
+        }
     }
 }
 

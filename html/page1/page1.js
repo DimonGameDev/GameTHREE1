@@ -37,7 +37,7 @@ btNload.onclick = () => {
     if (userChoice) {
       // Користувач підтвердив - переходимо на page3
       console.log('📂 Завантаження збереженої гри...');
-      window.location.href = '../page3/page3.html';
+      window.location.href = '../page3/page3.html?loadSave=true';
     } else {
       console.log('⏸️ Користувач скасував завантаження');
     }
