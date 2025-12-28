@@ -2,7 +2,7 @@
   "name": "Version of War",
   "short_name": "VoW",
 
-  "start_url": "./index.html",
+  "start_url": "./html/page1/page1.html",
   "scope": "./",
 
   "display": "standalone",
