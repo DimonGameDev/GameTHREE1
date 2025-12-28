@@ -27,6 +27,20 @@ function textBlock() {
 
 //тут перехід на наступну сторінку
 //тут перехід на наступну сторінку
-btNlocalGame.onclick = () => {
-    window.location.href = "/GameTHREE1/html/page2/page2_2.html"
+//btNlocalGame.onclick = () => {
+    //window.location.href = "/GameTHREE1/html/page2/page2_2.html"
+  }//
+	
+	btNlocalGame.onclick = () => {
+    window.location.href = './html/page2/page2_2.html'
   }
+	
+	//btNlocalGame.onclick = () => {
+    // Створюємо посилання динамічно
+    //const link = document.createElement('a');
+    //link.href = '/html/page2/page2_2.html'; // Абсолютний шлях
+    //link.target = '_self';                  // Відкривати у тому ж PWA
+    //document.body.appendChild(link);
+    //link.click();
+    //document.body.removeChild(link);        // Прибираємо після кліку
+//};

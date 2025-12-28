@@ -7,13 +7,13 @@
     <meta name="description" content="Turn-based strategy game">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/GameTHREE1/manifest.json">
+   <link rel="manifest" href="./manifest.json">
     
     <!-- iOS Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="GameTHREE">
-    <link rel="apple-touch-icon" href="/GameTHREE1/img/image.jpg">
+    <link rel="apple-touch-icon" href="./img/image.jpg">
     
     <title>GameTHREE - Strategy Game</title>
     
@@ -58,14 +58,14 @@
     <div class="container">
         <h1>🎮 GameTHREE</h1>
         <p>Стратегічна гра</p>
-        <a href="/GameTHREE1/html/page1/page1.html" class="btn">Грати</a>
+        <a href="./html/page1/page1.html" class="btn">Грати</a>
     </div>
     
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/GameTHREE1/sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(reg => console.log('✅ Service Worker зареєстровано'))
                     .catch(err => console.log('❌ Помилка SW:', err));
             });

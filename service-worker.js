@@ -2,16 +2,21 @@ const CACHE_NAME = 'version-of-war-v1.0';
 
 // Файли які кешуються при встановленні
 const urlsToCache = [
-  '/GameTHREE1/',
-  '/GameTHREE1/html/page1/page1.html',
-  '/GameTHREE1/html/page1/page1.css',
-  '/GameTHREE1/html/page1/page1.js',
-  '/GameTHREE1/html/page2/page2_2.html',
-  '/GameTHREE1/html/page2/page2_2.css',
-  '/GameTHREE1/html/page2/page2_2.js',
-  '/GameTHREE1/html/page3/page3.html',
-  '/GameTHREE1/html/page3/page3.css',
-  '/GameTHREE1/manifest.json'
+  './',
+  './index.html',
+
+  './html/page1/page1.html',
+  './html/page1/page1.css',
+  './html/page1/page1.js',
+
+  './html/page2/page2_2.html',
+  './html/page2/page2_2.css',
+  './html/page2/page2_2.js',
+
+  './html/page3/page3.html',
+  './html/page3/page3.css',
+
+  './manifest.json'
 ];
 
 // Встановлення Service Worker
