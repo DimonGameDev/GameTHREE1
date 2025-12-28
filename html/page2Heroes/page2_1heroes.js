@@ -516,7 +516,12 @@ readyBtn.addEventListener("click", () => {
     const playerNum = localStorage.getItem('currentPlayerSelectingHeroes') || '1';
     
     // Зберегти ID героїв
-    const selectedHeroIds = selectedHeroesSlots.map(hero => hero ? hero.id : null);
+   // Зберігаємо ІНДЕКСИ героїв, а не ID
+const selectedHeroIds = selectedHeroesSlots.map(hero => {
+  if (!hero) return null;
+  // Знаходимо індекс героя в масиві window.heroes
+  return window.heroes.findIndex(h => h.id === hero.id);
+});
     
     localStorage.setItem('selectedHeroesForPlayer' + playerNum, JSON.stringify(selectedHeroIds));
     localStorage.setItem('returningFromHeroesSelection', 'true');
