@@ -3,7 +3,10 @@
 // ============================================
 
 // Масив захоплених хаток золота: { x, y, playerIndex }
-let capturedGoldHouses = [];
+// Видаліть локальну змінну, використовуйте тільки window.capturedGoldHouses
+if (!window.capturedGoldHouses) {
+    window.capturedGoldHouses = [];
+}
 
 /**
  * Перевіряє чи юніт може захоплювати хатки (перший воїн кожної раси)
@@ -31,7 +34,7 @@ function isGoldHouse(x, y) {
  * Знаходить хатку золота за координатами
  */
 function findGoldHouse(x, y) {
-    return capturedGoldHouses.find(house => house.x === x && house.y === y);
+    return window.capturedGoldHouses.find(house => house.x === x && house.y === y);
 }
 
 /**
@@ -91,6 +94,9 @@ function updateGoldHouseVisual(x, y, playerIndex) {
     
     console.log(`🎨 Хатка (${x}, ${y}) змінила колір на колір гравця ${playerIndex + 1}`);
 }
+
+// Експортуємо функцію для використання в інших файлах
+window.updateGoldHouseVisual = updateGoldHouseVisual;
 /**
  * Отримує шлях до картинки клітинки (з урахуванням захоплених хаток)
  */

@@ -78,9 +78,19 @@ if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
             console.log('🏰 Замки оновлено');
             
             // Відновлюємо захоплені хатки
-            if (savedState.capturedGoldHouses) {
-                window.capturedGoldHouses = savedState.capturedGoldHouses;
-            }
+            // Відновлюємо захоплені хатки
+if (savedState.capturedGoldHouses) {
+    window.capturedGoldHouses = savedState.capturedGoldHouses;
+    
+    // Відновлюємо візуальне відображення
+    window.capturedGoldHouses.forEach(house => {
+        if (typeof window.updateGoldHouseVisual === 'function') {
+            window.updateGoldHouseVisual(house.x, house.y, house.playerIndex);
+        }
+    });
+    
+    console.log(`🏠 Відновлено ${window.capturedGoldHouses.length} хаток`);
+}
             
             // Відновлюємо юнітів
             unitsOnMap = savedState.units;
@@ -141,9 +151,19 @@ if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
                 console.log('🏰 Замки оновлено');
                 
                 // Відновлюємо захоплені хатки
-                if (savedState.capturedGoldHouses) {
-                    window.capturedGoldHouses = savedState.capturedGoldHouses;
-                }
+                // Відновлюємо захоплені хатки
+if (savedState.capturedGoldHouses) {
+    window.capturedGoldHouses = savedState.capturedGoldHouses;
+    
+    // Відновлюємо візуальне відображення
+    window.capturedGoldHouses.forEach(house => {
+        if (typeof window.updateGoldHouseVisual === 'function') {
+            window.updateGoldHouseVisual(house.x, house.y, house.playerIndex);
+        }
+    });
+    
+    console.log(`🏠 Відновлено ${window.capturedGoldHouses.length} хаток`);
+}
                 
                 // Відновлюємо юнітів
                 unitsOnMap = savedState.units;
