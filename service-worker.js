@@ -4,19 +4,35 @@ const CACHE_NAME = 'version-of-war-v1.0';
 const urlsToCache = [
   './',
   './index.html',
+  './manifest.json',
 
+  // Page 1
   './html/page1/page1.html',
   './html/page1/page1.css',
   './html/page1/page1.js',
 
+  // Page 2
   './html/page2/page2_2.html',
   './html/page2/page2_2.css',
   './html/page2/page2_2.js',
 
+  // Page 3
   './html/page3/page3.html',
   './html/page3/page3.css',
 
-  './manifest.json'
+  // Критичні зображення (додай найважливіші)
+  './img/image.jpg',
+  './img/map/grass/grass.jpeg',
+  './img/map/infoTablo/gold/gold.png',
+  './img/map/infoTablo/armor/armor.png',
+  './img/map/infoTablo/swords/swords.png',
+  './img/map/infoTablo/HP/hp.png',
+  
+  // Основні JS файли для page3 (найкритичніші)
+  './js/page3/globals/globals.js',
+  './js/asset/units/units2.js',
+  './js/asset/heroes/heroesList.js',
+  './js/page3/mapData/map/loadingMap.js'
 ];
 
 // Встановлення Service Worker
