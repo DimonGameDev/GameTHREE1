@@ -89,13 +89,33 @@
                     </div>
                     
                     <!-- Мана + settings -->
-                    <div class="itemsTopLine manaSection">
-                        <div class="manaUnits">
-                            <span class="manaUnitsNow"></span>
-                            <span class="manaUnitsThreshold"></span>
-                        </div>
-                        <div class="settings">⚙️</div>
-                    </div>
+<div class="itemsTopLine manaSection">
+    <div class="manaUnits">
+        <span class="manaUnitsNow"></span>
+        <span class="manaUnitsThreshold"></span>
+    </div>
+    <div class="settings">⚙️</div>
+    
+    <!-- МОДАЛЬНЕ МЕНЮ НАЛАШТУВАНЬ -->
+    <div class="settingsModal">
+        <div class="settingsModalItem" id="saveGameBtn">
+            <span class="settingsIcon">💾</span>
+            <span class="settingsText">Зберегти гру</span>
+        </div>
+        <div class="settingsModalItem" id="loadGameBtn">
+            <span class="settingsIcon">📂</span>
+            <span class="settingsText">Завантажити гру</span>
+        </div>
+        <div class="settingsModalItem" id="newGameBtn">
+            <span class="settingsIcon">🆕</span>
+            <span class="settingsText">Нова гра</span>
+        </div>
+        <div class="settingsModalItem" id="exitGameBtn">
+            <span class="settingsIcon">🚪</span>
+            <span class="settingsText">Вихід в меню</span>
+        </div>
+    </div>
+</div>
                 </div>
         <div class="window">
             <!-- модальне вікно накладених ефекти юнітів -->
@@ -275,7 +295,25 @@
     <div class="BtnModalMagicCentralActive">Активація</div>
 </div> -->
 
-
+<!-- МОДАЛЬНЕ МЕНЮ НАЛАШТУВАНЬ
+<div class="settingsModal">
+    <div class="settingsModalItem" id="saveGameBtn">
+        <span class="settingsIcon">💾</span>
+        <span class="settingsText">Зберегти гру</span>
+    </div>
+    <div class="settingsModalItem" id="loadGameBtn">
+        <span class="settingsIcon">📂</span>
+        <span class="settingsText">Завантажити гру</span>
+    </div>
+    <div class="settingsModalItem" id="newGameBtn">
+        <span class="settingsIcon">🆕</span>
+        <span class="settingsText">Нова гра</span>
+    </div>
+    <div class="settingsModalItem" id="exitGameBtn">
+        <span class="settingsIcon">🚪</span>
+        <span class="settingsText">Вихід в меню</span>
+    </div>
+</div> -->
     </div>  <!-- закриває container -->
 
     
@@ -696,7 +734,8 @@
     <script src="../../js/page3/mapData/mapBtn/nextUnitButton.js"></script> <!--кнопка "Далі" -->
 
     
-
+<!-- Модальне меню налаштувань -->
+<script src="../../js/page3/mapData/mapBtn/settingsModal.js"></script>
 
     
 </body>
