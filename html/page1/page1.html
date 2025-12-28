@@ -8,9 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Version of War">
-  <link rel="apple-touch-icon" href="/GameTHREE1/img/image.jpg">
-  <title>Version of War</title>
-    <link rel="manifest" href="/GameTHREE1/manifest.json">
+  <link rel="apple-touch-icon" href="../../img/image.jpg">
+  <link rel="manifest" href="../../manifest.json">
 
   <link rel="stylesheet" href="page1.css">
  </head>
@@ -38,7 +37,7 @@
 	<script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/GameTHREE1/service-worker.js')
+        navigator.serviceWorker.register('../../service-worker.js')
           .then((registration) => {
             console.log('✅ Service Worker зареєстровано:', registration);
           })
