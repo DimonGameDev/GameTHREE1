@@ -57,7 +57,7 @@ function captureGoldHouse(x, y, playerIndex) {
         console.log(`🏠 Хатка золота (${x}, ${y}) перехоплена від гравця ${oldOwner + 1} до гравця ${playerIndex + 1}`);
     } else {
         // Нова захоплена хатка
-        capturedGoldHouses.push({ x, y, playerIndex });
+        window.capturedGoldHouses.push({ x, y, playerIndex });
         console.log(`🏠 Хатка золота (${x}, ${y}) захоплена гравцем ${playerIndex + 1}`);
     }
     
@@ -330,7 +330,7 @@ function showCaptureMessage(x, y) {
  * Підраховує золото за захоплені хатки для гравця
  */
 function addGoldForCapturedHouses(playerIndex) {
-    const playerHouses = capturedGoldHouses.filter(house => house.playerIndex === playerIndex);
+    const playerHouses = window.capturedGoldHouses.filter(house => house.playerIndex === playerIndex);
     const houseCount = playerHouses.length;
     
     // Кожна хатка дає +30 золота
