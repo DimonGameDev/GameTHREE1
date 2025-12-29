@@ -32,7 +32,7 @@ const autoLoadSave = urlParams.get('loadSave') === 'true';
 const loadSlotId = urlParams.get('loadSlot');
 if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
     
-    if (autoLoadSave) {
+    if (autoLoadSave || loadSlotId) {
         // Користувач вже підтвердив на page1 - завантажуємо без питань
         console.log('📂 Автоматичне завантаження збереженої гри (підтверджено на page1)');
         loadedFromSave = true;
