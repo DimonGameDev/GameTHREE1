@@ -29,14 +29,21 @@ let loadedFromSave = false;
 // Перевіряємо чи користувач прийшов з page1 з підтвердженням
 const urlParams = new URLSearchParams(window.location.search);
 const autoLoadSave = urlParams.get('loadSave') === 'true';
-
+const loadSlotId = urlParams.get('loadSlot');
 if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
     
     if (autoLoadSave) {
         // Користувач вже підтвердив на page1 - завантажуємо без питань
         console.log('📂 Автоматичне завантаження збереженої гри (підтверджено на page1)');
         loadedFromSave = true;
-        const savedState = window.loadGameState();
+        // Завантажуємо з конкретного слота або зі старого збереження
+let savedState;
+if (loadSlotId) {
+    savedState = window.loadGameFromSlot(parseInt(loadSlotId));
+    console.log(`📂 Завантаження зі слота ${loadSlotId}`);
+} else {
+    savedState = window.loadGameState(); // Стара система (для сумісності)
+}
         
         if (savedState) {
             console.log('📂 Відновлюю стан гри...');
@@ -109,7 +116,14 @@ if (savedState.capturedGoldHouses) {
         
         if (userChoice) {
             loadedFromSave = true;
-            const savedState = window.loadGameState();
+            // Завантажуємо з конкретного слота або зі старого збереження
+let savedState;
+if (loadSlotId) {
+    savedState = window.loadGameFromSlot(parseInt(loadSlotId));
+    console.log(`📂 Завантаження зі слота ${loadSlotId}`);
+} else {
+    savedState = window.loadGameState(); // Стара система (для сумісності)
+}
             
             if (savedState) {
                 console.log('📂 Відновлюю стан гри...');

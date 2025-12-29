@@ -1,4 +1,4 @@
-const CACHE_NAME = 'version-of-war-v1.1';
+const CACHE_NAME = 'version-of-war-v1.0.1';
 
 // Файли які кешуються при встановленні
 const urlsToCache = [
@@ -40,7 +40,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('📦 Кешування файлів');
+        // console.log('📦 Кешування файлів');
         return cache.addAll(urlsToCache);
       })
   );
@@ -70,10 +70,10 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request)
       .then((response) => {
         if (response) {
-          console.log('✅ З кешу:', event.request.url);
+          // console.log('✅ З кешу:', event.request.url);
           return response;
         }
-        console.log('🌐 З мережі:', event.request.url);
+        // console.log('🌐 З мережі:', event.request.url);
         return fetch(event.request).then(
           (response) => {
             // Кешуємо нові файли

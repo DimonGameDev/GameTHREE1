@@ -24,26 +24,18 @@ btNlocalGame.onclick = () => {
 // ЗАВАНТАЖЕННЯ ЗБЕРЕЖЕНОЇ ГРИ
 // ======================================
 btNload.onclick = () => {
-  // Перевіряємо чи є збережена гра
-  if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
-    // Якщо є - питаємо підтвердження
-    const userChoice = confirm(
-      '🎮 Знайдено збережену гру!\n\n' +
-      'Продовжити гру?\n\n' +
-      '✅ OK - Завантажити гру\n' +
-      '❌ Скасувати - повернутися в меню'
-    );
-    
-    if (userChoice) {
-      // Користувач підтвердив - переходимо на page3
-      console.log('📂 Завантаження збереженої гри...');
-      window.location.href = '../page3/page3.html?loadSave=true';
+  // Перевіряємо чи є хоча б одне збереження
+  if (typeof window.hasAnySave === 'function' && window.hasAnySave()) {
+    // Викликаємо модальне вікно вибору слота
+    if (typeof window.showLoadModalForPage1 === 'function') {
+      window.showLoadModalForPage1();
     } else {
-      console.log('⏸️ Користувач скасував завантаження');
+      console.error('❌ Функція showLoadModalForPage1 не знайдена');
+      alert('❌ Система завантаження не доступна!');
     }
   } else {
-    // Немає збереженої гри
-    alert('❌ Немає збереженої гри!\n\nСпочатку створіть нову гру.');
-    console.log('ℹ️ Немає збереженої гри');
+    // Немає збережених ігор
+    alert('❌ Немає збережених ігор!\n\nСпочатку створіть нову гру.');
+    console.log('ℹ️ Немає збережених ігор');
   }
 }
