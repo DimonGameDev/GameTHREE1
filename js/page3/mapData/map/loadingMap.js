@@ -3,20 +3,20 @@
 // ============================================
 
 // Масив кольорів прапорів для 4 гравців
-let colorFlag = [
-    "rgb(255, 80, 80)",   // Гравець 1 - червоний
-    "rgb(80, 80, 255)",   // Гравець 2 - синій  
-    "rgb(80, 255, 80)",   // Гравець 3 - зелений
-    "rgb(255, 220, 80)"   // Гравець 4 - жовтий
-];
+// let colorFlag = [
+//     "rgb(255, 80, 80)",   // Гравець 1 - червоний
+//     "rgb(80, 80, 255)",   // Гравець 2 - синій  
+//     "rgb(80, 255, 80)",   // Гравець 3 - зелений
+//     "rgb(255, 220, 80)"   // Гравець 4 - жовтий
+// ];
 
-// Змінні гри
-let currentPlayerIndex = 0;  // Поточний гравець (за замовчуванням гравець 1)
-let players = [];            // Масив активних гравців
-let unitsOnMap = [];
-window.unitsOnMap = unitsOnMap;         // Юніти на карті
-let maxUnitsOnField = 0;     // Максимальна кількість юнітів на полі
-
+// // Змінні гри
+// let currentPlayerIndex = 0;  // Поточний гравець (за замовчуванням гравець 1)
+// let players = [];            // Масив активних гравців
+// let unitsOnMap = [];
+// window.unitsOnMap = unitsOnMap;         // Юніти на карті
+// let maxUnitsOnField = 0;     // Максимальна кількість юнітів на полі
+window.unitsOnMap = unitsOnMap;
 // Завантажуємо налаштування з localStorage
 // ============================================
 // ПЕРЕВІРКА ЗБЕРЕЖЕНОЇ ГРИ
@@ -24,13 +24,13 @@ let maxUnitsOnField = 0;     // Максимальна кількість юні
 
 // Спочатку перевіряємо чи є збережена гра
 // Спочатку перевіряємо чи є збережена гра
-let loadedFromSave = false;
+// let loadedFromSave = false;
 
 // Перевіряємо чи користувач прийшов з page1 з підтвердженням
 const urlParams = new URLSearchParams(window.location.search);
 const autoLoadSave = urlParams.get('loadSave') === 'true';
 const loadSlotId = urlParams.get('loadSlot');
-if (typeof window.hasSavedGame === 'function' && window.hasSavedGame()) {
+if (loadSlotId || (typeof window.hasSavedGame === 'function' && window.hasSavedGame())) {
     
     if (autoLoadSave || loadSlotId) {
         // Користувач вже підтвердив на page1 - завантажуємо без питань
@@ -51,10 +51,27 @@ if (loadSlotId) {
             // Відновлюємо мета-дані
             currentPlayerIndex = savedState.currentPlayerIndex;
             currentRound = savedState.currentRound;
+            maxUnitsOnField = savedState.maxUnitsOnField || 30;
             
             // Відновлюємо гравців
             players = savedState.players;
-
+            players.forEach((player, index) => {
+                const raceKey = raceMap[player.race || "Орки"];
+                
+                // Генеруємо доступні юніти
+                player.availableUnits = races[raceKey] ? [...races[raceKey]] : [];
+                
+                // Застосовуємо кольори до юнітів
+                if (player.availableUnits && Array.isArray(player.availableUnits)) {
+                    player.availableUnits = player.availableUnits.map(unit => {
+                        if (window.createColoredUnit) {
+                            return window.createColoredUnit(unit, player.originalIndex);
+                        }
+                        return unit;
+                    });
+                    console.log(`🎨 Регенеровано ${player.availableUnits.length} юнітів для гравця ${player.originalIndex + 1}`);
+                }
+            });
             const castleImages = [
                 "../../img/map/castle/red/castleRed.jpeg",
                 "../../img/map/castle/blue/castleBlue.jpeg",
@@ -104,6 +121,26 @@ if (savedState.capturedGoldHouses) {
             window.unitsOnMap = unitsOnMap;
             
             console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
+
+            if (maxUnits) {
+                maxUnits.innerText = maxUnitsOnField;
+                console.log(`📊 Оновлено maxUnits: ${maxUnitsOnField}`);
+            } else {
+                console.error('❌ maxUnits елемент не знайдено!');
+            }
+            
+            if (typeof goldNumber !== 'undefined') {
+                goldNumber.innerText = players[currentPlayerIndex].gold;
+            }
+            
+            if (typeof flagTopNumberPlayer !== 'undefined') {
+                flagTopNumberPlayer.innerText = players[currentPlayerIndex].originalIndex + 1;
+            }
+            
+            if (typeof FlagColorPlayer !== 'undefined') {
+                FlagColorPlayer.style.backgroundColor = colorFlag[players[currentPlayerIndex].originalIndex];
+                console.log(`🚩 Прапор встановлено для гравця ${players[currentPlayerIndex].originalIndex + 1}: ${colorFlag[players[currentPlayerIndex].originalIndex]}`);
+            }
         }
         
     } else {
@@ -131,10 +168,26 @@ if (loadSlotId) {
                 // Відновлюємо мета-дані
                 currentPlayerIndex = savedState.currentPlayerIndex;
                 currentRound = savedState.currentRound;
-                
+                maxUnitsOnField = savedState.maxUnitsOnField || 30;
                 // Відновлюємо гравців
                 players = savedState.players;
-
+                players.forEach((player, index) => {
+                    const raceKey = raceMap[player.race || "Орки"];
+                    
+                    // Генеруємо доступні юніти
+                    player.availableUnits = races[raceKey] ? [...races[raceKey]] : [];
+                    
+                    // Застосовуємо кольори до юнітів
+                    if (player.availableUnits && Array.isArray(player.availableUnits)) {
+                        player.availableUnits = player.availableUnits.map(unit => {
+                            if (window.createColoredUnit) {
+                                return window.createColoredUnit(unit, player.originalIndex);
+                            }
+                            return unit;
+                        });
+                        console.log(`🎨 Регенеровано ${player.availableUnits.length} юнітів для гравця ${player.originalIndex + 1}`);
+                    }
+                });
                 const castleImages = [
                     "../../img/map/castle/red/castleRed.jpeg",
                     "../../img/map/castle/blue/castleBlue.jpeg",
@@ -184,6 +237,22 @@ if (savedState.capturedGoldHouses) {
                 window.unitsOnMap = unitsOnMap;
                 
                 console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
+                if (typeof maxUnits !== 'undefined') {
+                    maxUnits.innerText = maxUnitsOnField;
+                }
+                
+                if (typeof goldNumber !== 'undefined') {
+                    goldNumber.innerText = players[currentPlayerIndex].gold;
+                }
+                
+                if (typeof flagTopNumberPlayer !== 'undefined') {
+                    flagTopNumberPlayer.innerText = players[currentPlayerIndex].originalIndex + 1;
+                }
+                
+                if (typeof FlagColorPlayer !== 'undefined') {
+                    FlagColorPlayer.style.backgroundColor = colorFlag[players[currentPlayerIndex].originalIndex];
+                    console.log(`🚩 Прапор встановлено для гравця ${players[currentPlayerIndex].originalIndex + 1}: ${colorFlag[players[currentPlayerIndex].originalIndex]}`);
+                }
             }
         } else {
             window.deleteSavedGame();

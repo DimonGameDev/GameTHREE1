@@ -12,6 +12,31 @@ let cauntNowUnits = document.querySelector(".cauntNowUnits");
 // скільки юнітів на полі максимум
 let maxUnits = document.querySelector(".maxUnits");
 
+
+// Глобальні змінні гри
+// let currentRound = 1;           // Поточний раунд гри
+// let maxUnitsOnField = 0;        // Максимальна кількість юнітів на полі
+
+// Глобальні змінні гри
+let currentRound = 1;           // Поточний раунд гри
+let maxUnitsOnField = 0;        // Максимальна кількість юнітів на полі
+let currentPlayerIndex = 0;     // Поточний гравець
+let players = [];               // Масив активних гравців
+let unitsOnMap = [];            // Юніти на карті
+let loadedFromSave = false;     // Чи завантажена гра зі збереження
+let colorFlag = [               // Кольори прапорів для 4 гравців
+    "rgb(255, 80, 80)",         // Гравець 1 - червоний
+    "rgb(80, 80, 255)",         // Гравець 2 - синій  
+    "rgb(80, 255, 80)",         // Гравець 3 - зелений
+    "rgb(255, 220, 80)"         // Гравець 4 - жовтий
+];
+
+// Масив захоплених хаток золота
+if (!window.capturedGoldHouses) {
+  window.capturedGoldHouses = [];
+}
+
+
 // скільки золота
 let goldNumber = document.querySelector(".goldNumber");
 

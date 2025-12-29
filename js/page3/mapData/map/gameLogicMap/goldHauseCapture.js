@@ -4,9 +4,9 @@
 
 // Масив захоплених хаток золота: { x, y, playerIndex }
 // Видаліть локальну змінну, використовуйте тільки window.capturedGoldHouses
-if (!window.capturedGoldHouses) {
-    window.capturedGoldHouses = [];
-}
+// if (!window.capturedGoldHouses) {
+//     window.capturedGoldHouses = [];
+// }
 
 /**
  * Перевіряє чи юніт може захоплювати хатки (перший воїн кожної раси)

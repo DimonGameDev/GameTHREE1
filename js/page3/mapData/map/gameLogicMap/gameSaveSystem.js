@@ -11,6 +11,8 @@ function saveGameState() {
         savedAt: new Date().toISOString(),
         currentPlayerIndex: currentPlayerIndex,
         currentRound: currentRound,
+        maxUnitsOnField: maxUnitsOnField,
+        
         
         // Дані гравців
         players: players.map(player => ({
@@ -172,6 +174,7 @@ function saveGameToSlot(slotId, saveName) {
         savedAt: new Date().toISOString(),
         currentPlayerIndex: currentPlayerIndex,
         currentRound: currentRound,
+        maxUnitsOnField: maxUnitsOnField,
         players: players.map(player => ({
             originalIndex: player.originalIndex,
             race: player.race,

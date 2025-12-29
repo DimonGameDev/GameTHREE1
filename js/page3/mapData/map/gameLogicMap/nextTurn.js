@@ -3,7 +3,7 @@
 // ============================================
 
 // Лічильник раундів (починається з 1)
-let currentRound = 1;
+// let currentRound = 1;
 
 function updatePlayerDisplay() {
     const currentPlayer = players[currentPlayerIndex];
