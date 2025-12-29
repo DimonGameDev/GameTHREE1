@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/batleSystem.css">
     <link rel="stylesheet" href="css/healthUnits.css">
     <link rel="stylesheet" href="css/auraUnits.css">
+    <link rel="stylesheet" href="css/modalWindows.css">
     <title>Document</title>
 </head>
 <body>
@@ -99,12 +100,15 @@
     <div class="settings">⚙️</div>
     
    <!-- МОДАЛЬНЕ МЕНЮ НАЛАШТУВАНЬ -->
-<div class="settingsModal">
+   <div class="settingsModal">
     <div class="settingsModalItem" id="saveGameBtn">
         <span class="settingsIcon">💾</span>
         <span class="settingsText">Зберегти гру</span>
     </div>
-    <!-- ВИДАЛЕНО: Завантажити гру -->
+    <div class="settingsModalItem" id="loadGameBtn">
+        <span class="settingsIcon">📂</span>
+        <span class="settingsText">Завантажити гру</span>
+    </div>
     <div class="settingsModalItem" id="newGameBtn">
         <span class="settingsIcon">🆕</span>
         <span class="settingsText">Нова гра</span>
@@ -718,6 +722,7 @@
 <!-- Модальне меню налаштувань -->
 <script src="../../js/page3/mapData/mapBtn/settingsModal.js"></script>
 
-    
+    <script src="../../js/page3/mapData/mapBtn/saveLoadModal.js"></script>
+
 </body>
 </html>

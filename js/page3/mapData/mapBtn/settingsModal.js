@@ -36,31 +36,40 @@ function initSettingsModal() {
     // ============================================
     
     // 1. ЗБЕРЕГТИ ГРУ
-    const saveGameBtn = document.querySelector('#saveGameBtn');
-    if (saveGameBtn) {
-        saveGameBtn.addEventListener('click', () => {
-            console.log('💾 Натиснуто "Зберегти гру"');
-            
-            if (typeof window.saveGameState === 'function') {
-                const success = window.saveGameState();
-                
-                if (success) {
-                    // Показуємо повідомлення про успіх
-                    alert('✅ Гру успішно збережено!');
-                    console.log('✅ Гра збережена успішно');
-                } else {
-                    alert('❌ Помилка збереження гри!');
-                    console.error('❌ Не вдалося зберегти гру');
-                }
-            } else {
-                alert('❌ Система збереження не доступна!');
-                console.error('❌ Функція saveGameState не знайдена');
-            }
-            
-            // Закриваємо меню
-            settingsModal.classList.remove('active');
-        });
-    }
+const saveGameBtn = document.querySelector('#saveGameBtn');
+if (saveGameBtn) {
+    saveGameBtn.addEventListener('click', () => {
+        console.log('💾 Натиснуто "Зберегти гру"');
+        
+        if (typeof window.showSaveModal === 'function') {
+            window.showSaveModal();
+        } else {
+            alert('❌ Система збереження не доступна!');
+            console.error('❌ Функція showSaveModal не знайдена');
+        }
+        
+        // Закриваємо меню налаштувань
+        settingsModal.classList.remove('active');
+    });
+}
+
+// 1.5. ЗАВАНТАЖИТИ ГРУ
+const loadGameBtn = document.querySelector('#loadGameBtn');
+if (loadGameBtn) {
+    loadGameBtn.addEventListener('click', () => {
+        console.log('📂 Натиснуто "Завантажити гру"');
+        
+        if (typeof window.showLoadModal === 'function') {
+            window.showLoadModal();
+        } else {
+            alert('❌ Система завантаження не доступна!');
+            console.error('❌ Функція showLoadModal не знайдена');
+        }
+        
+        // Закриваємо меню налаштувань
+        settingsModal.classList.remove('active');
+    });
+}
     
     // 2. НОВА ГРА
     const newGameBtn = document.querySelector('#newGameBtn');
