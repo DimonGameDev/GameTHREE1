@@ -12,7 +12,7 @@ let orcCatapultLevels = {
       step: 3,
       range: 5,
       coin: 600,
-      upgradeCost: 221,
+      upgradeCost: 50,
       description: "Сильний юніт. Дальня і сильна атака - сильна сторона, але повільний. Або стриляє, або рухається.",
       img: orcCatapultImg,
       abilities: [
@@ -30,7 +30,7 @@ let orcCatapultLevels = {
       step: 3,
       range: 5,
       coin: 600,
-      upgradeCost: 222,
+      upgradeCost: 100,
       description: "Сильний юніт. Дальня і сильна атака - сильна сторона, але повільний. Або стриляє, або рухається.",
       img: orcCatapultImg,
       abilities: [

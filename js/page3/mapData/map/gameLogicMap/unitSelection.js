@@ -795,8 +795,8 @@ if (daniUnitsCrit) {
                 const manaValue = players[unit.playerIndex].unitMana[unitType] || 0;
                 const currentLevel = unit.level || 1;
                 const threshold = window.unitProgressSystem?.getManaThreshold 
-                    ? window.unitProgressSystem.getManaThreshold(currentLevel)
-                    : 100;
+    ? window.unitProgressSystem.getManaThreshold(currentLevel, unit) // 👈 Передаємо юніта
+    : 100;
                 
                 if (isOwnUnit) {
                     // ✅ СВІЙ ЮНІТ - показуємо мана + поріг

@@ -160,9 +160,9 @@ if (window.AbilityFactory) {
     // console.log(`   Розміщено на позиції (${newUnit.x}, ${newUnit.y})`);
 
     // Закриваємо магазин ПЕРЕД тим як дозволити рух
-    if (typeof window.saveGameState === 'function') {
-        window.saveGameState();
-    }
+    // if (typeof window.saveGameState === 'function') {
+    //     window.saveGameState();
+    // }
     closeShop();
 
     // Скидаємо вибір ПЕРЕД тим як дозволити рух

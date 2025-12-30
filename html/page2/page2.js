@@ -712,7 +712,14 @@ btnBack.onclick = () => {
 
 btnNext.onclick = () => {
 // 🔹 Очищаємо старий збережений стан гри, щоб не підвантажувався старий прогрес
-localStorage.removeItem("gameState");
+// 🔹 Очищаємо всі збереження гри, щоб не підвантажувався старий прогрес
+localStorage.removeItem("gameState"); // стара назва (для сумісності)
+localStorage.removeItem("gameSaveState"); // нова назва основного збереження
+
+// 🔹 Очищаємо всі 4 слоти збережень
+for (let i = 1; i <= 4; i++) {
+  localStorage.removeItem(`save_slot_${i}`);
+}
 
 // Отримуємо вибраних героїв
 const finalHeroesSelection = localStorage.getItem('finalHeroesSelection');

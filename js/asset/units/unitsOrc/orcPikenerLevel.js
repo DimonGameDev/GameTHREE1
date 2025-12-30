@@ -124,7 +124,7 @@ let orcPikenerLevels = {
       attack: 73,
       step: 5,
       range: 1,
-      coin: 300,
+      coin: 600,
       upgradeCost: 400,
       description: "Загартований воїн з важкою броньою",
       img: orcPikenerImg,

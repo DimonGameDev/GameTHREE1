@@ -426,6 +426,15 @@ function showSecondBreathPopup(x, y) {
                 players[attacker.playerIndex].unitMana[unitType] = 0;
             }
             players[attacker.playerIndex].unitMana[unitType] += finalDamage;
+            
+            // 🎯 ВСТАНОВЛЮЄМО СТАН ПЕРЕД АПГРЕЙДОМ!
+attacker.moved = true;
+attacker.attacked = true;  // 👈 ДЛЯ ВСІХ ЮНІТІВ!
+
+if (attacker.name && attacker.name.toLowerCase().includes('катапульт')) {
+    console.log(`🎯 Катапульта атакувала → рух заблокований (moved=true, attacked=true)`);
+}
+            
             if (window.unitProgressSystem && typeof window.unitProgressSystem.checkAndUpgradeIfReady === 'function') {
                 window.unitProgressSystem.checkAndUpgradeIfReady(attacker.playerIndex, unitType);
             }
@@ -485,14 +494,16 @@ if (target.unit.isHero && window.heroAuraSystem && window.heroAuraSystem.checkLo
     
     // Позначаємо що юніт атакував
     attacker.attacked = true;
-    attacker.moved = true;
+    // attacker.moved = true;
 
-    if (attacker.name && attacker.name.toLowerCase().includes('катапульт')) {
-        console.log(`🎯 Катапульта атакувала → рух заблокований`);
-    }
-    if (attacker.type && attacker.type.toLowerCase().includes('catapult')) {
-        console.log(`🎯 Катапульта атакувала → рух заблокований`);
-    }
+    // if (attacker.name && attacker.name.toLowerCase().includes('катапульт')) {
+    //     attacker.attacked = true;
+    //     attacker.moved = true;  // 👈 ДОДАТИ!
+    //     console.log(`🎯 Катапульта атакувала → рух заблокований (moved=true, attacked=true)`);
+    // }
+    // if (attacker.type && attacker.type.toLowerCase().includes('catapult')) {
+    //     console.log(`🎯 Катапульта атакувала → рух заблокований`);
+    // }
 
     if (typeof updateUnitVisualState === 'function') {
         updateUnitVisualState(attacker);
@@ -698,13 +709,13 @@ window.getUnitType = function(unit) {
         '2': 'archer',
         '3': 'shaman',
         '4': 'horse',
-        '5': 'pikener',
-        '6': 'horseman',
-        '7': 'catapult',
-        '8': 'support',    // 🔴 ДОДАНО: Ведмідь, Голем і т.д.
-        '9': 'specialist', // 🔴 ДОДАНО: Відьма, Інженер, Демон-дух
+        '5': 'horseman',    // 👈 ЗМІНИТИ з 'pikener' на 'horseman'
+        '6': 'catapult',    // 👈 ЗМІНИТИ з 'horseman' на 'catapult'
+        '7': 'pikener',     // 👈 ЗМІНИТИ з 'catapult' на 'pikener'
+        '8': 'support',
+        '9': 'specialist',
         '10': 'mage',
-        '11': 'wisp'       // 🔴 ДОДАНО: Маг
+        '11': 'wisp'
     };
     
     return typeMap[typeCode] || null;

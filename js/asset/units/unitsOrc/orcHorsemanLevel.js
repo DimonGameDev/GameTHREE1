@@ -29,7 +29,7 @@ let orcHorsemanLevels = {
       attack: 67,
       step: 4,
       range: 1,
-      coin: 400,
+      coin: 550,
       upgradeCost: 222,
       description: "Чим він ближче, тим небезпечніший цей воїн, з гарною атакою і броньою",
       img: orcHorsemanImg,

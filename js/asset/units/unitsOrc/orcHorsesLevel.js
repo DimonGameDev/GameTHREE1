@@ -1,5 +1,8 @@
 // js/asset/units/unitsOrc/warrior/orcLevel.js
 let orcHorsesImg = "../../img/units/orc/orcHorse/blue/orcHorseBlue.png";
+
+//опис воїна
+let orcHorseDescr = "Кавард - це загартований воїн який швидко зближається з ворогом. Серед воїнів також типу, у орків вони мають найбільшу атаку. "
 // ОРКИ - Воїн (8 рівнів)
 let orcHorsesLevels = {
     level1: {
@@ -11,9 +14,9 @@ let orcHorsesLevels = {
       attack: 63,
       step: 4,
       range: 1,
-      coin: 350,
+      coin: 450,
       upgradeCost: 221,
-      description: "Воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 200},
@@ -31,7 +34,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: 222,
-      description: "Воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
             // { key: "arrowShot", power: 250},
@@ -50,7 +53,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: 223,
-      description: "Воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 300},
@@ -69,7 +72,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: 400,
-      description: "Загартований воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 250},
@@ -88,7 +91,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: 400,
-      description: "Загартований воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 250},
@@ -107,7 +110,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: 400,
-      description: "Загартований воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 250},
@@ -126,7 +129,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: 400,
-      description: "Загартований воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 250},
@@ -145,7 +148,7 @@ let orcHorsesLevels = {
       range: 1,
       coin: 350,
       upgradeCost: null,
-      description: "Легендарний воїн який швидко зближається з ворогом",
+      description: orcHorseDescr,
       img: orcHorsesImg,
       abilities: [
         // { key: "arrowShot", power: 600},

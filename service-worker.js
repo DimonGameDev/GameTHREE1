@@ -1,4 +1,4 @@
-const CACHE_NAME = 'version-of-war-v1.0.12';
+const CACHE_NAME = 'version-of-war-v1.0.32';
 
 // Файли які кешуються при встановленні
 const urlsToCache = [
@@ -84,10 +84,18 @@ self.addEventListener('fetch', (event) => {
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
+              })
+              .catch((error) => {
+                // Ігноруємо помилки кешування
+                console.warn('⚠️ Помилка кешування:', error);
               });
             return response;
           }
-        );
+        ).catch((error) => {
+          // Якщо файл не знайдено - повертаємо порожню відповідь замість помилки
+          console.warn('⚠️ Файл не знайдено:', event.request.url);
+          return new Response('', { status: 404, statusText: 'Not Found' });
+        });
       })
   );
 });

@@ -1,16 +1,16 @@
 let orcs = [
-    orcWarriorLevels.level1,
-    orcArcherLevels.level1, 
-    orcShamanLevels.level1, 
-    orcHorsesLevels.level1,
-    orcPikenerLevels.level1,
-    orcHorsemanLevels.level1,
-    orcCatapultLevels.level1,
-    orcBearLevels.level1,
-    orcMagLevels.level1,
-    orcMinotaurLevels.level1,
-    orcWispLevels.level1,
-    ];
+    orcWarriorLevels.level1,      // 0
+    orcArcherLevels.level1,       // 1
+    orcShamanLevels.level1,       // 2
+    orcHorsesLevels.level1,       // 3
+    orcHorsemanLevels.level1,     // 4 ✅ (було Pikener)
+    orcCatapultLevels.level1,     // 5 ✅ (було Horseman)
+    orcPikenerLevels.level1,      // 6 ✅ (було Catapult)
+    orcBearLevels.level1,         // 7
+    orcMagLevels.level1,          // 8
+    orcMinotaurLevels.level1,     // 9
+    orcWispLevels.level1,         // 10
+];
 
 
     let pipls = [
@@ -18,9 +18,9 @@ let orcs = [
         piplArcherLevels.level1, 
         piplShamanLevels.level1,  
         piplHorsesLevels.level1,
-        piplPikenerLevels.level1,    
         piplHorsemanLevels.level1,
-        piplCatapultLevels.level1, 
+        piplCatapultLevels.level1,
+        piplPikenerLevels.level1,    
         piplWerewolfLevels.level1,
         piplEngineerLevels.level1,
         piplAssassinLevels.level1,
@@ -32,12 +32,12 @@ let orcs = [
         elfArcherLevels.level1, 
         elfShamanLevels.level1, 
         elfHorsesLevels.level1,     
-        elfPikenerLevels.level1,    
-        elfHorsemanLevels.level1,
-        elfCatapultLevels.level1, 
-        elfDarkelfLevels.level1,
+        elfHorsemanLevels.level1,     // ✅ (було Pikener)
+        elfCatapultLevels.level1,     // ✅ (було Horseman)
+        elfPikenerLevels.level1,
+        elfGolemLevels.level1,      // ✅ (було Catapult) 
         elfWitchLevels.level1,
-        elfGolemLevels.level1,
+        elfDarkelfLevels.level1,
         elfWispLevels.level1,
     ];   
     
@@ -46,12 +46,12 @@ let orcs = [
         demonArcherLevels.level1, 
         demonShamanLevels.level1,  
         demonHorsesLevels.level1,    
-        demonPikenerLevels.level1,    
-        demonHorsemanLevels.level1,
-        demonCatapultLevels.level1,    
-        demonCerberusLevels.level1,
+        demonHorsemanLevels.level1,     // ✅ (було Pikener)
+        demonCatapultLevels.level1,     // ✅ (було Horseman)
+        demonPikenerLevels.level1,
+        demonSupervisorLevels.level1,      // ✅ (було Catapult)    
         demonSpiritLevels.level1,
-        demonSupervisorLevels.level1,
+        demonCerberusLevels.level1,
         demonWispLevels.level1,
     ];
 
@@ -60,12 +60,12 @@ let orcs = [
         beetleArcherLevels.level1, 
         beetleShamanLevels.level1,  
         beetleHorsesLevels.level1,     
-        beetlePikenerLevels.level1,    
-        beetleHorsemanLevels.level1,
-        beetleCatapultLevels.level1,    
-        beetleScarabLevels.level1,
+        beetleHorsemanLevels.level1,     // ✅ (було Pikener)
+        beetleCatapultLevels.level1,     // ✅ (було Horseman)
+        beetlePikenerLevels.level1,
+        beetleArmoredLevels.level1,     // ✅ (було Catapult)
         beetleUterusLevels.level1,
-        beetleArmoredLevels.level1,
+        beetleScarabLevels.level1,
         beetleWispLevels.level1,
     ];   
 

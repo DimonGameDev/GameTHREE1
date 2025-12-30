@@ -78,7 +78,7 @@ const abilities = {
   manaCost: 0,                   // Вартість використання (якщо буде мана)
   duration: null,                // Миттєвий ефект
   description: "Відновлює здоров'я вибраному союзнику на відстані до 3 клітинок.",
-  img: "../../img/nextLevel/orc/voin/shield.jpg"  // 👈 Замініть на свою іконку
+  img: "../../img/nextLevel/auraHealth.jpeg"  // 👈 Замініть на свою іконку
 },
 armorAura: {
   name: "Аура захисту",
@@ -91,7 +91,7 @@ armorAura: {
   // perTurn: false,                // Не на хід, а постійно поки в радіусі
   duration: 1,                // Безстроково поки в радіусі
   description: "Всі союзники на сусідніх клітинках отримують +3, а з 4 рівня +5 до броні.",
-  img: "../../img/nextLevel/orc/voin/shield.jpg"  // 👈 Замініть на іконку щита/аури
+  img: "../../img/nextLevel/plusArmor.jpeg"  // 👈 Замініть на іконку щита/аури
 },
   // 👇 НОВА АУРА АТАКИ
   attackAura: {
@@ -105,7 +105,7 @@ armorAura: {
     // perTurn: false,                // Не на хід, а постійно поки в радіусі
     duration: 1,                // Безстроково поки в радіусі
     description: "Всі союзники на сусідніх клітинках отримують +3, а з 4 рівня +5 до  атаки.",
-    img: "../../img/nextLevel/orc/voin/voin2.jpg"  // 👈 Замініть на іконку меча/аури
+    img: "../../img/nextLevel/plusAttack.jpeg"  // 👈 Замініть на іконку меча/аури
   },
   hasteAlly: {
     name: "Прискорення",
@@ -118,7 +118,7 @@ armorAura: {
     cooldown: 4,                   // Перезарядка 4 ходи
     duration: 1,                   // Діє 2 ходи
     description: "Дає вибраному союзнику +1, а з 4 рівня +2, до кроку на 1 хід.",
-    img: "../../img/nextLevel/orc/voin/voin2.jpg"  // 👈 Замініть на іконку швидкості
+    img: "../../img/nextLevel/speed.jpeg"  // 👈 Замініть на іконку швидкості
   },
   handcuffs: {  // Замість placeMine
     name: "Наручники",
@@ -131,7 +131,7 @@ armorAura: {
     cooldown: 4,
     duration: 1,                  // Діє 1 раунд
     description: "Надіває наручники на ворога, не даючи йому атакувати протягом 1 раунду.",
-    img: "../../img/nextLevel/orc/voin/voin2.jpg"  // 👈 Іконка наручників
+    img: "../../img/nextLevel/handcuffs.jpeg"  // 👈 Іконка наручників
   },
   entangle: {
     name: "Коріння",
@@ -145,7 +145,8 @@ armorAura: {
     duration: 1,                   // Діє 1 хід
     stepReduction: 999,            // Крок стає 0 (не може рухатись)
     description: "Коріння обплутує ворога, не даючи йому рухатись протягом 1 ходу.",
-    img: "../../img/nextLevel/orc/voin/voin2.jpg"  // 👈 Замініть на іконку коріння/ліан
+    img: "../../img/nextLevel/roots.jpeg"  
+		// 👈 Замініть на іконку коріння/ліан
   },
 
   markTarget: {
@@ -160,7 +161,7 @@ armorAura: {
     cooldown: 3,                   // Перезарядка 3 ходи
     duration: 1,                   // Діє 1 хід
     description: "Помічає ворога, зменшуючи його броню на 1 хід.",
-    img: "../../img/nextLevel/orc/voin/voin2.jpg"  // 👈 Замініть на іконку мітки/ока
+    img: "../../img/nextLevel/minusArmor.jpeg"  // 👈 Замініть на іконку мітки/ока
   },
   parasite: {
     name: "Паразіт",
@@ -174,7 +175,7 @@ armorAura: {
     cooldown: 3,                   // Перезарядка 3 ходи
     duration: 1,                   // Діє 1 хід
     description: "Паразит заражає ворога, зменшуючи його атаку на 1 хід.",
-    img: "../../img/nextLevel/orc/voin/voin2.jpg"  // 👈 Замініть на іконку паразита/черв'яка
+    img: "../../img/nextLevel/minusAttack.jpeg"  // 👈 Замініть на іконку паразита/черв'яка
   },
   supportAura: {
     name: "Аура підтримки",
@@ -188,7 +189,7 @@ armorAura: {
     targets: "allies",             // Всі союзники
     duration: 1,                   // Діє 1 хід
     description: "Дає додаткові бонуси союзникам на 2 клітинки: % до атаки, броню та реген HP.",
-    img: "../../img/nextLevel/orc/voin/shield.jpg"
+    img: "../../img/nextLevel/auraBonus.jpeg"
   },
   };
   

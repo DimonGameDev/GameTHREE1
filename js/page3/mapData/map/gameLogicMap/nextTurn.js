@@ -374,9 +374,9 @@ if (currentPlayer && typeof window.regenerateUnitsAtTurnStart === 'function') {
         if (typeof updateActivePlayerUnitsVisuals === 'function') {
             updateActivePlayerUnitsVisuals();
         }
-        if (typeof window.saveGameState === 'function') {
-            window.saveGameState();
-        }
+        // if (typeof window.saveGameState === 'function') {
+        //     window.saveGameState();
+        // }
     // console.log(`✅ Хід передано гравцю ${players[currentPlayerIndex].originalIndex + 1}`);
 }
 

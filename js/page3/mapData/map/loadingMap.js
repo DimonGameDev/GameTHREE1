@@ -145,11 +145,11 @@ if (savedState.capturedGoldHouses) {
         
     } else {
         // Звичайний діалог (якщо користувач прийшов не з page1)
-        console.log('🔍 ТЕСТ: Знайдено збережену гру!');
-        console.log('🔍 ТЕСТ: Зараз показую діалог...');
+       // console.log('🔍 ТЕСТ: Знайдено збережену гру!');
+        //console.log('🔍 ТЕСТ: Зараз показую діалог...');
         
         const userChoice = confirm('🎮 Знайдено збережену гру!\n\nПродовжити збережену гру?');
-        console.log('🔍 ТЕСТ: Вибір користувача:', userChoice);
+        //console.log('🔍 ТЕСТ: Вибір користувача:', userChoice);
         
         if (userChoice) {
             loadedFromSave = true;
@@ -185,7 +185,7 @@ if (loadSlotId) {
                             }
                             return unit;
                         });
-                        console.log(`🎨 Регенеровано ${player.availableUnits.length} юнітів для гравця ${player.originalIndex + 1}`);
+                        //console.log(`🎨 Регенеровано ${player.availableUnits.length} юнітів для гравця ${player.originalIndex + 1}`);
                     }
                 });
                 const castleImages = [
@@ -237,9 +237,17 @@ if (savedState.capturedGoldHouses) {
                 window.unitsOnMap = unitsOnMap;
                 
                 console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
+                // if (typeof window.applyTileDefenseBonuses === 'function') {
+                //     unitsOnMap.forEach(unit => {
+                //         window.applyTileDefenseBonuses(unit);
+                //     });
+                //     console.log('🛡️ Бонуси клітинок застосовано до всіх юнітів');
+                // }
                 if (typeof maxUnits !== 'undefined') {
                     maxUnits.innerText = maxUnitsOnField;
                 }
+
+                
                 
                 if (typeof goldNumber !== 'undefined') {
                     goldNumber.innerText = players[currentPlayerIndex].gold;
@@ -415,10 +423,10 @@ if (loadedFromSave && unitsOnMap.length > 0) {
                 const heroTemplate = window.heroes[unit.heroTemplateId - 1];
                 if (heroTemplate && window.getColoredHeroImage) {
                     // 🔍 ДІАГНОСТИКА: Виводимо інформацію про юніта
-                    console.log(`🔍 Герой ${unit.name} (ID: ${unit.heroTemplateId}):`, {
-                        playerIndex: unit.playerIndex,
-                        originalIndex: unit.originalIndex
-                    });
+                    //console.log(`🔍 Герой ${unit.name} (ID: ${unit.heroTemplateId}):`, {
+                       // playerIndex: unit.playerIndex,
+                        //originalIndex: unit.originalIndex
+                    //});
                     
                     // ✅ ВИПРАВЛЕННЯ: Знаходимо правильний originalIndex через гравця
                     let correctOriginalIndex = unit.originalIndex;
@@ -427,11 +435,11 @@ if (loadedFromSave && unitsOnMap.length > 0) {
                     if (correctOriginalIndex === undefined || correctOriginalIndex === null) {
                         const player = players[unit.playerIndex];
                         correctOriginalIndex = player ? player.originalIndex : 0;
-                        console.warn(`⚠️ У героя ${unit.name} немає originalIndex, використовую ${correctOriginalIndex} з гравця`);
+                        //console.warn(`⚠️ У героя ${unit.name} немає originalIndex, використовую ${correctOriginalIndex} з гравця`);
                     }
                     
                     unit.img = window.getColoredHeroImage(heroTemplate.img, correctOriginalIndex);
-                    console.log(`🎨 Регенеровано img для героя ${unit.heroTemplateId} з кольором гравця ${correctOriginalIndex + 1}`);
+                    //console.log(`🎨 Регенеровано img для героя ${unit.heroTemplateId} з кольором гравця ${correctOriginalIndex + 1}`);
                 }
             }
             
@@ -456,7 +464,12 @@ if (loadedFromSave && unitsOnMap.length > 0) {
                 createUnitVisual(unit);
             }
         });
-        
+        if (typeof window.applyTileDefenseBonuses === 'function') {
+            unitsOnMap.forEach(unit => {
+                window.applyTileDefenseBonuses(unit);
+            });
+            console.log('🛡️ Бонуси клітинок застосовано до всіх юнітів');
+        }
         // Оновлюємо дисплей
         if (typeof updatePlayerDisplay === 'function') {
             updatePlayerDisplay();

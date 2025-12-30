@@ -458,13 +458,13 @@ function highlightSelectedSlot(selectedIndex) {
             
             if (abilityInstance) {
                 // 🔍 ДЕБАГ:
-                console.log("🔍 DEBUG abilityInstance:", abilityInstance);
-                console.log("  mode:", abilityInstance.mode);
-                console.log("  actionType:", abilityInstance.actionType);
-                console.log("  cooldown:", abilityInstance.cooldown);
-                console.log("  currentCooldown:", abilityInstance.currentCooldown);
-                console.log("  healAmount:", abilityInstance.healAmount);
-                console.log("  range:", abilityInstance.range);
+                //console.log("🔍 DEBUG abilityInstance:", abilityInstance);
+                //console.log("  mode:", abilityInstance.mode);
+                //console.log("  actionType:", abilityInstance.actionType);
+                //console.log("  cooldown:", abilityInstance.cooldown);
+                //console.log("  currentCooldown:", abilityInstance.currentCooldown);
+                //console.log("  healAmount:", abilityInstance.healAmount);
+                //console.log("  range:", abilityInstance.range);
                 
                 // Додаємо параметри здібності
                 detailedDescription += '\n\n📊 Параметри:';

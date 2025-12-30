@@ -1,5 +1,7 @@
 // js/asset/units/unitsOrc/warrior/orcLevel.js
 let orcWarriorImg = "../../img/units/orc/orcWarrior/blue/orcWarriorBlue.png";
+
+let orcWarriorDescr = "Сильний воїн з важкою сокирою. В орків ці воїни хоть і не мають великої атаки, зате здоровʼя в них найбільше."
 // ОРКИ - Воїн (8 рівнів)
 let orcWarriorLevels = {
   level1: {
@@ -12,8 +14,8 @@ let orcWarriorLevels = {
     step: 6,
     range: 1,
     coin: 150,
-    upgradeCost: 200,
-    description: "Сильний воїн з важкою сокирою",
+    upgradeCost: 60,
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 200},
@@ -31,8 +33,8 @@ let orcWarriorLevels = {
     step: 4,
     range: 1,
     coin: 150,
-    upgradeCost: 400,
-    description: "Сильний воїн з важкою сокирою",
+    upgradeCost: 70,
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 250},
@@ -50,8 +52,8 @@ let orcWarriorLevels = {
     step: 5,
     range: 2,
     coin: 150,
-    upgradeCost: 800,
-    description: "Сильний воїн з важкою сокирою",
+    upgradeCost: 80,
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 300},
@@ -70,7 +72,7 @@ let orcWarriorLevels = {
     range: 1,
     coin: 150,
     upgradeCost: 400,
-    description: "Загартований в боях воїн",
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 250},
@@ -89,7 +91,7 @@ let orcWarriorLevels = {
     range: 1,
     coin: 150,
     upgradeCost: 400,
-    description: "Загартований в боях воїн",
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 250},
@@ -108,7 +110,7 @@ let orcWarriorLevels = {
     range: 1,
     coin: 150,
     upgradeCost: 400,
-    description: "Загартований в боях воїн",
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 250},
@@ -127,7 +129,7 @@ let orcWarriorLevels = {
     range: 1,
     coin: 150,
     upgradeCost: 400,
-    description: "Загартований в боях воїн",
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 250},
@@ -146,7 +148,7 @@ let orcWarriorLevels = {
     range: 1,
     coin: 150,
     upgradeCost: null,
-    description: "Легендарний воїн",
+    description: orcWarriorDescr,
     img: orcWarriorImg,
     abilities: [
       // { key: "arrowShot", power: 600},

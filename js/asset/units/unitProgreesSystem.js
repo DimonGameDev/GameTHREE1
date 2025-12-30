@@ -11,13 +11,13 @@ const UNIT_TYPE_MAP = {
     1: 'archer',
     2: 'shaman',
     3: 'horse',
-    4: 'pikener',
-    5: 'horseman',
-    6: 'catapult',
-    7: 'support',      // 🔴 ДОДАТИ: код 8
-    8: 'specialist',   // 🔴 ДОДАТИ: код 9
+    4: 'horseman',    // 👈 Було pikener
+    5: 'catapult',    // 👈 Було horseman
+    6: 'pikener',     // 👈 Було catapult
+    7: 'support',
+    8: 'specialist',
     9: 'mage',
-    10: 'wisp'          // 🔴 ДОДАТИ: код 10
+    10: 'wisp'
 };
 
 const TYPE_TO_INDEX_MAP = {
@@ -25,13 +25,13 @@ const TYPE_TO_INDEX_MAP = {
     'archer': 1,
     'shaman': 2,
     'horse': 3,
-    'pikener': 4,
-    'horseman': 5,
-    'catapult': 6,
-    'support': 7,      // 🔴 ДОДАТИ
-    'specialist': 8,   // 🔴 ДОДАТИ
+    'horseman': 4,    // 👈 Було 5
+    'catapult': 5,    // 👈 Було 6
+    'pikener': 6,     // 👈 Було 4
+    'support': 7,
+    'specialist': 8,
     'mage': 9,
-    'wisp': 10          // 🔴 ДОДАТИ
+    'wisp': 10
 };
 
 /**
@@ -53,15 +53,25 @@ const PROGRESS_CONFIG = {
 };
 
 /**
- * Отримує поріг мани для поточного рівня
+ * Отримує поріг мани для поточного рівня з upgradeCost юніта
  * @param {number} currentLevel - поточний рівень юніта (1-7)
+ * @param {object} unit - об'єкт юніта (опціонально, для отримання upgradeCost)
  * @returns {number} поріг мани для наступного рівня
  */
-function getManaThreshold(currentLevel) {
-    // currentLevel 1 → індекс 0, currentLevel 2 → індекс 1, тощо
+function getManaThreshold(currentLevel, unit = null) {
+    console.log(`🔍 getManaThreshold: level=${currentLevel}, unit=`, unit, `upgradeCost=${unit?.upgradeCost}`);
+    
+    // Якщо передано юніта і у нього є upgradeCost - використовуємо його
+    if (unit && unit.upgradeCost !== undefined && unit.upgradeCost !== null) {
+        console.log(`✅ Використовую upgradeCost: ${unit.upgradeCost}`);
+        return unit.upgradeCost;
+    }
+    
+    // Інакше використовуємо старий масив (для сумісності)
+    console.log(`⚠️ upgradeCost не знайдено, використовую масив`);
     const index = currentLevel - 1;
     if (index < 0 || index >= PROGRESS_CONFIG.manaThresholds.length) {
-        return PROGRESS_CONFIG.manaThresholds[0]; // За замовчуванням перший поріг
+        return PROGRESS_CONFIG.manaThresholds[0];
     }
     return PROGRESS_CONFIG.manaThresholds[index];
 }
@@ -74,7 +84,8 @@ function getManaThreshold(currentLevel) {
  */
 function getUnitLevelsObject(raceKey, unitIndex) {
     // Мапа типів юнітів за індексами
-    const unitTypeNames = ['Warrior', 'Archer', 'Shaman', 'Horses', 'Pikener', 'Horseman', 'Catapult'];
+    const unitTypeNames = ['Warrior', 'Archer', 'Shaman', 'Horses', 'Horseman', 'Catapult', 'Pikener'];
+//                      Index 0    Index 1   Index 2   Index 3   Index 4     Index 5     Index 6
     
     // Мапа рас на префікси змінних
     const racePrefixes = {
@@ -130,7 +141,7 @@ function getUnitIdPrefix(raceKey, unitIndex) {
     }
     
     // Формуємо префікс ID: наприклад orc10 для воїна, orc20 для лучника
-    return `${prefix}${unitIndex + 1}`;
+    return `${prefix}${unitIndex + 1}0`;
 }
 /**
  * Перевіряє чи досягнуто порогу мани і вдосконалює юнітів
@@ -172,7 +183,7 @@ function checkAndUpgradeIfReady(playerIndex, unitType) {
     }
     
     const currentLevel = currentShopUnit.level;
-    const threshold = getManaThreshold(currentLevel);
+const threshold = getManaThreshold(currentLevel, currentShopUnit); // 👈 Передаємо юніта
     
     console.log(`🔍 Перевірка прогресу ${unitType} (рівень ${currentLevel}): ${player.unitMana[unitType]}/${threshold}`);
     
@@ -213,7 +224,7 @@ const currentShopUnit = player.availableUnits[unitIndex];
     const nextLevel = currentLevel + 1;
     
     // Отримуємо поріг для цього рівня
-    const threshold = getManaThreshold(currentLevel);
+    const threshold = getManaThreshold(currentLevel, currentShopUnit); // 👈 Передаємо юніта
     
     console.log(`\n🎯 ВДОСКОНАЛЕННЯ ЮНІТІВ ТИПУ: ${unitType}`);
     //console.log(`   Гравець: ${playerIndex + 1}`);
@@ -243,15 +254,39 @@ const currentShopUnit = player.availableUnits[unitIndex];
         return false;
     }
     
-    // 1. Оновлюємо юніта в магазині
-    player.availableUnits[unitIndex] = nextLevelUnit;
-    console.log(`✅ Магазин: ${currentShopUnit.name} → ${nextLevelUnit.name} (рівень ${nextLevel})`);
+    // 1. Оновлюємо юніта в магазині з правильним кольором
+const coloredNextLevelUnit = window.createColoredUnit 
+? window.createColoredUnit(nextLevelUnit, player.originalIndex)
+: nextLevelUnit;
+
+player.availableUnits[unitIndex] = coloredNextLevelUnit;
+console.log(`✅ Магазин: ${currentShopUnit.name} → ${nextLevelUnit.name} (рівень ${nextLevel})`);
     
     // 2. Оновлюємо всі юніти цього типу на полі
+    // let upgradedCount = 0;
+        // 2. Оновлюємо всі юніти цього типу на полі
+           // 2. Оновлюємо всі юніти цього типу на полі
     let upgradedCount = 0;
     unitsOnMap.forEach((unit, index) => {
         // Перевіряємо чи це юніт потрібного гравця і типу
         if (unit.playerIndex === playerIndex && unit.unitId && unit.unitId.startsWith(getUnitIdPrefix(raceKey, unitIndex))) {
+            
+            // 🎯 ВИПРАВЛЕННЯ: Зберігаємо стан руху/атаки
+            let finalMoved = unit.moved;
+            let finalAttacked = unit.attacked;
+            
+            // Якщо юніт атакував - він не може більше рухатись (для всіх юнітів)
+            if (unit.attacked) {
+                finalMoved = true;
+                console.log(`🎯 ${unit.name} (${unit.id}) атакував → рух заблокований після апгрейду`);
+            }
+            
+            // Додаткова перевірка для катапульти (вона не може рухатись після атаки взагалі)
+            if (unit.name && unit.name.toLowerCase().includes('катапульт') && unit.attacked) {
+                finalMoved = true;
+                finalAttacked = true;
+            }
+            
             // Створюємо вдосконаленого юніта
             const upgradedUnit = {
                 ...nextLevelUnit,
@@ -259,17 +294,21 @@ const currentShopUnit = player.availableUnits[unitIndex];
                 y: unit.y,
                 newhp: Math.min((unit.newhp || unit.hp), nextLevelUnit.hp),
                 playerIndex: unit.playerIndex,
-                moved: unit.moved,
-                attacked: unit.attacked,
+                moved: finalMoved,      // 👈 Використовуємо finalMoved
+                attacked: finalAttacked, // 👈 Використовуємо finalAttacked
                 id: unit.id,
                 effects: unit.effects || []
             };
             
             unitsOnMap[index] = upgradedUnit;
             upgradedCount++;
+            
+            // 🔍 ДІАГНОСТИКА: Перевіряємо що записалося
+            console.log(`🔍 Після апгрейду ${upgradedUnit.name}: moved=${upgradedUnit.moved}, attacked=${upgradedUnit.attacked}, id=${upgradedUnit.id}`);
+            console.log(`🔍 Перевірка unitsOnMap[${index}]:`, unitsOnMap[index].moved, unitsOnMap[index].attacked);
         }
     });
-    
+    console.log("пппп");
     console.log(`✅ На полі вдосконалено ${upgradedCount} юнітів`);
     
     // 3. Оновлюємо відображення (якщо магазин відкритий)
@@ -301,6 +340,10 @@ const currentShopUnit = player.availableUnits[unitIndex];
                     if (typeof updateUnitTablo === 'function') {
                         updateUnitTablo(updatedUnit);
                         console.log('📊 Оновлено табло для вибраного юніта');
+                    }
+                    if (typeof window.updateUnitVisualState === 'function') {
+                        window.updateUnitVisualState(updatedUnit);
+                        console.log('🎨 Оновлено візуальний стан юніта');
                     }
                 }
             }
