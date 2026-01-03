@@ -57,6 +57,7 @@ if (loadSlotId) {
             const neutralCastleImage = "../../img/map/castle/castleStartFon/castleStartFon.jpeg";
             
             castles.forEach(castle => {
+                console.count("ALL CELLS SEARCH");
                 const cells = map.querySelectorAll('.cell');
                 cells.forEach(cell => {
                     const cellX = parseInt(cell.dataset.x);
@@ -656,4 +657,4 @@ window.gameData = {
 
 // console.log('🎯 gameData експортовано:', window.gameData);
 
-// console.log("лоадінгОМАПккк");
+console.log("лоадінгОМАПааааааааа");

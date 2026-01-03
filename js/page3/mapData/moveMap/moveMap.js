@@ -7,6 +7,8 @@ class MapMovement {
       this.map = mapElement;
       this.viewport = viewportElement;
       
+      this.viewportRect = this.viewport.getBoundingClientRect();
+
       // Поточна позиція карти
       this.mapX = 0;
       this.mapY = 0;
@@ -31,28 +33,33 @@ class MapMovement {
       // Ініціалізація обробників
       this.initTouchEvents();
       this.initKeyboardEvents();
+      window.addEventListener('resize', () => {
+        this.updateViewportRect();
+        this.updateMapPosition();
+      });
+      
     }
     
     // ========================================
     // ЦЕНТРУВАННЯ КАРТИ
     // ========================================
     centerMap() {
-      const viewportRect = this.viewport.getBoundingClientRect();
-      
+      this.updateViewportRect();
+const viewportRect = this.viewportRect;
+
       // Центруємо карту
       this.mapX = -(this.mapWidth / 2) + (viewportRect.width / 2);
       this.mapY = -(this.mapHeight / 2) + (viewportRect.height / 2);
       
       this.updateMapPosition();
+      
     }
     
     // ========================================
     // ОНОВЛЕННЯ ПОЗИЦІЇ КАРТИ
     // ========================================
     updateMapPosition() {
-      // Обмеження руху (щоб не виходити за межі)
-      const viewportRect = this.viewport.getBoundingClientRect();
-      
+      const viewportRect = this.viewportRect;
       const minX = -(this.mapWidth - viewportRect.width);
       const maxX = 0;
       const minY = -(this.mapHeight - viewportRect.height);
@@ -64,6 +71,8 @@ class MapMovement {
       
       // Застосовуємо трансформацію
       this.map.style.transform = `translate(${this.mapX}px, ${this.mapY}px)`;
+      
+      
     }
     
     // ========================================
@@ -94,6 +103,11 @@ class MapMovement {
       
       // Змінюємо курсор
       this.viewport.style.cursor = 'grabbing';
+
+      
+    }
+    updateViewportRect() {
+      this.viewportRect = this.viewport.getBoundingClientRect();
     }
     
     handleMove(e) {
@@ -192,8 +206,9 @@ class MapMovement {
       return { x: this.mapX, y: this.mapY };
     }
     centerOnCell(cellX, cellY, cellSize = 60) {
-      const viewportRect = this.viewport.getBoundingClientRect();
-      
+      // const viewportRect = this.viewport.getBoundingClientRect();
+      const viewportRect = this.viewportRect;
+
       // Конвертуємо координати клітинки в піксельні координати
       const unitPixelX = cellX * cellSize;
       const unitPixelY = cellY * cellSize;
