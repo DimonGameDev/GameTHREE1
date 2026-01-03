@@ -49,9 +49,22 @@ function openShop() {
     setTimeout(() => {
         shopClickHandler = function(e) {
             // Перевіряємо чи клік був НЕ всередині магазину
-            if (!ModalWindowsShop.contains(e.target)) {
-                closeShop();
-            }
+           // Прибираємо картинки, залишаємо тільки текст
+upgradeSlots.forEach((slot, index) => {
+    if (!slot || !slot.container) return;
+
+    const upgrade = currentUpgradeList[index];
+    slot.container.dataset.upgradeIndex = upgrade ? index : "";
+    // slot.img видаляємо, бо прибрали <img> з HTML
+    if (slot.name) slot.name.textContent = upgrade?.name || "";
+    if (slot.number) slot.number.textContent = upgrade ? `${upgrade.level} рівень` : "";  // Більш читабельно
+    if (slot.description) slot.description.textContent = upgrade?.description || "";
+    
+    // Ховаємо порожні слоти
+    if (slot.container) {
+        slot.container.style.display = upgrade ? 'block' : 'none';
+    }
+});
         };
         document.addEventListener('click', shopClickHandler);
         console.log('✅ Обробник закриття магазину додано');
@@ -190,12 +203,13 @@ function initShopHandlers() {
     }
     
     // Обробник кнопки закриття магазину
-    const modalBtnLineClose = document.querySelector('.modalBtnLineClose');
-    if (modalBtnLineClose) {
-        modalBtnLineClose.addEventListener('click', () => {
-            closeShop();
-        });
-    }
+const modalBtnLineClose = document.querySelector('.modalBtnLineClose');
+if (modalBtnLineClose) {
+    modalBtnLineClose.addEventListener('click', (e) => {
+        e.stopPropagation(); // ← Додайте це, щоб зупинити спливання
+        closeShop();
+    });
+}
     
     // За замовчуванням магазин закритий
     closeShop();

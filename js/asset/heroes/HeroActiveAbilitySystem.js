@@ -159,11 +159,18 @@ class HeroActiveAbilitySystem {
                 
                 console.log(`🔍 AFTER: newhp=${enemy.newhp}`);
                 console.log(`🏹 ${hero.name} стріляє в ${enemy.name}: ${damage} шкоди`);
-                
+                if (typeof window.addHeroesMana === 'function') {
+                    const heroOriginalIndex = hero.originalIndex ?? hero.playerIndex;
+                    window.addHeroesMana(heroOriginalIndex, damage, false);
+                }
                 // Перевіряємо чи ворог загинув
                 if (enemy.newhp <= 0) {
                     console.log(`💀 ${enemy.name} загинув від стріли!`);
                     // Тут можна додати видалення юніта
+                    if (typeof window.addManaForKill === 'function') {
+                        const heroOriginalIndex = hero.originalIndex ?? hero.playerIndex;
+                        window.addManaForKill(heroOriginalIndex);
+                    }
                 }
                 
                 // Оновлюємо health bar
@@ -708,7 +715,10 @@ this.registerHandler('thorns', {
                         
                         enemy.newhp = Math.max(0, currentHp - actualDamage);
                         console.log(`💥 ${enemy.name} отримав ${actualDamage} урону (HP: ${currentHp} → ${enemy.newhp})`);
-                        
+                        if (typeof window.addHeroesMana === 'function') {
+                            const heroOriginalIndex = hero.originalIndex ?? hero.playerIndex;
+                            window.addHeroesMana(heroOriginalIndex, actualDamage, false);
+                        }
                         // 2️⃣ Зменшуємо крок
 if (stepMinus && stepMinus > 0) {
     // Зберігаємо оригінальний step якщо ще не збережено
@@ -742,6 +752,10 @@ if (stepMinus && stepMinus > 0) {
                         if (enemy.newhp <= 0) {
                             console.log(`☠️ ${enemy.name} загинув від AoE!`);
                             // Тут можна додати видалення юніта
+                            if (typeof window.addManaForKill === 'function') {
+                                const heroOriginalIndex = hero.originalIndex ?? hero.playerIndex;
+                                window.addManaForKill(heroOriginalIndex);
+                            }
                         }
                         
                         affectedEnemies.push({

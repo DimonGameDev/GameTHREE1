@@ -288,19 +288,26 @@ console.log(`✅ Магазин: ${currentShopUnit.name} → ${nextLevelUnit.nam
             }
             
             // Створюємо вдосконаленого юніта
-            const upgradedUnit = {
-                ...nextLevelUnit,
-                x: unit.x,
-                y: unit.y,
-                newhp: Math.min((unit.newhp || unit.hp), nextLevelUnit.hp),
-                playerIndex: unit.playerIndex,
-                moved: finalMoved,      // 👈 Використовуємо finalMoved
-                attacked: finalAttacked, // 👈 Використовуємо finalAttacked
-                id: unit.id,
-                effects: unit.effects || []
-            };
-            
-            unitsOnMap[index] = upgradedUnit;
+const upgradedUnit = {
+    ...nextLevelUnit,
+    x: unit.x,
+    y: unit.y,
+    newhp: Math.min((unit.newhp || unit.hp), nextLevelUnit.hp),
+    playerIndex: unit.playerIndex,
+    moved: finalMoved,
+    attacked: finalAttacked,
+    id: unit.id,
+    effects: unit.effects || [],
+    activeEffects: unit.activeEffects || []
+};
+
+// ✅ КЛЮЧОВЕ: Ініціалізуємо здібності для вдосконаленого юніта
+if (window.AbilityFactory) {
+    upgradedUnit.abilityInstances = AbilityFactory.createAbilities(upgradedUnit);
+    console.log(`✨ Ініціалізовано ${upgradedUnit.abilityInstances.length} здібностей для вдосконаленого ${upgradedUnit.name}`);
+}
+
+unitsOnMap[index] = upgradedUnit;
             upgradedCount++;
             
             // 🔍 ДІАГНОСТИКА: Перевіряємо що записалося

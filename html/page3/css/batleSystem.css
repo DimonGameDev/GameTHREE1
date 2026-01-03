@@ -230,6 +230,26 @@
             brightness(1.05);
 }
 
+/* Підсвічування клітинок для лікування - СОЮЗНИКИ (зелений колір) */
+.cell.cellAttackGreen {
+    border: 1px solid #00ff00 !important;
+    cursor: pointer !important;
+    position: relative;
+    box-shadow: 0 0 30px #00ff00, inset 0 0 60px rgba(0, 255, 0, 0.6) !important;
+}
+
+.cell.cellAttackGreen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 255, 0, 0.3);
+    pointer-events: none;
+    z-index: 0;
+}
+
 /* Прогрес юніта */
 /* .unitProgressBar {
     position: absolute;

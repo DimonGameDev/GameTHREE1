@@ -76,14 +76,17 @@ unit.effects.forEach(effect => {
     const effectItem = document.createElement('div');
     effectItem.classList.add('modEfeUnitsItems');
     
-    // Формуємо текст зі змінами характеристик
-    let statsText = '';
-    if (effect.attackBonus) statsText += `⚔️ Атака: +${effect.attackBonus}\n`;
-    if (effect.armorBonus) statsText += `🛡️ Броня: +${effect.armorBonus}\n`;
-    if (effect.hpBonus) statsText += `❤️ HP: +${effect.hpBonus}\n`;
-    if (effect.stepBonus) statsText += `👟 Крок: +${effect.stepBonus}\n`;
-    if (effect.rangeBonus) statsText += `🎯 Дальність: +${effect.rangeBonus}\n`;
-    
+        // Формуємо текст зі змінами характеристик
+        let statsText = '';
+        if (effect.attackBonus) statsText += `⚔️ Атака: +${effect.attackBonus}\n`;
+        if (effect.attackBoost) statsText += `⚔️ Атака: +${effect.attackBoost}\n`;  // ← ДОДАНО для аури
+        if (effect.attackBoostPercent) statsText += `⚔️ Атака: +${effect.attackBoostPercent}%\n`;  // ← Для відсотків
+        if (effect.armorBonus) statsText += `🛡️ Броня: +${effect.armorBonus}\n`;
+        if (effect.armorBoost) statsText += `🛡️ Броня: +${effect.armorBoost}\n`;  // ← ДОДАНО для аури
+        if (effect.hpBonus) statsText += `❤️ HP: +${effect.hpBonus}\n`;
+        if (effect.hpRegenPercent) statsText += `💚 Реген HP: +${effect.hpRegenPercent}%\n`;  // ← ДОДАНО для аури
+        if (effect.stepBonus) statsText += `👟 Крок: +${effect.stepBonus}\n`;
+        if (effect.rangeBonus) statsText += `🎯 Дальність: +${effect.rangeBonus}\n`;
     // Тривалість
     let durationText = '∞';
     if (effect.duration !== undefined && effect.duration !== null) {

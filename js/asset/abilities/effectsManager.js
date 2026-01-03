@@ -73,19 +73,18 @@ static removeEffect(unit, effect) {
       break;
 
       case "mixed":
-        // 1. Зняти відсотковий бонус атаки
-        if (effect.attackBoostPercent && effect.attackBoostPercent > 0) {
-          const attackBonus = Math.floor((unit.attack || 0) * (effect.attackBoostPercent / (100 + effect.attackBoostPercent)));
-          unit.attack = Math.max(0, unit.attack - attackBonus);
-          console.log(`⚔️ ${unit.name} втратив +${effect.attackBoostPercent}% атаки`);
-        }
-        
-        // 2. Зняти фіксований бонус броні
-        if (effect.armorBoost && effect.armorBoost > 0) {
-          unit.armor = Math.max(0, unit.armor - effect.armorBoost);
-          console.log(`🛡️ ${unit.name} втратив +${effect.armorBoost} броні`);
-        }
-        break;
+    // 1. Зняти фіксований бонус атаки (не відсоток!)
+    if (effect.attackBoost && effect.attackBoost > 0) {
+        unit.attack = Math.max(0, unit.attack - effect.attackBoost);
+        console.log(`⚔️ ${unit.name} втратив +${effect.attackBoost} атаки`);
+    }
+    
+    // 2. Зняти фіксований бонус броні
+    if (effect.armorBoost && effect.armorBoost > 0) {
+        unit.armor = Math.max(0, unit.armor - effect.armorBoost);
+        console.log(`🛡️ ${unit.name} втратив +${effect.armorBoost} броні`);
+    }
+    break;
 
       case "control":
   if (effect.effectType === "immobilize") {

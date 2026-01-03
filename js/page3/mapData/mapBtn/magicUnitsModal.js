@@ -438,19 +438,54 @@ function highlightSelectedSlot(selectedIndex) {
         }
         
         // Рівень або сила
-        const levelElement = document.querySelector(".ModMagicCenNumLevel");
-        if (levelElement) {
-            if (ability.level) {
-                levelElement.textContent = `Рівень ${ability.level}`;
-            } else if (ability.power) {
-                levelElement.textContent = `Сила ${ability.power}`;
-            } else {
-                levelElement.textContent = '';
-            }
-        }
-        
-        // ✅ ДОДАМО РОЗШИРЕНИЙ ОПИС:
-        let detailedDescription = ability.description || '';
+const levelElement = document.querySelector(".ModMagicCenNumLevel");
+if (levelElement) {
+    if (ability.level) {
+        levelElement.textContent = `Рівень ${ability.level}`;
+    } else if (ability.power) {
+        levelElement.textContent = `Сила ${ability.power}`;
+    } else {
+        levelElement.textContent = '';
+    }
+}
+
+// ✅ ДОДАНО: Відображення типу здібності
+const typeElement = document.querySelector(".ModMagicCenNameType");
+if (typeElement) {
+    if (ability.type === "active") {
+        typeElement.textContent = "⚡ АКТИВНА";
+        typeElement.style.background = "linear-gradient(135deg, #ff6b6b, #ee5a6f)";
+        typeElement.style.color = "white";
+        typeElement.style.padding = "5px 12px";
+        typeElement.style.borderRadius = "8px";
+        typeElement.style.display = "inline-block";
+        typeElement.style.fontWeight = "bold";
+    } else if (ability.type === "passive" || ability.type === "pasive") {
+        typeElement.textContent = "🔮 АУРА (ПАСИВНА)";
+        typeElement.style.background = "linear-gradient(135deg, #667eea, #764ba2)";
+        typeElement.style.color = "white";
+        typeElement.style.padding = "5px 12px";
+        typeElement.style.borderRadius = "8px";
+        typeElement.style.display = "inline-block";
+        typeElement.style.fontWeight = "bold";
+    } else {
+        typeElement.textContent = "";
+        typeElement.style.display = "none";
+    }
+}
+
+// ✅ ДОДАНО: Показувати/приховувати кнопку активації
+const activateButton = document.querySelector(".BtnModalMagicCentralActive");
+if (activateButton) {
+    if (ability.type === "passive" || ability.type === "pasive") {
+        activateButton.style.display = "none";
+    } else if (ability.type === "active") {
+        activateButton.style.display = "block";
+    }
+}
+
+// ✅ ДОДАМО РОЗШИРЕНИЙ ОПИС:
+let detailedDescription = ability.description || '';
         
         // Отримуємо екземпляр здібності для деталей
         if (selectedUnitForMove && selectedUnitForMove.abilityInstances) {
@@ -573,22 +608,26 @@ function highlightSelectedSlot(selectedIndex) {
             }
             
             // Для юнітів - якщо є power параметри
-            if (ability.power && typeof ability.power === 'object') {
-                description += "\n\n📊 Бонуси:";
-                const params = [];
-                if (ability.power.attackBoostPercent) params.push(`⚔️ +${ability.power.attackBoostPercent}% атаки`);
-                if (ability.power.armorBoost) params.push(`🛡️ +${ability.power.armorBoost} броні`);
-                if (ability.power.hpRegenPercent) params.push(`💚 +${ability.power.hpRegenPercent}% регену HP`);
-                if (params.length > 0) {
-                    description += "\n" + params.join("\n");
-                }
-            }
+                        // Для юнітів - якщо є power параметри
+                        if (ability.power && typeof ability.power === 'object') {
+                            description += "\n\n📊 Бонуси:";
+                            const params = [];
+                            // ✅ ВИПРАВЛЕНО: Додано attackBoost (фіксований бонус)
+                            if (ability.power.attackBoost) params.push(`⚔️ +${ability.power.attackBoost} атаки`);
+                            if (ability.power.attackBoostPercent) params.push(`⚔️ +${ability.power.attackBoostPercent}% атаки`);
+                            if (ability.range && ability.range > 0) params.push(`📏 Дистанція: ${ability.range} клітинок`);
+                            if (ability.power.armorBoost) params.push(`🛡️ +${ability.power.armorBoost} броні`);
+                            if (ability.power.hpRegenPercent) params.push(`💚 +${ability.power.hpRegenPercent}% регену HP`);
+                            if (params.length > 0) {
+                                description += "\n" + params.join("\n");
+                            }
+                        }
             
             modMagicBoxTextDescription.textContent = description;
         }
         
         // Тип
-        const typeElement = document.querySelector(".ModMagicCenNameType");
+        // const typeElement = document.querySelector(".ModMagicCenNameType");
         if (typeElement) {
             typeElement.textContent = ability.type;
         }
@@ -612,8 +651,15 @@ function clearHealTargets() {
         wrapper.style.border = "";
         wrapper.style.boxShadow = "";
         wrapper.style.cursor = "";
-        wrapper.style.zIndex = ""; // ✅ ДОДАЙТЕ: Скидаємо z-index
+        wrapper.style.zIndex = "";
         wrapper.style.pointerEvents = "";
+    });
+    
+    // ✅ ДОДАНО: Очищаємо підсвічування клітинок
+    document.querySelectorAll('.heal-target-cell').forEach(cell => {
+        cell.style.backgroundColor = '';
+        cell.style.opacity = '';
+        cell.classList.remove('heal-target-cell');
     });
     
     isSelectingHealTarget = false;
@@ -686,41 +732,118 @@ function highlightHealTargets(caster, ability) {
     activeHealAbility = ability;
     healCaster = caster;
     
-    // Знаходимо союзників в радіусі (включаючи самого себе для самолікування)
-    const allies = unitsOnMap.filter(unit => 
-        unit.playerIndex === caster.playerIndex && unit.id !== caster.id
-    );
-    
+    // ✅ ПІДСВІЧУЄМО ВСІ КЛІТИНКИ В РАДІУСІ (як у героїв)
+    const range = ability.range || 3;
     let targetsFound = 0;
     
-    allies.forEach(ally => {
-        const distance = ability.calculateDistance(caster, ally);
-        
-        if (distance <= ability.range) {
-            // Знаходимо візуальний елемент юніта
-            const wrapper = document.querySelector(`[data-unit-id="${ally.id}"]`);
+    for (let dx = -range; dx <= range; dx++) {
+        for (let dy = -range; dy <= range; dy++) {
+            if (dx === 0 && dy === 0) continue; // Пропускаємо клітинку кастера
             
-            if (wrapper) {
-                // Підсвічуємо зеленим
-                wrapper.style.border = "3px solid #00ff00";
-                wrapper.style.boxShadow = "0 0 15px #00ff00";
-                wrapper.style.cursor = "pointer";
-                wrapper.style.zIndex = "1000";
-                wrapper.style.pointerEvents = "auto";
+            const targetX = caster.x + dx;
+            const targetY = caster.y + dy;
+            
+            // Перевіряємо відстань
+            const distance = Math.abs(dx) + Math.abs(dy);
+            if (distance > range) continue;
+            
+            // Знаходимо клітинку
+            const cell = document.querySelector(`.cell[data-x="${targetX}"][data-y="${targetY}"]`);
+            if (!cell) continue;
+            
+            // Шукаємо юніта на клітинці
+            const targetUnit = unitsOnMap.find(u => u.x === targetX && u.y === targetY);
+            
+            if (targetUnit && targetUnit.playerIndex === caster.playerIndex) {
+                // Це союзник - підсвічуємо ЯСКРАВО зеленим
+                const wrapper = document.querySelector(`[data-unit-id="${targetUnit.id}"]`);
+                if (wrapper) {
+                    wrapper.style.border = '3px solid #00ff00';
+                    wrapper.style.boxShadow = '0 0 15px #00ff00';
+                    wrapper.style.cursor = 'pointer';
+                    wrapper.style.zIndex = '1000';
+                    wrapper.style.pointerEvents = 'auto';
+                }
                 
+                cell.style.backgroundColor = '#00ff00';
+                cell.style.opacity = '0.6';
+                cell.classList.add('heal-target-cell');
                 targetsFound++;
+            } else {
+                // Порожня клітинка або ворог - підсвічуємо БЛІДО
+                cell.style.backgroundColor = '#00ff00';
+                cell.style.opacity = '0.2';
+                cell.classList.add('heal-target-cell');
             }
         }
-    });
-    
-    if (targetsFound === 0) {
-        alert(`❌ Немає союзників в радіусі ${ability.range} клітинок`);
-        clearHealTargets();
-        return false;
     }
     
-    console.log(`✅ Підсвічено ${targetsFound} можливих союзників`);
+    console.log(`✅ Підсвічено клітинки в радіусі ${range} (знайдено союзників: ${targetsFound})`);
     return true;
+}
+
+
+/**
+ * Підсвічує ворогів для контролю та дебафів
+ */
+/**
+ * Підсвічує ворогів для контролю та дебафів
+ */
+function highlightEnemyTargets(caster, ability) {
+    clearHealTargets();
+    
+    isSelectingHealTarget = true;
+    activeHealAbility = ability;
+    healCaster = caster;
+    
+    // ✅ ПІДСВІЧУЄМО ВСІ КЛІТИНКИ В РАДІУСІ
+    const range = ability.range || 3;
+    let enemiesFound = 0;
+    
+    for (let dx = -range; dx <= range; dx++) {
+        for (let dy = -range; dy <= range; dy++) {
+            if (dx === 0 && dy === 0) continue;
+            
+            const targetX = caster.x + dx;
+            const targetY = caster.y + dy;
+            
+            // Перевіряємо відстань
+            const distance = Math.abs(dx) + Math.abs(dy);
+            if (distance > range) continue;
+            
+            // Знаходимо клітинку
+            const cell = document.querySelector(`.cell[data-x="${targetX}"][data-y="${targetY}"]`);
+            if (!cell) continue;
+            
+            // Шукаємо юніта на клітинці
+            const targetUnit = unitsOnMap.find(u => u.x === targetX && u.y === targetY);
+            
+            if (targetUnit && targetUnit.playerIndex !== caster.playerIndex) {
+                // Це ВОРОГ - підсвічуємо ЯСКРАВО
+                const wrapper = document.querySelector(`[data-unit-id="${targetUnit.id}"]`);
+                if (wrapper) {
+                    wrapper.style.border = '3px solid #ff0000';
+                    wrapper.style.boxShadow = '0 0 15px #ff0000';
+                    wrapper.style.cursor = 'crosshair';
+                    wrapper.style.zIndex = '1000';
+                    wrapper.style.pointerEvents = 'auto';
+                }
+                
+                cell.style.backgroundColor = '#ff0000';
+                cell.style.opacity = '0.6';
+                cell.classList.add('heal-target-cell');
+                enemiesFound++;
+            } else {
+                // Порожня клітинка або союзник - ТЕЖ підсвічуємо блідо
+                cell.style.backgroundColor = '#ff0000';
+                cell.style.opacity = '0.2';
+                cell.classList.add('heal-target-cell');
+            }
+        }
+    }
+    
+    console.log(`✅ Підсвічено клітинки в радіусі ${range} (знайдено ворогів: ${enemiesFound})`);
+    return true;  // ← Завжди повертаємо true, навіть якщо немає ворогів
 }
 
 /**

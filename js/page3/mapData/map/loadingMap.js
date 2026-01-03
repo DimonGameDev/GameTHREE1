@@ -1,30 +1,6 @@
-// ============================================
-// ЗАВАНТАЖЕННЯ ДАНИХ З СТОРІНКИ 2 (page2)
-// ============================================
 
-// Масив кольорів прапорів для 4 гравців
-// let colorFlag = [
-//     "rgb(255, 80, 80)",   // Гравець 1 - червоний
-//     "rgb(80, 80, 255)",   // Гравець 2 - синій  
-//     "rgb(80, 255, 80)",   // Гравець 3 - зелений
-//     "rgb(255, 220, 80)"   // Гравець 4 - жовтий
-// ];
-
-// // Змінні гри
-// let currentPlayerIndex = 0;  // Поточний гравець (за замовчуванням гравець 1)
-// let players = [];            // Масив активних гравців
-// let unitsOnMap = [];
-// window.unitsOnMap = unitsOnMap;         // Юніти на карті
-// let maxUnitsOnField = 0;     // Максимальна кількість юнітів на полі
 window.unitsOnMap = unitsOnMap;
-// Завантажуємо налаштування з localStorage
-// ============================================
-// ПЕРЕВІРКА ЗБЕРЕЖЕНОЇ ГРИ
-// ============================================
 
-// Спочатку перевіряємо чи є збережена гра
-// Спочатку перевіряємо чи є збережена гра
-// let loadedFromSave = false;
 
 // Перевіряємо чи користувач прийшов з page1 з підтвердженням
 const urlParams = new URLSearchParams(window.location.search);
@@ -116,12 +92,113 @@ if (savedState.capturedGoldHouses) {
     console.log(`🏠 Відновлено ${window.capturedGoldHouses.length} хаток`);
 }
             
-            // Відновлюємо юнітів
-            unitsOnMap = savedState.units;
-            window.unitsOnMap = unitsOnMap;
+            // Відновлюємо юнітів (регенеруємо через шаблони для здібностей)
+unitsOnMap = savedState.units.map(savedUnit => {
+    // Знаходимо шаблон юніта
+    let templateUnit = null;
+    
+    if (savedUnit.isHero) {
+        // ✅ НОВИЙ ПІДХІД: Створюємо героя заново з правильним кольором
+        
+        // Знаходимо шаблон героя за іменем (якщо heroTemplateId відсутній)
+        let heroIndex = -1;
+        if (savedUnit.heroTemplateId) {
+            heroIndex = savedUnit.heroTemplateId - 1;
+        } else {
+            // Шукаємо за іменем для старих збережень
+            heroIndex = window.heroes.findIndex(h => h.name === savedUnit.name);
+            console.log(`🔧 Знайдено героя ${savedUnit.name} за іменем, індекс: ${heroIndex}`);
+        }
+        
+        if (heroIndex >= 0 && window.heroes[heroIndex]) {
+            const heroTemplate = window.heroes[heroIndex];
+            const player = players[savedUnit.playerIndex];
+            
+            // Створюємо героя ЗАНОВО з шаблону
+            templateUnit = {
+                ...heroTemplate,
+                abilitiesProgress: heroTemplate.abilitiesProgress.map(ability => ({...ability})),
+                effects: heroTemplate.effects ? [...heroTemplate.effects] : [],
+            };
+            
+            // Встановлюємо правильне кольорове зображення
+            if (window.getColoredHeroImage && player) {
+                templateUnit.img = window.getColoredHeroImage(heroTemplate.img, player.originalIndex);
+                console.log(`🎨 Створено героя ${heroTemplate.name} з кольором гравця ${player.originalIndex + 1}`);
+            }
+            
+            // Зберігаємо heroTemplateId для майбутніх збережень
+            templateUnit.heroTemplateId = heroTemplate.id;
+        } else {
+            console.error(`❌ Не знайдено шаблон героя для ${savedUnit.name}`);
+            templateUnit = { ...savedUnit };
+        }
+        
+        // Створюємо відновленого юніта
+        const restoredUnit = templateUnit ? { ...templateUnit } : { ...savedUnit };
+        
+        // Відновлюємо ЗБЕРЕЖЕНІ дані (позицію, стан, прогрес)
+        restoredUnit.id = savedUnit.id;
+        restoredUnit.playerIndex = savedUnit.playerIndex;
+        restoredUnit.originalIndex = savedUnit.originalIndex;
+        restoredUnit.x = savedUnit.x;  // ← Позиція зі збереження
+        restoredUnit.y = savedUnit.y;  // ← Позиція зі збереження
+        restoredUnit.hp = savedUnit.hp;
+        restoredUnit.newhp = savedUnit.newhp;
+        restoredUnit.moved = savedUnit.moved;
+        restoredUnit.attacked = savedUnit.attacked;
+        restoredUnit.canAttack = savedUnit.canAttack;
+        restoredUnit.effects = savedUnit.effects || [];
+        restoredUnit.activeEffects = savedUnit.activeEffects || [];
+        restoredUnit.isHero = true;
+        restoredUnit.maxHp = savedUnit.hp || heroTemplate.hp;
+        
+        // Відновлюємо прогрес героя зі збереження
+        restoredUnit.level = savedUnit.level;
+        restoredUnit.LevelAttack = savedUnit.LevelAttack;
+        restoredUnit.LevelArmor = savedUnit.LevelArmor;
+        restoredUnit.abilitiesProgress = savedUnit.abilitiesProgress;
+        
+        // Ініціалізуємо здібності
+        if (window.AbilityFactory) {
+            restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
+            console.log(`✨ Відновлено ${restoredUnit.abilityInstances.length} здібностей для ${restoredUnit.name}`);
+        }
+        // ✅ Відновлюємо кулдауни здібностей героїв
+if (savedState.heroCooldowns && window.heroAbilitySystem) {
+    savedState.heroCooldowns.forEach(([key, value]) => {
+        window.heroAbilitySystem.currentCooldowns.set(key, value);
+    });
+    console.log(`⏱️ Відновлено ${savedState.heroCooldowns.length} кулдаунів здібностей`);
+}
+    //     // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
+    // if (window.AbilityFactory) {
+    //     restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
+    //     console.log(`✨ Відновлено ${restoredUnit.abilityInstances.length} здібностей для ${restoredUnit.name}`);
+    // }
+        return restoredUnit;
+    }
+    
+    
+    
+    return restoredUnit;
+});
+window.unitsOnMap = unitsOnMap;
             
             console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
-
+// ✅ ДОДАНО: Відновлюємо кулдауни здібностей героїв
+if (savedState.heroCooldowns && window.heroActiveAbilitySystem) {
+    window.heroActiveAbilitySystem.currentCooldowns.clear(); // Спочатку очищаємо
+    savedState.heroCooldowns.forEach(([key, value]) => {
+        window.heroActiveAbilitySystem.currentCooldowns.set(key, value);
+    });
+    console.log(`⏱️ Відновлено ${savedState.heroCooldowns.length} кулдаунів здібностей`);
+} else {
+    console.warn('⚠️ Кулдауни не відновлено:', {
+        hasCooldowns: !!savedState.heroCooldowns,
+        hasSystem: !!window.heroActiveAbilitySystem
+    });
+}
             if (maxUnits) {
                 maxUnits.innerText = maxUnitsOnField;
                 console.log(`📊 Оновлено maxUnits: ${maxUnitsOnField}`);
@@ -232,11 +309,97 @@ if (savedState.capturedGoldHouses) {
     console.log(`🏠 Відновлено ${window.capturedGoldHouses.length} хаток`);
 }
                 
-                // Відновлюємо юнітів
-                unitsOnMap = savedState.units;
-                window.unitsOnMap = unitsOnMap;
+                // Відновлюємо юнітів (регенеруємо через шаблони для здібностей)
+unitsOnMap = savedState.units.map(savedUnit => {
+    // Знаходимо шаблон юніта
+    let templateUnit = null;
+    
+    if (savedUnit.isHero && savedUnit.heroTemplateId) {
+        // Для героїв - знаходимо шаблон з window.heroes
+        templateUnit = window.heroes[savedUnit.heroTemplateId - 1];
+    } else if (savedUnit.unitId) {
+        // Для звичайних юнітів - знаходимо в availableUnits гравця
+        // ✅ ВИПРАВЛЕНО: Шукаємо гравця за playerIndex, а не originalIndex
+        const player = players[savedUnit.playerIndex];
+        console.log(`🔍 Шукаю шаблон для ${savedUnit.name}, unitId: ${savedUnit.unitId}, playerIndex: ${savedUnit.playerIndex}`);
+        
+        if (player && player.availableUnits) {
+            templateUnit = player.availableUnits.find(u => u.unitId === savedUnit.unitId);
+            console.log(`🔍 Знайдено шаблон:`, templateUnit ? `${templateUnit.name} (${templateUnit.unitId})` : 'НЕ ЗНАЙДЕНО');
+            console.log(`🔍 Abilities в шаблоні:`, templateUnit?.abilities);
+        } else {
+            console.warn(`⚠️ Гравець не знайдений для playerIndex: ${savedUnit.playerIndex}`);
+        }
+    }
+    
+    // Створюємо новий об'єкт юніта на основі шаблону
+    const restoredUnit = templateUnit ? { ...templateUnit } : { ...savedUnit };
+    
+          // Відновлюємо збережені дані (НЕ використовуємо Object.assign, щоб не перезаписати abilities)
+    restoredUnit.id = savedUnit.id;
+    restoredUnit.playerIndex = savedUnit.playerIndex;
+    restoredUnit.originalIndex = savedUnit.originalIndex;
+    restoredUnit.x = savedUnit.x;
+    restoredUnit.y = savedUnit.y;
+    restoredUnit.hp = savedUnit.hp;
+    restoredUnit.newhp = savedUnit.newhp;
+    restoredUnit.moved = savedUnit.moved;
+    restoredUnit.attacked = savedUnit.attacked;
+    restoredUnit.canAttack = savedUnit.canAttack;
+    restoredUnit.effects = savedUnit.effects || [];
+    restoredUnit.activeEffects = savedUnit.activeEffects || [];
+    // abilities залишається з шаблону! ✅
+    
+        // Для героїв - відновлюємо прогрес і регенеруємо зображення
+        if (savedUnit.isHero) {
+            restoredUnit.level = savedUnit.level;
+            restoredUnit.LevelAttack = savedUnit.LevelAttack;
+            restoredUnit.LevelArmor = savedUnit.LevelArmor;
+            restoredUnit.abilitiesProgress = savedUnit.abilitiesProgress;
+            
+            // ✅ РЕГЕНЕРУЄМО ЗОБРАЖЕННЯ з правильним кольором
+            if (restoredUnit.heroTemplateId && window.getColoredHeroImage) {
+                const heroTemplate = window.heroes[restoredUnit.heroTemplateId - 1];
+                if (heroTemplate) {
+                    const player = players[savedUnit.playerIndex];
+                    const colorIndex = player ? player.originalIndex : savedUnit.playerIndex;
+                    restoredUnit.img = window.getColoredHeroImage(heroTemplate.img, colorIndex);
+                    console.log(`🎨 Регенеровано зображення героя ${restoredUnit.name} з кольором гравця ${colorIndex + 1}`);
+                }
+            }
+        }
+    
+    // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
+    if (window.AbilityFactory) {
+        restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
+        console.log(`✨ Відновлено ${restoredUnit.abilityInstances.length} здібностей для ${restoredUnit.name}`);
+    }
+    // ✅ Відновлюємо кулдауни здібностей героїв
+if (savedState.heroCooldowns && window.heroAbilitySystem) {
+    savedState.heroCooldowns.forEach(([key, value]) => {
+        window.heroAbilitySystem.currentCooldowns.set(key, value);
+    });
+    console.log(`⏱️ Відновлено ${savedState.heroCooldowns.length} кулдаунів здібностей`);
+}
+    
+    return restoredUnit;
+});
+window.unitsOnMap = unitsOnMap;
                 
                 console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
+                // ✅ ДОДАНО: Відновлюємо кулдауни здібностей героїв
+if (savedState.heroCooldowns && window.heroActiveAbilitySystem) {
+    window.heroActiveAbilitySystem.currentCooldowns.clear();
+    savedState.heroCooldowns.forEach(([key, value]) => {
+        window.heroActiveAbilitySystem.currentCooldowns.set(key, value);
+    });
+    console.log(`⏱️ Відновлено ${savedState.heroCooldowns.length} кулдаунів здібностей`);
+} else {
+    console.warn('⚠️ Кулдауни не відновлено:', {
+        hasCooldowns: !!savedState.heroCooldowns,
+        hasSystem: !!window.heroActiveAbilitySystem
+    });
+}
                 // if (typeof window.applyTileDefenseBonuses === 'function') {
                 //     unitsOnMap.forEach(unit => {
                 //         window.applyTileDefenseBonuses(unit);
@@ -423,10 +586,10 @@ if (loadedFromSave && unitsOnMap.length > 0) {
                 const heroTemplate = window.heroes[unit.heroTemplateId - 1];
                 if (heroTemplate && window.getColoredHeroImage) {
                     // 🔍 ДІАГНОСТИКА: Виводимо інформацію про юніта
-                    //console.log(`🔍 Герой ${unit.name} (ID: ${unit.heroTemplateId}):`, {
-                       // playerIndex: unit.playerIndex,
-                        //originalIndex: unit.originalIndex
-                    //});
+                    console.log(`🔍 Герой ${unit.name} (ID: ${unit.heroTemplateId}):`, {
+                       playerIndex: unit.playerIndex,
+                        originalIndex: unit.originalIndex
+                    });
                     
                     // ✅ ВИПРАВЛЕННЯ: Знаходимо правильний originalIndex через гравця
                     let correctOriginalIndex = unit.originalIndex;
@@ -435,7 +598,7 @@ if (loadedFromSave && unitsOnMap.length > 0) {
                     if (correctOriginalIndex === undefined || correctOriginalIndex === null) {
                         const player = players[unit.playerIndex];
                         correctOriginalIndex = player ? player.originalIndex : 0;
-                        //console.warn(`⚠️ У героя ${unit.name} немає originalIndex, використовую ${correctOriginalIndex} з гравця`);
+                        console.warn(`⚠️ У героя ${unit.name} немає originalIndex, використовую ${correctOriginalIndex} з гравця`);
                     }
                     
                     unit.img = window.getColoredHeroImage(heroTemplate.img, correctOriginalIndex);
@@ -492,3 +655,5 @@ window.gameData = {
 };
 
 // console.log('🎯 gameData експортовано:', window.gameData);
+
+// console.log("лоадінгОМАПккк");

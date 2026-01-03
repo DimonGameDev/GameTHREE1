@@ -52,6 +52,27 @@ function hideEndTurnButton() {
 }
 
 /**
+ * Закриває кнопку завершення ходу при кліку поза нею
+ */
+function initEndTurnButtonClickOutside() {
+    document.addEventListener('click', (event) => {
+        if (!BtnActiveUnitEndTurn) return;
+        
+        // Перевіряємо чи кнопка видима
+        if (BtnActiveUnitEndTurn.style.display !== 'block') return;
+        
+        // Перевіряємо чи клік був НЕ на кнопці
+        if (!BtnActiveUnitEndTurn.contains(event.target)) {
+            hideEndTurnButton();
+            console.log('✅ Кнопку завершення ходу закрито (клік поза нею)');
+        }
+    });
+}
+
+// Викликаємо один раз при завантаженні
+initEndTurnButtonClickOutside();
+
+/**
  * Завершує хід юніта достроково
  */
 function endUnitTurn(unit) {
@@ -82,10 +103,6 @@ function endUnitTurn(unit) {
 }
 
 
-
-/**
- * Очищає підсвічені клітинки руху
- */
 function clearMoveCells() {
     document.querySelectorAll(".cell").forEach(cell => {
         cell.classList.remove("moveCellMap");
@@ -95,9 +112,6 @@ function clearMoveCells() {
 }
 
 
-/**
- * Підсвічує доступні клітинки для руху юніта
- */
 function highlightMoveCells(unit) {
     // Очищаємо старі підсвічені клітинки
     
@@ -161,9 +175,7 @@ function highlightMoveCells(unit) {
             
             if (costToMove === Infinity) continue; // непрохідна клітинка
             
-            // Перевіряємо чи немає там вже юніта
-            // const hasUnit = unitsOnMap.some(u => u.x === nx && u.y === ny && u !== unit);
-            // if (hasUnit) continue; // клітинка зайнята
+         
             
             let newCost = cost + costToMove;
             
@@ -223,9 +235,7 @@ function highlightMoveCells(unit) {
     // console.log(`✅ Підсвічено доступні клітинки для руху юніта ${unit.name}`);
 }
 
-/**
- * Дозволяє рухати юніта після підсвічування клітинок
- */
+
 function enableUnitMovement(unit, cellPlayer) {
     // Якщо юніт уже ходив — нічого не робимо
     if (unit.moved) {
@@ -303,16 +313,7 @@ function enableUnitMovement(unit, cellPlayer) {
     if (window.EffectsManager && window.EffectsManager.hasAuraAbility(unit)) {
         EffectsManager.applyUnitAuras(unit);
     }
-                        // // Додаткове очищення для мобільних
-                        // setTimeout(() => {
-                        //     document.querySelectorAll(".cell").forEach(cell => {
-                        //         cell.classList.remove("moveCellMap");
-                        //         // Примусово скидаємо всі inline стилі
-                        //         cell.style.backgroundColor = '';
-                        //         cell.style.boxShadow = '';
-                        //         cell.style.border = '';
-                        //     });
-                        // }, 100); // Збільшив затримку до 100мс
+
         }
     
     // Додаємо слухачі тільки до клітинок з класом moveCellMap
@@ -321,11 +322,7 @@ function enableUnitMovement(unit, cellPlayer) {
         cell.addEventListener("click", handleMove, { once: true });
     });
 }
-/**
- * Переміщує юніта на нову позицію
- */
-// В файлі: GameTHREE/js/page3/mapData/map/gameLogicMap/unitSelection.js
-// Замініть функцію moveUnit() на цю версію:
+
 
 function moveUnit(unit, cellPlayer, targetX, targetY) {
     const cellSize = cellSizeAll;
@@ -376,12 +373,7 @@ function moveUnit(unit, cellPlayer, targetX, targetY) {
         }, 300);
     }
 
-/**
- * Обробляє клік по юніту
- */
-/**
- * Обробляє клік по юніту
- */
+
 function handleUnitClick(unit, cellPlayer) {
     const currentPlayer = players[currentPlayerIndex];
     if (!currentPlayer) {
@@ -424,8 +416,6 @@ if (BtnActiveHauseGoldCapture) {
         }
     }
 
-    // ... решта коду без змін
-
     if (unit.playerIndex !== currentPlayerIndex) {
         // console.log('[handleUnitClick] чужий юніт', unit.name, 'playerIndex', unit.playerIndex, 'current', currentPlayerIndex);
         clearMoveCells();
@@ -438,13 +428,7 @@ if (BtnActiveHauseGoldCapture) {
         return;
     }
    
-    // подальша логіка без змін
-
-    // подальша логіка без змін
-
-    
-    
-    
+ 
    // ⬇️ ВИПРАВЛЕННЯ: Оновлюємо selectedUnitForMove ЗАВЖДИ, навіть якщо юніт вже ходив
 selectedUnitForMove = unit;
 selectedUnitVisual = cellPlayer;
@@ -734,18 +718,107 @@ if (daniUnitsCrit) {
         daniUnitsCrit.style.color = '#888';
     }
 }
-        // 🔧 ДЕБАГ: перевіряємо tempBonuses
-        //console.log('📊 tempBonuses:', unit.tempBonuses);
-        
-        // 🔧 ВИПРАВЛЕНО: Показуємо бонус від здібностей (тільки %)
-        if (unit.tempBonuses && unit.tempBonuses.attackPercent > 0) {
-            const bonusPercent = unit.tempBonuses.attackPercent;
-            daniUnitsAtack.innerHTML = finalAttack + ` <span style="color:#00ff00">(+${bonusPercent}%)</span>`;
-        } else {
-            daniUnitsAtack.innerText = finalAttack;
-        }
+
+// ✨ Показуємо бонуси від аури в табло
+if (unit.activeEffects && unit.activeEffects.length > 0) {
+    console.log('🔍 DEBUG: activeEffects юніта:', unit.activeEffects);
     
+    // Шукаємо аури (ефекти від інших юнітів з attackBoost або armorBoost)
+    const auraEffects = unit.activeEffects.filter(e => 
+        (e.type === "attack" || e.type === "armor" || e.type === "mixed") && 
+        e.abilityName && 
+        (e.abilityName.includes("Аура") || e.abilityName.includes("підтримки"))
+    );
+    
+    console.log('🔍 DEBUG: Знайдено auraEffects:', auraEffects);
+    
+    if (auraEffects.length > 0) {
+        // ДЕТАЛЬНИЙ ЛОГ: подивимося що всередині
+        console.log('📊 Структура першого ефекту:', auraEffects[0]);
+        console.log('📊 Структура першого ефекту:', auraEffects[0]);
+        console.log('📊 ВСІ КЛЮЧІ:', Object.keys(auraEffects[0]));
+        console.log('📊 ВСІ ЗНАЧЕННЯ:', Object.values(auraEffects[0]));
+                // Рахуємо ФІКСОВАНІ бонуси (правильні назви полів!)
+                const auraAttackBoost = auraEffects.reduce((sum, e) => {
+                    const boost = e.attackBonus || e.attackBoost || e.attack || 0;
+                    console.log('🔍 Ефект:', e.abilityName, '→ attack bonus:', boost);
+                    return sum + boost;
+                }, 0);
+                
+                const auraArmorBoost = auraEffects.reduce((sum, e) => {
+                    const boost = e.armorBonus || e.armorBoost || e.armor || 0;
+                    console.log('🔍 Ефект:', e.abilityName, '→ armor bonus:', boost);
+                    return sum + boost;
+                }, 0);
+                
+                console.log('🔍 DEBUG: Бонуси від аур:', { auraAttackBoost, auraArmorBoost });
+        
+        // Показуємо атаку як 23(+3)
+        if (daniUnitsAtack && auraAttackBoost > 0) {
+            // finalAttack УЖЕ містить бонус, тому віднімаємо його для відображення
+            const baseAttack = finalAttack - auraAttackBoost;
+            daniUnitsAtack.innerText = `${baseAttack}(+${auraAttackBoost})`;
+            daniUnitsAtack.style.color = '#00ff88';
+            daniUnitsAtack.style.fontWeight = 'bold';
+            console.log(`✨ Табло атака: ${baseAttack}(+${auraAttackBoost})`);
+        } else if (daniUnitsAtack) {
+            daniUnitsAtack.innerText = finalAttack;
+            daniUnitsAtack.style.color = '';
+            daniUnitsAtack.style.fontWeight = '';
+        }
+        
+        // Показуємо броню як 15(+2)
+        if (daniUnitsArmor && auraArmorBoost > 0) {
+            let baseArmor = unit.isHero 
+                ? (unit.armor || 0) + (unit.LevelArmor || 0) - auraArmorBoost
+                : (unit.armor || 0) - auraArmorBoost;
+            
+            // ✅ ВИПРАВЛЕНО: Визначаємо tileBonus локально
+            const tileBonusForArmor = unit.tileBonuses 
+                ? (unit.tileBonuses.armor || 0) + (unit.tileBonuses.defense || 0)
+                : 0;
+            
+            console.log('🔍 DEBUG: Броня в табло:', {
+                unitArmor: unit.armor,
+                auraArmorBoost: auraArmorBoost,
+                baseArmor: baseArmor,
+                tileBonus: tileBonusForArmor
+            });
+            
+            if (tileBonusForArmor > 0) {
+                // Якщо є бонус від клітинки теж: 15+3(+2)
+                daniUnitsArmor.innerText = `${baseArmor}+${tileBonusForArmor}(+${auraArmorBoost})`;
+            } else {
+                // Тільки аура: 15(+2)
+                daniUnitsArmor.innerText = `${baseArmor}(+${auraArmorBoost})`;
             }
+            daniUnitsArmor.style.color = '#00ff88';
+            daniUnitsArmor.style.fontWeight = 'bold';
+            console.log(`✨ Табло броня: ${baseArmor}(+${auraArmorBoost})`);
+        } else {
+            console.log('❌ Броня НЕ відображається:', {
+                hasDaniUnitsArmor: !!daniUnitsArmor,
+                auraArmorBoost: auraArmorBoost
+            });
+        }
+    } else {
+        // Немає ефектів аури - показуємо звичайну атаку
+        if (daniUnitsAtack) {
+            daniUnitsAtack.innerText = finalAttack;
+            daniUnitsAtack.style.color = '';
+            daniUnitsAtack.style.fontWeight = '';
+        }
+    }
+} else {
+    // Немає activeEffects взагалі - показуємо звичайну атаку
+    if (daniUnitsAtack) {
+        daniUnitsAtack.innerText = finalAttack;
+        daniUnitsAtack.style.color = '';
+        daniUnitsAtack.style.fontWeight = '';
+    }
+}
+
+        }  // ← Закриття if (daniUnitsAtack) з рядка 712
 
     // Оновлюємо ману юніта/героя
     if (unit.playerIndex !== undefined) {

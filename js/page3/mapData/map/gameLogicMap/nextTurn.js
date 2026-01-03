@@ -422,3 +422,5 @@ if (document.readyState === 'loading') {
 } else {
     setTimeout(initNextTurnButton, 100);
 }
+
+console.log("нікстТур");

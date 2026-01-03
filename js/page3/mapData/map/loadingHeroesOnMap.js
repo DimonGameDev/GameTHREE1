@@ -171,7 +171,7 @@ function createHeroVisual(heroUnit) {
     let cellPlayer = document.createElement("img");
     cellPlayer.classList.add("cellPlayer");
     cellPlayer.src = heroUnit.img;
-    cellPlayer.style.border = `1px dashed ${colorFlag[players.findIndex(p => p.originalIndex === heroUnit.playerIndex)]}`;
+    cellPlayer.style.border = `1px dashed ${colorFlag[heroUnit.originalIndex]}`;
     cellPlayer.style.boxSizing = "border-box";
     cellPlayer.style.pointerEvents = "none";
     

@@ -215,6 +215,8 @@ function saveGameToSlot(slotId, saveName) {
             effects: unit.effects,
             activeEffects: unit.activeEffects
         })),
+        heroCooldowns: window.heroActiveAbilitySystem ? 
+    Array.from(window.heroActiveAbilitySystem.currentCooldowns.entries()) : [],
         capturedGoldHouses: window.capturedGoldHouses || []
     };
     

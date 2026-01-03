@@ -15,7 +15,7 @@ window.heroes = [
       img: "../../img/heroes/heroesList/tuveran/blue/tuveranBlue.png",
       description: "Майстер лука, що може вражати ворогів на відстані.",
       abilitiesProgress: [
-        { abilityId: 12, currentLevel: 4 },  
+        { abilityId: 12, currentLevel: 1 },  
         { abilityId: 1, currentLevel: 1 },  
         { abilityId: 2, currentLevel: 1 }  
       ],

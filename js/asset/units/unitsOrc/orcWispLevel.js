@@ -18,7 +18,7 @@ let orcWispLevels = {
       abilities: [
         { 
           key: "supportAura", 
-          power: { attackBoostPercent: 3, armorBoost: 2, hpRegenPercent: 30 }
+          power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
         },
       ],
       effects: []
@@ -39,7 +39,7 @@ let orcWispLevels = {
       abilities: [
         { 
           key: "supportAura", 
-          power: { attackBoostPercent: 3, armorBoost: 2, hpRegenPercent: 30 }
+          power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
         },
       ],
       effects: []
@@ -60,7 +60,7 @@ let orcWispLevels = {
         abilities: [
           { 
             key: "supportAura", 
-            power: { attackBoostPercent: 3, armorBoost: 2, hpRegenPercent: 30 }
+            power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
           },
         ],
         effects: []
@@ -81,7 +81,7 @@ let orcWispLevels = {
         abilities: [
           { 
             key: "supportAura", 
-            power: { attackBoostPercent: 3, armorBoost: 2, hpRegenPercent: 30 }
+            power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
           },
         ],
         effects: []
@@ -102,7 +102,7 @@ let orcWispLevels = {
         abilities: [
           { 
             key: "supportAura", 
-            power: { attackBoostPercent: 3, armorBoost: 2, hpRegenPercent: 30 }
+            power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
           },
         ],
         effects: []
@@ -123,7 +123,7 @@ let orcWispLevels = {
         abilities: [
           { 
             key: "supportAura", 
-            power: { attackBoostPercent: 5, armorBoost: 4, hpRegenPercent: 50 }
+            power: { attackBoost: 5, armorBoost: 4, hpRegenPercent: 30 }
           },
         ],
         effects: []
@@ -144,7 +144,7 @@ let orcWispLevels = {
         abilities: [
           { 
             key: "supportAura", 
-            power: { attackBoostPercent: 5, armorBoost: 4, hpRegenPercent: 50 }
+            power: { attackBoost: 5, armorBoost: 4, hpRegenPercent: 30 }
               },
         ],
         effects: []
@@ -165,7 +165,7 @@ let orcWispLevels = {
       abilities: [
         { 
           key: "supportAura", 
-          power: { attackBoostPercent: 5, armorBoost: 4, hpRegenPercent: 50 }
+          power: { attackBoost: 5, armorBoost: 4, hpRegenPercent: 30 }
         },
       ],
       effects: []

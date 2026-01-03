@@ -364,11 +364,11 @@ createAuraEffect(source) {
     case "hp":
       effect.healAmount = this.healAmount || 0;
       break;
-    case "mixed":  // ⬅️ ДОДАТИ ЦЕЙ БЛОК
-      effect.attackBoostPercent = this.attackBoostPercent || 0;
-      effect.armorBoost = this.armorBoost || 0;
-      effect.hpRegenPercent = this.hpRegenPercent || 0;
-      break;
+      case "mixed":
+        effect.attackBoost = this.attackBoost || 0;      // ← Було attackBoostPercent
+        effect.armorBoost = this.armorBoost || 0;
+        effect.hpRegenPercent = this.hpRegenPercent || 0;
+        break;
   }
   
   return effect;
@@ -487,33 +487,32 @@ switch (effect.type) {
     break;
 
     case "mixed":
-      // 1. Відсотковий бонус до атаки
-      if (effect.attackBoostPercent && effect.attackBoostPercent > 0) {
-        const attackBonus = Math.floor((unit.attack || 0) * (effect.attackBoostPercent / 100));
-        unit.attack = (unit.attack || 0) + attackBonus;
-        console.log(`⚔️ ${unit.name} отримав +${effect.attackBoostPercent}% атаки (${attackBonus}) від "${effect.abilityName}"`);
-      }
-      
-      // 2. Фіксований бонус до броні
-      if (effect.armorBoost && effect.armorBoost > 0) {
+    // 1. ФІКСОВАНИЙ бонус до атаки (не відсоток!)
+    if (effect.attackBoost && effect.attackBoost > 0) {
+        unit.attack = (unit.attack || 0) + effect.attackBoost;
+        console.log(`⚔️ ${unit.name} отримав +${effect.attackBoost} атаки від "${effect.abilityName}"`);
+    }
+    
+    // 2. Фіксований бонус до броні (залишається як є)
+    if (effect.armorBoost && effect.armorBoost > 0) {
         unit.armor = (unit.armor || 0) + effect.armorBoost;
         console.log(`🛡️ ${unit.name} отримав +${effect.armorBoost} броні від "${effect.abilityName}"`);
-      }
-      
-      // 3. Відсотковий реген HP
-      if (effect.hpRegenPercent && effect.hpRegenPercent > 0) {
+    }
+    
+    // 3. Відсотковий реген HP (залишається як є)
+    if (effect.hpRegenPercent && effect.hpRegenPercent > 0) {
         const maxHp = unit.maxHp || unit.hp;
         const healAmount = Math.floor(maxHp * (effect.hpRegenPercent / 100));
         const currentHp = unit.newhp ?? unit.hp;
         unit.newhp = Math.min(currentHp + healAmount, maxHp);
         console.log(`💚 ${unit.name} відновив ${healAmount} HP (${effect.hpRegenPercent}%) від "${effect.abilityName}"`);
         if (typeof window.updateUnitHealthBar === 'function') {
-          window.updateUnitHealthBar(unit);
+            window.updateUnitHealthBar(unit);
         }
-      }
-      
-      this.showAuraEffect(unit, 'mixed');
-      break;
+    }
+    
+    this.showAuraEffect(unit, 'mixed');
+    break;
 
 
     case "control":

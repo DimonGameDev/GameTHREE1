@@ -258,6 +258,8 @@ if (modEfeHerTextLineDescription) {
 
 // Тип здібності (ДОДАЙТЕ ЦЕЙ БЛОК)
 if (typeAbility) {
+    // Очищаємо старі класи
+    typeAbility.className = 'typeAbility';
     let typeText = "";
     if (ability.type === "active") {
         typeText = "⚡ Активна";
