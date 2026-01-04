@@ -1057,9 +1057,10 @@ function handleHeroAbilityActivation() {
     
     const actionType = window.heroActiveAbilitySystem.getActionType(abilityId);
     const freeActions = ['self_buff', 'thorns', 'health_swap', 'armor_self', 'armor_per_enemy'];
-if (!freeActions.includes(actionType)) {
-    hero.attacked = true;
-}
+    if (!freeActions.includes(actionType)) {
+        hero.attacked = true;
+        hero.moved = true; // ДОДАЙТЕ ЦЕЙ РЯДОК!
+    }
     
     // Оновлюємо візуал
     if (typeof updateUnitVisualState === 'function') {

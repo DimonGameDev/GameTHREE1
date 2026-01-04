@@ -494,7 +494,7 @@ if (target.unit.isHero && window.heroAuraSystem && window.heroAuraSystem.checkLo
     
     // Позначаємо що юніт атакував
     attacker.attacked = true;
-    // attacker.moved = true;
+    attacker.moved = true;
 
     // if (attacker.name && attacker.name.toLowerCase().includes('катапульт')) {
     //     attacker.attacked = true;
