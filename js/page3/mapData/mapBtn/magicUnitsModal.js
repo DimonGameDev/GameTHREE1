@@ -205,7 +205,7 @@ function getUnitAbilities(unit) {
                 description: abilityData.description,
                 img: abilityData.img,
                 power: abilityPower,
-                type: abilityData.mode === "active" ? "Активне" : "Пасивне"
+                type: abilityData.mode === "active" ? "active" : "passive"
             });
         }
     });
@@ -475,12 +475,20 @@ if (typeElement) {
 }
 
 // ✅ ДОДАНО: Показувати/приховувати кнопку активації
+// ✅ ДОДАНО: Показувати/приховувати кнопку активації
 const activateButton = document.querySelector(".BtnModalMagicCentralActive");
 if (activateButton) {
-    if (ability.type === "passive" || ability.type === "pasive") {
+    // Визначаємо, чи є здібність пасивною
+    const isPassive = ability.mode === "passive" || 
+                     ability.actionType === "aura" || 
+                     ability.type === "passive";
+    
+    if (isPassive) {
         activateButton.style.display = "none";
-    } else if (ability.type === "active") {
+        activateButton.textContent = "Пасивна здібність";
+    } else {
         activateButton.style.display = "block";
+        activateButton.textContent = "Активація";
     }
 }
 

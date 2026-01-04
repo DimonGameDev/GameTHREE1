@@ -159,11 +159,25 @@
   display: none;
 }
 
-/* .attack-bonus, .armor-bonus {
-  color: #00ff00;
-  font-size: 0.85em;
+/* Підсвітка для юнітів під аурою */
+.aura-highlight {
+  animation: aura-pulse 1s ease-in-out;
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7);
+  border-radius: 5px;
+  filter: brightness(1.3);
 }
 
-.armor-bonus {
-  color: #00aaff;
-} */
+@keyframes aura-pulse {
+  0% {
+      box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3);
+      filter: brightness(1.1);
+  }
+  50% {
+      box-shadow: 0 0 20px 8px rgba(255, 255, 255, 0.9);
+      filter: brightness(1.5);
+  }
+  100% {
+      box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3);
+      filter: brightness(1.1);
+  }
+}

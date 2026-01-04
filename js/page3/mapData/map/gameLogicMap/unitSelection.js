@@ -296,9 +296,14 @@ function enableUnitMovement(unit, cellPlayer) {
 }
 
             // Перевіряємо чи можна захопити хатку і показуємо кнопку
-            if (typeof window.checkAndShowCaptureButton === 'function') {
-                window.checkAndShowCaptureButton(unit, targetX, targetY);
-            }
+if (typeof window.checkAndShowCaptureButton === 'function') {
+    window.checkAndShowCaptureButton(unit, targetX, targetY);
+}
+
+// ⬇️ ДОДАНО: Перевіряємо чи можна захопити замок і показуємо кнопку
+if (typeof window.checkAndShowCastleCaptureButton === 'function') {
+    window.checkAndShowCastleCaptureButton(unit, targetX, targetY);
+}
     
             // Помічаємо, що юніт зробив хід
             unit.moved = true;
@@ -436,6 +441,11 @@ selectedUnitVisual = cellPlayer;
 // ⬇️ НОВИЙ КОД: Перевіряємо чи юніт стоїть на хатці і може її захопити
 if (typeof window.checkAndShowCaptureButton === 'function') {
     window.checkAndShowCaptureButton(unit, unit.x, unit.y);
+}
+
+// ⬇️ ДОДАНО: Перевіряємо чи юніт стоїть на замку і може його захопити
+if (typeof window.checkAndShowCastleCaptureButton === 'function') {
+    window.checkAndShowCastleCaptureButton(unit, unit.x, unit.y);
 }
     
     // Перевіряємо чи юніт вже ходив
@@ -637,10 +647,15 @@ function updateUnitTablo(unit) {
     }
     
     // Оновлюємо назву
-    if (daniUnitsName) {
-        // Для юнітів використовуємо name, для героїв теж name
-        daniUnitsName.innerText = unit.name || unit.type || "Невідомо";
-    }
+        // Оновлюємо назву
+        if (daniUnitsName) {
+            // Для юнітів використовуємо name, для героїв теж name
+            const unitName = unit.name || unit.type || "Невідомо";
+            const unitLevel = unit.level || 1; // Якщо рівня немає, вважаємо 1
+            
+            // Завжди додаємо рівень у дужках для всіх юнітів і героїв
+            daniUnitsName.innerText = `${unitName} (${unitLevel})`;
+        }
     
     // Оновлюємо Step (хід)
     if (daniUnitsStep) {

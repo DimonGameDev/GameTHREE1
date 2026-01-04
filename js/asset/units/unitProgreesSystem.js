@@ -84,8 +84,20 @@ function getManaThreshold(currentLevel, unit = null) {
  */
 function getUnitLevelsObject(raceKey, unitIndex) {
     // Мапа типів юнітів за індексами
-    const unitTypeNames = ['Warrior', 'Archer', 'Shaman', 'Horses', 'Horseman', 'Catapult', 'Pikener'];
-//                      Index 0    Index 1   Index 2   Index 3   Index 4     Index 5     Index 6
+    const unitTypeNames = [
+        'Warrior',    // Index 0
+        'Archer',     // Index 1
+        'Shaman',     // Index 2
+        'Horses',     // Index 3
+        'Horseman',   // Index 4
+        'Catapult',   // Index 5
+        'Pikener',    // Index 6
+        'Support',    // Index 7
+        'Specialist', // Index 8
+        'Mage',       // Index 9
+        'Wisp'        // Index 10
+    ];
+
     
     // Мапа рас на префікси змінних
     const racePrefixes = {
@@ -153,39 +165,39 @@ function getUnitIdPrefix(raceKey, unitIndex) {
 function checkAndUpgradeIfReady(playerIndex, unitType) {
     const player = players[playerIndex];
     if (!player || !player.unitMana) {
-        console.error('❌ Гравець або unitMana не знайдені!');
+        // console.error('❌ Гравець або unitMana не знайдені!');
         return false;
     }
     
     // Знаходимо індекс юніта за типом
     const unitIndex = TYPE_TO_INDEX_MAP[unitType];
     if (unitIndex === undefined) {
-        console.error('❌ Невідомий тип юніта:', unitType);
+        // console.error('❌ Невідомий тип юніта:', unitType);
         return false;
     }
     
     // Отримуємо расу гравця та поточний рівень юніта
     const raceKey = raceMap[player.race];
     if (!raceKey || !races[raceKey]) {
-        console.error('❌ Раса не знайдена:', player.race);
+        // console.error('❌ Раса не знайдена:', player.race);
         return false;
     }
     
     if (!player.availableUnits || !player.availableUnits[unitIndex]) {
-        console.error('❌ Юніт не знайдений в availableUnits гравця');
+        // console.error('❌ Юніт не знайдений в availableUnits гравця');
         return false;
     }
     
     const currentShopUnit = player.availableUnits[unitIndex];
     if (!currentShopUnit) {
-        console.error('❌ Юніт не знайдений в магазині');
+        // console.error('❌ Юніт не знайдений в магазині');
         return false;
     }
     
     const currentLevel = currentShopUnit.level;
 const threshold = getManaThreshold(currentLevel, currentShopUnit); // 👈 Передаємо юніта
     
-    console.log(`🔍 Перевірка прогресу ${unitType} (рівень ${currentLevel}): ${player.unitMana[unitType]}/${threshold}`);
+    // console.log(`🔍 Перевірка прогресу ${unitType} (рівень ${currentLevel}): ${player.unitMana[unitType]}/${threshold}`);
     
     // Перевіряємо чи досягнуто порогу
     if (player.unitMana[unitType] >= threshold) {
@@ -214,7 +226,7 @@ function upgradeAllUnitsOfType(playerIndex, unitType, unitIndex) {
     
     // Отримуємо поточний рівень юніта в магазині ГРАВЦЯ
 if (!player.availableUnits || !player.availableUnits[unitIndex]) {
-    console.error('❌ Юніт не знайдений в availableUnits гравця');
+    // console.error('❌ Юніт не знайдений в availableUnits гравця');
     return false;
 }
 
@@ -226,7 +238,7 @@ const currentShopUnit = player.availableUnits[unitIndex];
     // Отримуємо поріг для цього рівня
     const threshold = getManaThreshold(currentLevel, currentShopUnit); // 👈 Передаємо юніта
     
-    console.log(`\n🎯 ВДОСКОНАЛЕННЯ ЮНІТІВ ТИПУ: ${unitType}`);
+    // console.log(`\n🎯 ВДОСКОНАЛЕННЯ ЮНІТІВ ТИПУ: ${unitType}`);
     //console.log(`   Гравець: ${playerIndex + 1}`);
     //console.log(`   Витрачено мани: ${threshold}, банка обнулена`);
     
@@ -250,7 +262,7 @@ const currentShopUnit = player.availableUnits[unitIndex];
     
     const nextLevelUnit = unitLevelsObject[`level${nextLevel}`];
     if (!nextLevelUnit) {
-        console.error('❌ Наступний рівень не знайдений:', nextLevel);
+        // console.error('❌ Наступний рівень не знайдений:', nextLevel);
         return false;
     }
     
@@ -260,7 +272,7 @@ const coloredNextLevelUnit = window.createColoredUnit
 : nextLevelUnit;
 
 player.availableUnits[unitIndex] = coloredNextLevelUnit;
-console.log(`✅ Магазин: ${currentShopUnit.name} → ${nextLevelUnit.name} (рівень ${nextLevel})`);
+// console.log(`✅ Магазин: ${currentShopUnit.name} → ${nextLevelUnit.name} (рівень ${nextLevel})`);
     
     // 2. Оновлюємо всі юніти цього типу на полі
     // let upgradedCount = 0;
@@ -288,35 +300,36 @@ console.log(`✅ Магазин: ${currentShopUnit.name} → ${nextLevelUnit.nam
             }
             
             // Створюємо вдосконаленого юніта
-const upgradedUnit = {
-    ...nextLevelUnit,
-    x: unit.x,
-    y: unit.y,
-    newhp: Math.min((unit.newhp || unit.hp), nextLevelUnit.hp),
-    playerIndex: unit.playerIndex,
-    moved: finalMoved,
-    attacked: finalAttacked,
-    id: unit.id,
-    effects: unit.effects || [],
-    activeEffects: unit.activeEffects || []
-};
+            // Створюємо вдосконаленого юніта
+            const upgradedUnit = {
+                ...nextLevelUnit, // Містить правильні hp, attack, armor тощо
+                x: unit.x,
+                y: unit.y,
+                newhp: nextLevelUnit.hp, // Повне HP нового рівня
+                playerIndex: unit.playerIndex,
+                moved: finalMoved,
+                attacked: finalAttacked,
+                id: unit.id,
+                effects: unit.effects || [],
+                activeEffects: unit.activeEffects || []
+            };
 
 // ✅ КЛЮЧОВЕ: Ініціалізуємо здібності для вдосконаленого юніта
 if (window.AbilityFactory) {
     upgradedUnit.abilityInstances = AbilityFactory.createAbilities(upgradedUnit);
-    console.log(`✨ Ініціалізовано ${upgradedUnit.abilityInstances.length} здібностей для вдосконаленого ${upgradedUnit.name}`);
+    // console.log(`✨ Ініціалізовано ${upgradedUnit.abilityInstances.length} здібностей для вдосконаленого ${upgradedUnit.name}`);
 }
 
 unitsOnMap[index] = upgradedUnit;
             upgradedCount++;
             
             // 🔍 ДІАГНОСТИКА: Перевіряємо що записалося
-            console.log(`🔍 Після апгрейду ${upgradedUnit.name}: moved=${upgradedUnit.moved}, attacked=${upgradedUnit.attacked}, id=${upgradedUnit.id}`);
-            console.log(`🔍 Перевірка unitsOnMap[${index}]:`, unitsOnMap[index].moved, unitsOnMap[index].attacked);
+            // console.log(`🔍 Після апгрейду ${upgradedUnit.name}: moved=${upgradedUnit.moved}, attacked=${upgradedUnit.attacked}, id=${upgradedUnit.id}`);
+            // console.log(`🔍 Перевірка unitsOnMap[${index}]:`, unitsOnMap[index].moved, unitsOnMap[index].attacked);
         }
     });
-    console.log("пппп");
-    console.log(`✅ На полі вдосконалено ${upgradedCount} юнітів`);
+    // console.log("пппп");
+    // console.log(`✅ На полі вдосконалено ${upgradedCount} юнітів`);
     
     // 3. Оновлюємо відображення (якщо магазин відкритий)
     if (typeof ModalWindowsShop !== 'undefined' && ModalWindowsShop && ModalWindowsShop.style.display === 'block') {
@@ -388,3 +401,4 @@ window.unitProgressSystem = {
 
 //console.log('✅ Система прогресу юнітів завантажена');
 
+console.log("aaaaaaaaaaaa");

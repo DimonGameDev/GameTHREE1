@@ -1,4 +1,4 @@
-const CACHE_NAME = 'version-of-war-v1.0.57';
+const CACHE_NAME = 'version-of-war-v1.0.59';
 
 // Файли які кешуються при встановленні
 const urlsToCache = [
@@ -55,6 +55,7 @@ self.addEventListener('activate', (event) => {
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
             console.log('🗑️ Видалення старого кешу:', cacheName);
+            console.log('📦 Кешування файлів');
             return caches.delete(cacheName);
           }
         })

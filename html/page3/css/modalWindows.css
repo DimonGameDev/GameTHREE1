@@ -147,3 +147,33 @@
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+
+/* Додати в файл CSS або створити новий файл castleCapture.css */
+.castle-capture-btn {
+    position: absolute;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    display: none;
+    padding: 10px 20px;
+    background-color: #8B4513;
+    color: white;
+    border: 2px solid gold;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+
+
+
+/* .castle-capture-btn:hover {
+    background-color: #A0522D !important;
+    transform: translate(-50%, -50%) scale(1.05) !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4) !important; 
+} */
+   

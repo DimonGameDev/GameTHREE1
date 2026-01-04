@@ -1,7 +1,8 @@
 window.heroes = [
     {
       id: 1,
-      name: "Туверан", 
+      name: "Туверан",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -24,6 +25,7 @@ window.heroes = [
     {
       id: 2,
       name: "Тімер",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -46,6 +48,7 @@ window.heroes = [
     {
       id: 3,
       name: "Дарест",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -68,6 +71,7 @@ window.heroes = [
     {
       id: 4,
       name: "Крівер",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -90,6 +94,7 @@ window.heroes = [
     {
       id: 5,
       name: "Спетрі",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -112,6 +117,7 @@ window.heroes = [
     {
       id: 6,
       name: "Артеміс",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -134,6 +140,7 @@ window.heroes = [
     {
       id: 7,
       name: "Енагра",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -156,6 +163,7 @@ window.heroes = [
     {
       id: 8,
       name: "Блістер",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -178,6 +186,7 @@ window.heroes = [
     {
       id: 9,
       name: "Генрі",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -200,6 +209,7 @@ window.heroes = [
     {
       id: 10,
       name: "Савагар",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -222,6 +232,7 @@ window.heroes = [
     {
       id: 11,
       name: "Майден",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -244,6 +255,7 @@ window.heroes = [
     {
       id: 12,
       name: "Елдера",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -266,6 +278,7 @@ window.heroes = [
     {
       id: 13,
       name: "Дазара",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -288,6 +301,7 @@ window.heroes = [
     {
       id: 14,
       name: "Сніпер",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,
@@ -310,6 +324,7 @@ window.heroes = [
     {
       id: 15,
       name: "Некропіус",
+      isHero: true, 
       level: 1,
       LevelAttack: 1,
       LevelArmor: 1,

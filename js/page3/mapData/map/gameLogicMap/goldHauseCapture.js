@@ -12,12 +12,20 @@
  * Перевіряє чи юніт може захоплювати хатки (перший воїн кожної раси)
  */
 function canCaptureGoldHouse(unit) {
+    // 1. Герої можуть захоплювати (id починається з 'hero_' або є isHero: true)
+    const isHero = unit.isHero === true || (unit.id && unit.id.startsWith('hero_'));
+    if (isHero) {
+        return true;
+    }
+    
+    // 2. Для звичайних юнітів
     if (!unit.unitId) return false;
     
-    // Перший воїн має ID що закінчується на 101: orc101, pipl101, elf101, demon101, beetle101
-    const canCapture = unit.unitId.endsWith('101');
+    // 3. Воїни можуть, Віспи не можуть
+    const isWarrior = unit.unitId.endsWith('101');
+    const isWisp = unit.unitId.endsWith('1101');
     
-    return canCapture;
+    return isWarrior && !isWisp;
 }
 
 /**
@@ -130,6 +138,27 @@ function getTileImage(x, y, tileType) {
             }
         }
     }
+
+    // Якщо замок не захоплений, перевіряємо оригінальний масив замків
+    const castle = castles.find(c => c.x === x && c.y === y);
+    if (castle) {
+        const activePlayer = players.find(p => p.originalIndex === castle.playerIndex);
+        
+        if (activePlayer) {
+            // Активний гравець - кольоровий замок
+            const castleImages = [
+                "../../img/map/castle/red/castleRed.jpeg",
+                "../../img/map/castle/blue/castleBlue.jpeg",
+                "../../img/map/castle/green/castleGreen.jpeg",
+                "../../img/map/castle/yellow/castleYellow.jpeg"
+            ];
+            return castleImages[castle.playerIndex];
+        } else {
+            // Неактивний гравець - нейтральний замок
+            return "../../img/map/castle/castleStartFon/castleStartFon.jpeg";
+        }
+    }
+
     
     // Перевіряємо чи це хатка золота (tileType === 2)
     if (tileType === 2) {

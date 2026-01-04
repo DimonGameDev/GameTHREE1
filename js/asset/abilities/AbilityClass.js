@@ -303,6 +303,8 @@ applyDebuff(caster, target) {
         const effect = this.createAuraEffect(caster);
         this.addTemporaryEffect(target, effect);
         affectedUnits.push(target);
+                // ДОДАЄМО ПІДСВІТКУ - НОВИЙ КОД
+                this.highlightUnitWithAura(target);
       });
       
       console.log(`✨ ${this.name}: ${caster.name} вплинув на ${affectedUnits.length} юнітів`);
@@ -314,23 +316,74 @@ applyDebuff(caster, target) {
       };
     }
     
-    // Знайти юнітів в радіусі
+
+           // Підсвітити юніта аурою
+    highlightUnitWithAura(unit) {
+      console.log(`🎯 Спроба підсвітити юніта: ${unit.name} на позиції (${unit.x}, ${unit.y})`);
+      
+      // Спробуємо знайти за data-unit-id
+      const unitElement = document.querySelector(`[data-unit-id="${unit.id}"]`);
+      
+      if (!unitElement) {
+        // Якщо немає data-unit-id, шукаємо wrapper на позиції
+        const unitWrappers = document.querySelectorAll('.unit-wrapper');
+        
+        unitWrappers.forEach(wrapper => {
+          const wrapperX = parseInt(wrapper.style.left) / cellSizeAll;
+          const wrapperY = parseInt(wrapper.style.top) / cellSizeAll;
+          
+          if (Math.abs(wrapperX - unit.x) < 0.1 && Math.abs(wrapperY - unit.y) < 0.1) {
+            unitElement = wrapper;
+          }
+        });
+      }
+      
+      if (unitElement) {
+        // Знаходимо зображення всередині
+        const unitImg = unitElement.querySelector('img') || unitElement;
+        
+        // Додаємо клас підсвітки
+        unitImg.classList.add('aura-highlight');
+        console.log(`✅ Додано клас aura-highlight для ${unit.name}`);
+        
+        // Видаляємо клас через 1 секунду
+        setTimeout(() => {
+          unitImg.classList.remove('aura-highlight');
+        }, 1000);
+      } else {
+        console.log(`❌ Не знайдено елемент для юніта ${unit.name}`);
+      }
+    }
+    
+            // Знайти юнітів в радіусі
     findUnitsInRadius(centerUnit, unitsOnMap, radius) {
       const result = [];
       
-      // Генеруємо всі можливі позиції в радіусі
+      // Генеруємо всі можливі позиції
       for (let dx = -radius; dx <= radius; dx++) {
         for (let dy = -radius; dy <= radius; dy++) {
-          // Пропускаємо центральну клітинку (сам юніт)
+          // Пропускаємо центральну клітинку
           if (dx === 0 && dy === 0) continue;
           
-          // Для radius=1 це буде 8 сусідніх клітинок
-          const targetX = centerUnit.x + dx;
-          const targetY = centerUnit.y + dy;
+          // Манхеттенська відстань
+          const manhattanDistance = Math.abs(dx) + Math.abs(dy);
           
-          const unit = unitsOnMap.find(u => u.x === targetX && u.y === targetY);
-          if (unit) {
-            result.push(unit);
+          // Максимальна діагональна складова
+          const maxDiagonal = Math.min(Math.abs(dx), Math.abs(dy));
+          
+          // Умова: загальна відстань ≤ radius І діагональ ≤ 1
+          if (manhattanDistance <= radius && maxDiagonal <= 1) {
+            // Знаходимо юніта на цій позиції
+            const targetX = centerUnit.x + dx;
+            const targetY = centerUnit.y + dy;
+            
+            const targetUnit = unitsOnMap.find(u => 
+              u.x === targetX && u.y === targetY
+            );
+            
+            if (targetUnit) {
+              result.push(targetUnit);
+            }
           }
         }
       }
