@@ -38,6 +38,66 @@ function findCastle(x, y) {
     return window.capturedCastles.find(castle => castle.x === x && castle.y === y);
 }
 
+
+/**
+ * Отримує індекс гравця-власника замку
+ * @param {number} x - координата X замку
+ * @param {number} y - координата Y замку
+ * @returns {number|null} - індекс гравця-власника або null для нейтрального замку
+ */
+function getCastleOwner(x, y) {
+    // 1. Перевіряємо в масиві захоплених замків
+    const capturedCastle = findCastle(x, y);
+    if (capturedCastle) {
+        return capturedCastle.playerIndex;
+    }
+    
+    // 2. Перевіряємо в масиві початкових замків
+    if (typeof castles !== 'undefined' && Array.isArray(castles)) {
+        const startCastle = castles.find(castle => castle.x === x && castle.y === y);
+        if (startCastle) {
+            return startCastle.playerIndex;
+        }
+    }
+    
+    // 3. Якщо замок не знайдений - він нейтральний
+    return null;
+}
+
+/**
+ * Перевіряє, чи може гравець захопити замок
+ * @param {number} x - координата X замку
+ * @param {number} y - координата Y замку
+ * @param {number} playerIndex - індекс гравця, який намагається захопити
+ * @returns {Object} - результат перевірки {canCapture: boolean, reason: string}
+ */
+function canCaptureCastleByPlayer(x, y, playerIndex) {
+    // Отримуємо власника замку
+    const castleOwner = getCastleOwner(x, y);
+    
+    // Якщо замок нейтральний (немає власника)
+    if (castleOwner === null) {
+        return {
+            canCapture: true,
+            reason: "✅ Замок нейтральний, можна захопити"
+        };
+    }
+    
+    // Якщо гравець намагається захопити свій власний замок
+    if (castleOwner === playerIndex) {
+        return {
+            canCapture: false,
+            reason: "❌ Не можна захопити власний замок"
+        };
+    }
+    
+    // Якщо замок належить іншому гравцю
+    return {
+        canCapture: true,
+        reason: `✅ Замок належить гравцю ${castleOwner + 1}, можна захопити`
+    };
+}
+
 /**
  * Захоплює замок
  */
@@ -75,11 +135,16 @@ function captureCastle(x, y, playerIndex) {
     updateCastleVisual(x, y, playerIndex);
     
     // Перевіряємо чи гравець програв після втрати замку
-    if (oldOwnerIndex !== null && oldOwnerIndex !== playerIndex) {
-        setTimeout(() => {
-            checkPlayerDefeatAfterCastleCapture(x, y, playerIndex, oldOwnerIndex);
-        }, 100);
-    }
+        // Перевіряємо чи гравець програв після втрати замку
+        if (oldOwnerIndex !== null && oldOwnerIndex !== playerIndex) {
+            setTimeout(() => {
+                checkPlayerDefeatAfterCastleCapture(x, y, playerIndex, oldOwnerIndex);
+                // ДОДАТКОВО: перевіряємо через нову систему
+                if (window.hasPlayerLost && window.hasPlayerLost(oldOwnerIndex)) {
+                    window.handlePlayerDefeat(oldOwnerIndex);
+                }
+            }, 100);
+        }
     
     return true;
 }
@@ -131,15 +196,17 @@ function checkAndShowCastleCaptureButton(unit, targetX, targetY) {
         return false;
     }
 
-    const capturedCastle = findCastle(targetX, targetY);
-    if (capturedCastle && capturedCastle.playerIndex === unit.playerIndex) {
-        // Замок вже належить цьому гравцю - не показуємо кнопку
-        if (window.BtnActiveCastleCapture) {
-            window.BtnActiveCastleCapture.style.display = "none";
+        // Перевіряємо, чи може гравець захопити цей замок
+        const captureCheck = canCaptureCastleByPlayer(targetX, targetY, unit.playerIndex);
+    
+        if (!captureCheck.canCapture) {
+            // Не можна захопити - ховаємо кнопку
+            if (window.BtnActiveCastleCapture) {
+                window.BtnActiveCastleCapture.style.display = "none";
+            }
+            console.log(`🏰 ${captureCheck.reason}`);
+            return false;
         }
-        console.log('🏰 Замок вже належить цьому гравцю');
-        return false;
-    }
     
     // Перевіряємо чи юніт вже завершив хід
     if (unit.moved && unit.attacked) {
@@ -149,6 +216,16 @@ function checkAndShowCastleCaptureButton(unit, targetX, targetY) {
         }
         return false;
     }
+
+        // Зберігаємо вибраний юніт для захоплення
+        if (!window.selectedUnitForCapture) {
+            window.selectedUnitForCapture = {};
+        }
+        window.selectedUnitForCapture = {
+            unit: unit,
+            castleX: targetX,
+            castleY: targetY
+        };
     
     // Юніт може захопити замок - показуємо кнопку
     if (window.BtnActiveCastleCapture) {
@@ -204,6 +281,20 @@ function executeCaptureCastle() {
         return;
     }
     
+    // Перевіряємо, чи може гравець захопити цей замок
+    const captureCheck = canCaptureCastleByPlayer(x, y, unit.playerIndex);
+    
+    if (!captureCheck.canCapture) {
+        console.error(`❌ ${captureCheck.reason}`);
+        alert(captureCheck.reason);
+        
+        // Ховаємо кнопку
+        if (window.BtnActiveCastleCapture) {
+            window.BtnActiveCastleCapture.style.display = "none";
+        }
+        return;
+    }
+    
     // Захоплюємо замок
     const captured = captureCastle(x, y, unit.playerIndex);
     
@@ -215,6 +306,10 @@ function executeCaptureCastle() {
         unit.moved = true;
         unit.attacked = true; // Також блокуємо атаку
         
+                    // Оновлюємо візуальний стан після руху
+                    if (typeof window.updateUnitVisualState === 'function') {
+                        window.updateUnitVisualState(unit);
+                    }
         // Очищаємо жовті клітинки руху
         if (typeof clearMoveCells === 'function') {
             clearMoveCells();

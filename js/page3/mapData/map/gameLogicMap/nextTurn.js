@@ -163,6 +163,13 @@ if (unit.activeEffects && unit.activeEffects.length > 0) {
                 }
             }
         });
+
+         // 🆕 ДОДАНО: Оновлюємо таймери воскресіння для героїв попереднього гравця
+         if (typeof window.updateRespawnTimers === 'function') {
+            window.updateRespawnTimers(previousPlayerIndex);
+        } else {
+            console.log('⚠️ Функція updateRespawnTimers не знайдена');
+        }
         
         // 🆕 ДОДАНО: Видаляємо портали гравця який закінчив хід
         if (window.activePortals && window.activePortals.length > 0) {

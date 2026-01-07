@@ -19,6 +19,82 @@ class EffectsManager {
       });
     }
     
+
+    // Замінити весь метод applyAllAuras в effectsManager.js
+static applyAllAuras() {
+  console.log('🔴 applyAllAuras ВИКЛИКАНО!');
+  
+  if (!window.unitsOnMap) {
+    console.error('❌ unitsOnMap не знайдено');
+    return;
+  }
+  
+  console.log(`🔍 Юнітів на полі: ${window.unitsOnMap.length}`);
+  
+  let auraCount = 0;
+  let unitCount = 0;
+  
+  window.unitsOnMap.forEach((unit, index) => {
+    console.log(`🔍 [${index}] ${unit.name}: abilityInstances =`, unit.abilityInstances?.length || 0);
+    
+    if (unit.abilityInstances && Array.isArray(unit.abilityInstances)) {
+      unit.abilityInstances.forEach((ability, abilityIndex) => {
+        console.log(`  🔍 [${abilityIndex}] ${ability.name}: actionType=${ability.actionType}, mode=${ability.mode}`);
+        
+        if (ability.actionType === "aura" && ability.mode === "passive") {
+          console.log(`  ✅ ЗАСТОСОВУЄМО АУРУ: ${ability.name}`);
+          const result = ability.applyAura(unit, window.unitsOnMap);
+          console.log(`  ✅ Результат:`, result);
+          auraCount++;
+        }
+      });
+      unitCount++;
+    }
+  });
+  
+  console.log(`✨ Підсумок: ${auraCount} аур для ${unitCount} юнітів`);
+}
+
+
+        // Застосувати аури для нового юніта (при покупці)
+        static applyAurasForNewUnit(newUnit) {
+          if (!window.unitsOnMap) {
+            console.error('❌ unitsOnMap не знайдено');
+            return;
+          }
+          
+          // 1. Новий юніт впливає на інших
+          // if (newUnit.abilityInstances && Array.isArray(newUnit.abilityInstances)) {
+          //   newUnit.abilityInstances.forEach(ability => {
+          //     if (ability.actionType === "aura" && ability.mode === "passive") {
+          //       ability.applyAura(newUnit, window.unitsOnMap);
+          //       console.log(`✨ Новий юніт ${newUnit.name} застосував ауру на інших`);
+          //     }
+          //   });
+          // }
+          
+          // 2. Інші юніти впливають на нового
+          window.unitsOnMap.forEach(unit => {
+            if (unit.id === newUnit.id) return;
+            
+            if (unit.abilityInstances && Array.isArray(unit.abilityInstances)) {
+              unit.abilityInstances.forEach(ability => {
+                if (ability.actionType === "aura" && ability.mode === "passive") {
+                  // Перевіряємо чи аура впливає на нового юніта
+                  const distance = ability.calculateDistance(unit, newUnit);
+                  if (distance <= ability.radius) {
+                    // Створюємо ефект аури
+                    const effect = ability.createAuraEffect(unit);
+                    ability.addTemporaryEffect(newUnit, effect);
+                    console.log(`✨ ${unit.name} вплинув на нового юніта ${newUnit.name}`);
+                  }
+                }
+              });
+            }
+          });
+        }
+
+
     // Очистити ефекти на початку ходу гравця
     static cleanupExpiredEffects(playerIndex) {
       if (!window.unitsOnMap) return;
@@ -124,6 +200,10 @@ static removeEffect(unit, effect) {
       );
     }
   }
+
+
+
+  
   
   // Глобальний доступ
   window.EffectsManager = EffectsManager;

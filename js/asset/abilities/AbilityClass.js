@@ -119,7 +119,8 @@ let healAmount = this.healAmount || 50;
 
 // Якщо є healPercent, використовуємо його
 if (this.healPercent) {
-  healAmount = Math.floor(target.maxHp * (this.healPercent / 100));
+  const maxHp = target.maxHp || target.hp || 100; // Запасний варіант
+  healAmount = Math.floor(maxHp * (this.healPercent / 100));
 }
 
 console.log("🔍 DEBUG target:", target);
@@ -135,7 +136,8 @@ if (typeof target.newhp === 'undefined' || target.newhp === null) {
 }
 
 const oldHp = target.newhp;
-target.newhp = Math.min(target.newhp + healAmount, target.maxHp);
+const maxHp = target.maxHp || target.hp || 100; // Запасний варіант
+target.newhp = Math.min(target.newhp + healAmount, maxHp);
 const actualHeal = target.newhp - oldHp;
   
       // Встановлюємо cooldown

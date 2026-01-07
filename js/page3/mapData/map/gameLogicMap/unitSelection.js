@@ -8,8 +8,70 @@ let mapClickHandler = null;     // ⬅️ ДОДАЙТЕ: Зберігаємо �
 let isInitialized = false; 
 
 
+
+// ============================================
+// СИСТЕМА ВОСКРЕСІННЯ ГЕРОЇВ
+// ============================================
+
+// Глобальний масив для зберігання померлих героїв, які чекають воскресіння
+let deadHeroesWaitingForRespawn = [];
+
+
+// ============================================
+// ФУНКЦІЯ ПЕРЕВІРКИ БЛОКУВАННЯ КЛІТИНКИ ВОРОЖИМИ ЮНІТАМИ
+// ============================================
+
+/**
+ * Перевіряє чи клітинка заблокована ворожим юнітом
+ * @param {number} x - координата X клітинки
+ * @param {number} y - координата Y клітинки  
+ * @param {number} currentPlayerIndex - індекс поточного гравця
+ * @returns {boolean} - true якщо клітинка заблокована ворожим юнітом
+ */
+function isCellBlocked(x, y, currentPlayerIndex) {
+    // Детальний лог для дебагу
+    console.log(`🔍 Перевірка блокування клітинки (${x}, ${y}) для гравця ${currentPlayerIndex + 1}`);
+    
+    // Шукаємо юніта на цій клітинці
+    const unitOnCell = unitsOnMap.find(unit => {
+        return unit.x === x && unit.y === y;
+    });
+    
+    // Якщо на клітинці немає юніта - вона не заблокована
+    if (!unitOnCell) {
+        console.log(`✅ Клітинка (${x}, ${y}) вільна - немає юнітів`);
+        return false;
+    }
+    
+    // Отримуємо індекс гравця юніта
+    const unitPlayerIndex = unitOnCell.playerIndex;
+    
+    // Перевіряємо чи це ворожий юніт
+    const isEnemyUnit = unitPlayerIndex !== currentPlayerIndex;
+    
+    // Детальний лог
+    console.log(`📊 Дані юніта на клітинці (${x}, ${y}):`);
+    console.log(`   - Назва: ${unitOnCell.name || unitOnCell.type}`);
+    console.log(`   - Гравець юніта: ${unitPlayerIndex + 1}`);
+    console.log(`   - Поточний гравець: ${currentPlayerIndex + 1}`);
+    console.log(`   - Це ворожий юніт? ${isEnemyUnit ? '✅ ТАК' : '❌ НІ'}`);
+    
+    // Якщо це ворожий юніт - клітинка заблокована
+    if (isEnemyUnit) {
+        console.log(`🚫 Клітинка (${x}, ${y}) ЗАБЛОКОВАНА ворожим юнітом ${unitOnCell.name || unitOnCell.type}`);
+        return true;
+    }
+    
+    // Якщо це свій юніт - клітинка не заблокована
+    console.log(`✅ Клітинка (${x}, ${y}) НЕ заблокована - свій юніт`);
+    return false;
+}
+
+
 // Додати на початку файлу unitSelection.js (після інших змінних)
 let selectedUnitForEndTurn = null; // Юніт для завершення ходу
+
+
 
 /**
  * Показує кнопку завершення ходу юніта
@@ -113,16 +175,18 @@ function clearMoveCells() {
 
 
 function highlightMoveCells(unit) {
-    // Очищаємо старі підсвічені клітинки
+    // 🆕 ДОДАНО: Лог для дебагу
+    console.log(`🚶 Початок розрахунку руху для ${unit.name}`);
+    console.log(`📊 Параметри: крок=${unit.step}, координати=(${unit.x},${unit.y}), гравець=${unit.playerIndex + 1}`);
     
+    // Очищаємо старі підсвічені клітинки
     clearMoveCells();
+    
     if (unit.name && unit.name.toLowerCase().includes('катапульт') && unit.attacked) {
         console.log(`🚫 Катапульта вже атакувала → рух заблокований`);
         return;
     }
     
-    if (unit.step <= 0) {
-    }
     if (unit.step <= 0) {
         console.log(`⚠️ ${unit.name} не може рухатись (крок: ${unit.step})`);
         return;
@@ -132,6 +196,7 @@ function highlightMoveCells(unit) {
     let startX = unit.x;
     let startY = unit.y;
     let blockedPortals = [];
+    
     // Таблиця вартості руху
     const moveCost = {
         0: 1,        // Трава
@@ -175,7 +240,12 @@ function highlightMoveCells(unit) {
             
             if (costToMove === Infinity) continue; // непрохідна клітинка
             
-         
+            // 🆕 ДОДАНО: Перевірка чи клітинка заблокована ворожим юнітом
+            const isBlockedByEnemy = isCellBlocked(nx, ny, unit.playerIndex);
+            if (isBlockedByEnemy) {
+                console.log(`⛔ Пропускаємо клітинку (${nx}, ${ny}) - заблокована ворожим юнітом`);
+                continue; // Пропускаємо цю клітинку
+            }
             
             let newCost = cost + costToMove;
             
@@ -218,8 +288,9 @@ function highlightMoveCells(unit) {
             }
         }
     }
-     // 🆕 ДОДАНО: Показуємо повідомлення про заблоковані портали
-     if (blockedPortals.length > 0) {
+    
+    // 🆕 ДОДАНО: Показуємо повідомлення про заблоковані портали
+    if (blockedPortals.length > 0) {
         const names = [...new Set(blockedPortals.map(p => p.blockedBy))].join(', ');
         console.log(`🚫 Портал заблоковано: ${names} стоїть на виході`);
         
@@ -232,7 +303,7 @@ function highlightMoveCells(unit) {
         }
     }
     
-    // console.log(`✅ Підсвічено доступні клітинки для руху юніта ${unit.name}`);
+    console.log(`✅ Підсвічено доступні клітинки для руху юніта ${unit.name}`);
 }
 
 
@@ -314,6 +385,11 @@ if (typeof window.checkAndShowCastleCaptureButton === 'function') {
                 unit.attacked = true;
                 console.log(`🎯 Катапульта походила → атака заблокована`);
             }
+
+                        // Оновлюємо візуальний стан після руху
+                        if (typeof window.updateUnitVisualState === 'function') {
+                            window.updateUnitVisualState(unit);
+                        }
              // Перевіряємо чи є у юніта аури і застосовуємо їх
     if (window.EffectsManager && window.EffectsManager.hasAuraAbility(unit)) {
         EffectsManager.applyUnitAuras(unit);
@@ -1107,12 +1183,387 @@ function checkAndUsePortal(unit, newX, newY) {
     return true;
 }
 
+// ============================================
+// СИСТЕМА ВОСКРЕСІННЯ ГЕРОЇВ - ФУНКЦІЇ
+// ============================================
 
+/**
+ * Ініціалізує поля для воскресіння героя
+ * @param {Object} hero - об'єкт героя
+ * @param {number} respawnTimer - кількість ходів до воскресіння (за замовчуванням 4)
+ */
+function initHeroRespawnFields(hero, respawnTimer = 4) {
+    // Перевіряємо чи це герой
+    if (!hero.isHero) {
+        console.log(`⚠️ ${hero.name} не є героєм - пропускаємо ініціалізацію воскресіння`);
+        return;
+    }
+    
+    // Ініціалізуємо поля для воскресіння
+    hero.respawnTimer = respawnTimer;          // Таймер воскресіння (в ходах)
+    hero.isDead = false;                       // Чи герой мертвий
+    hero.respawnX = null;                      // Координата X для воскресіння
+    hero.respawnY = null;                      // Координата Y для воскресіння
+    hero.originalStats = {                     // Зберігаємо оригінальні характеристики
+        hp: hero.hp || hero.health || 0,
+        attack: hero.attack || 0,
+        armor: hero.armor || 0,
+        step: hero.step || 0,
+        range: hero.range || 0
+    };
+    
+    console.log(`✅ Ініціалізовано поля воскресіння для героя ${hero.name}:`);
+    console.log(`   - Таймер воскресіння: ${hero.respawnTimer} ходів`);
+    console.log(`   - Оригінальне HP: ${hero.originalStats.hp}`);
+    console.log(`   - Оригінальна атака: ${hero.originalStats.attack}`);
+    console.log(`   - Оригінальна броня: ${hero.originalStats.armor}`);
+}
+
+/**
+ * Ініціалізує поля воскресіння для всіх героїв на карті
+ */
+function initAllHeroesRespawnFields() {
+    console.log('🔍 Ініціалізація полів воскресіння для всіх героїв...');
+    
+    let heroesInitialized = 0;
+    
+    unitsOnMap.forEach(unit => {
+        if (unit.isHero) {
+            initHeroRespawnFields(unit);
+            heroesInitialized++;
+        }
+    });
+    
+    console.log(`✅ Ініціалізовано поля воскресіння для ${heroesInitialized} героїв`);
+}
+
+/**
+ * Обробляє смерть героя (додає до списку очікування воскресіння)
+ * @param {Object} hero - герой, який помер
+ */
+function handleHeroDeath(hero) {
+    console.log(`💀 Обробка смерті героя ${hero.name} (Гравець ${hero.playerIndex + 1})`);
+    
+    // Перевіряємо чи це герой
+    if (!hero.isHero) {
+        console.log(`⚠️ ${hero.name} не є героєм - пропускаємо обробку смерті`);
+        return;
+    }
+    
+    // Позначаємо героя як мертвого
+    hero.isDead = true;
+    
+    // Зберігаємо оригінальні координати (для пошуку замка)
+    hero.deathX = hero.x;
+    hero.deathY = hero.y;
+    
+    // Додаємо героя до списку очікування воскресіння
+    deadHeroesWaitingForRespawn.push(hero);
+    
+    console.log(`⏳ Герой ${hero.name} доданий до списку очікування воскресіння`);
+    console.log(`   - Таймер воскресіння: ${hero.respawnTimer} ходів`);
+    console.log(`   - Координати смерті: (${hero.deathX}, ${hero.deathY})`);
+    console.log(`   - Всього героїв в очікуванні: ${deadHeroesWaitingForRespawn.length}`);
+    
+    // Видаляємо героя з масиву unitsOnMap (він буде в deadHeroesWaitingForRespawn)
+    const index = unitsOnMap.findIndex(u => u.id === hero.id);
+    if (index !== -1) {
+        unitsOnMap.splice(index, 1);
+        console.log(`🗑️ Герой ${hero.name} видалений з unitsOnMap`);
+    }
+    
+    // Видаляємо візуальний елемент
+    const wrapper = document.querySelector(`.unit-wrapper[data-unit-id="${hero.id}"]`);
+    if (wrapper) {
+        wrapper.remove();
+        console.log(`💀 Видалено візуальний елемент героя: ${hero.name}`);
+    }
+    
+    // Оновлюємо лічильник юнітів
+    if (typeof updateUnitsCount === 'function') {
+        updateUnitsCount();
+    }
+}
+
+/**
+ * Знаходить вільну клітинку біля замка гравця
+ * @param {number} playerIndex - індекс гравця
+ * @returns {Object|null} - об'єкт {x, y} з координатами вільної клітинки або null
+ */
+function findFreeCellNearCastle(playerIndex) {
+    console.log(`🔍 Пошук вільної клітинки біля замка гравця ${playerIndex + 1}`);
+    
+    // Знаходимо замок гравця
+    const playerCastle = castles.find(castle => castle.playerIndex === playerIndex);
+    
+    if (!playerCastle) {
+        console.error(`❌ Замок гравця ${playerIndex + 1} не знайдено!`);
+        return null;
+    }
+    
+    console.log(`🏰 Замок гравця ${playerIndex + 1} знаходиться на (${playerCastle.x}, ${playerCastle.y})`);
+    
+    // Визначаємо напрямки для пошуку (всі 8 напрямків навколо)
+    const directions = [
+        { dx: 0, dy: -1 },   // вгору
+        { dx: 1, dy: -1 },   // вгору-вправо
+        { dx: 1, dy: 0 },    // вправо
+        { dx: 1, dy: 1 },    // вправо-вниз
+        { dx: 0, dy: 1 },    // вниз
+        { dx: -1, dy: 1 },   // вниз-вліво
+        { dx: -1, dy: 0 },   // вліво
+        { dx: -1, dy: -1 }   // вліво-вгору
+    ];
+    
+    // Спочатку шукаємо в радіусі 1 клітинки
+    for (let radius = 1; radius <= 3; radius++) {
+        console.log(`🔍 Пошук в радіусі ${radius} від замка...`);
+        
+        for (let dir of directions) {
+            const checkX = playerCastle.x + (dir.dx * radius);
+            const checkY = playerCastle.y + (dir.dy * radius);
+            
+            // Перевірка меж карти
+            if (checkX < 0 || checkY < 0 || checkX >= mapData[0].length || checkY >= mapData.length) {
+                continue;
+            }
+            
+            // Перевірка типу клітинки (не повинна бути водою)
+            const tileType = mapData[checkY][checkX];
+            if (tileType === 3) { // 3 = вода (непрохідна)
+                continue;
+            }
+            
+            // Перевірка чи клітинка вільна (немає юнітів)
+            const isCellOccupied = unitsOnMap.some(unit => unit.x === checkX && unit.y === checkY);
+            
+            if (!isCellOccupied) {
+                console.log(`✅ Знайдено вільну клітинку на (${checkX}, ${checkY}) в радіусі ${radius}`);
+                return { x: checkX, y: checkY };
+            }
+        }
+    }
+    
+    console.log(`❌ Не знайдено вільної клітинки біля замка гравця ${playerIndex + 1}`);
+    return null;
+}
+
+/**
+ * Воскрешає героя
+ * @param {Object} hero - герой для воскресіння
+ */
+function respawnHero(hero) {
+    console.log(`✨ Воскресіння героя ${hero.name} (Гравець ${hero.playerIndex + 1})`);
+    
+    // Знаходимо вільну клітинку біля замка
+    const respawnCell = findFreeCellNearCastle(hero.playerIndex);
+    
+    if (!respawnCell) {
+        console.log(`⏳ Не знайдено вільної клітинки для воскресіння ${hero.name}. Таймер встановлено на 1.`);
+        hero.respawnTimer = 1; // Чекаємо ще один хід
+        return;
+    }
+    
+    // Оновлюємо координати героя
+    hero.x = respawnCell.x;
+    hero.y = respawnCell.y;
+    
+    // Відновлюємо характеристики
+    hero.newhp = hero.originalStats.hp;
+    hero.attack = hero.originalStats.attack;
+    hero.armor = hero.originalStats.armor;
+    hero.step = hero.originalStats.step;
+    hero.range = hero.originalStats.range;
+    
+    // Скидаємо прапорці смерті
+    hero.isDead = false;
+    hero.moved = true;      // Не може ходити в цей хід
+    hero.attacked = true;   // Не може атакувати в цей хід
+    
+    console.log(`✅ Герой ${hero.name} воскрес на клітинці (${hero.x}, ${hero.y})`);
+    console.log(`   - HP відновлено: ${hero.newhp}`);
+    console.log(`   - Атака відновлена: ${hero.attack}`);
+    console.log(`   - Броня відновлена: ${hero.armor}`);
+    console.log(`   - Не може ходити/атакувати в цей хід`);
+    
+    // Додаємо героя назад до unitsOnMap
+    unitsOnMap.push(hero);
+    
+    // Видаляємо зі списку очікування
+    const index = deadHeroesWaitingForRespawn.findIndex(h => h.id === hero.id);
+    if (index !== -1) {
+        deadHeroesWaitingForRespawn.splice(index, 1);
+    }
+    
+    // Створюємо візуальний елемент героя
+    createHeroVisualElement(hero);
+    
+    // Оновлюємо лічильник юнітів
+    if (typeof updateUnitsCount === 'function') {
+        updateUnitsCount();
+    }
+}
+
+/**
+ * Створює візуальний елемент для воскреслого героя
+ * @param {Object} hero - герой
+ */
+function createHeroVisualElement(hero) {
+    console.log(`🎨 Створення візуального елемента для воскреслого героя ${hero.name}`);
+    
+    // Знаходимо елемент карти
+    const mapElement = document.querySelector('.map');
+    if (!mapElement) {
+        console.error('❌ Елемент карти не знайдено!');
+        return;
+    }
+    
+    // Створюємо wrapper для юніта
+    const wrapper = document.createElement('div');
+    wrapper.className = 'unit-wrapper';
+    wrapper.dataset.unitId = hero.id;
+    wrapper.dataset.x = hero.x;
+    wrapper.dataset.y = hero.y;
+    
+    // Встановлюємо позицію
+    const cellSize = cellSizeAll || 60;
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = `${hero.x * cellSize}px`;
+    wrapper.style.top = `${hero.y * cellSize}px`;
+    wrapper.style.width = `${cellSize}px`;
+    wrapper.style.height = `${cellSize}px`;
+    wrapper.style.zIndex = '10';
+    
+       // Створюємо зображення юніта
+       const unitImage = document.createElement('img');
+    
+       // Визначаємо шлях до зображення героя
+       let imagePath = hero.img || hero.image;
+       if (!imagePath || imagePath.trim() === '') {
+        console.warn(`⚠️ Герой ${hero.name} не має зображення. Використовуємо стандартне.`);
+        imagePath = '../../img/units/default.png';
+    } else {
+        // Перевіряємо чи це повний URL або відносний шлях
+        if (!imagePath.startsWith('http') && !imagePath.startsWith('/') && !imagePath.startsWith('../')) {
+            // Додаємо базовий шлях якщо потрібно
+            imagePath = '../../' + imagePath;
+        }
+        console.log(`🖼️ Шлях до зображення героя ${hero.name}: ${imagePath}`);
+    }
+       
+       unitImage.src = imagePath;
+       unitImage.alt = hero.name;
+       unitImage.style.width = '100%';
+       unitImage.style.height = '100%';
+       unitImage.style.objectFit = 'contain';
+       
+       // Обробка помилки завантаження зображення
+       unitImage.onerror = function() {
+           console.error(`❌ Не вдалося завантажити зображення для героя ${hero.name}: ${imagePath}`);
+           console.log(`   Спробуємо резервний шлях: ../../img/units/default.png`);
+           this.src = '../../img/units/default.png';
+       };
+       
+       // Додаємо клас для героя
+       unitImage.classList.add('hero-unit');
+       
+       // Додаємо зображення до wrapper
+       wrapper.appendChild(unitImage);
+    
+    // Додаємо health bar (якщо є така система)
+    if (typeof window.createHealthBar === 'function') {
+        window.createHealthBar(hero, wrapper);
+    }
+    
+    // Додаємо wrapper до карти
+    mapElement.appendChild(wrapper);
+    
+    console.log(`✅ Візуальний елемент для ${hero.name} створено на (${hero.x}, ${hero.y})`);
+}
+
+/**
+ * Оновлює таймери воскресіння для всіх мертвих героїв
+ * @param {number} playerIndex - індекс гравця, який закінчив хід
+ */
+function updateRespawnTimers(playerIndex) {
+    console.log(`⏳ Оновлення таймерів воскресіння для гравця ${playerIndex + 1}`);
+    
+    let timersUpdated = 0;
+    let heroesReadyToRespawn = [];
+    
+    // Проходимо по всіх мертвих героях
+    deadHeroesWaitingForRespawn.forEach(hero => {
+        // Зменшуємо таймер тільки для героїв цього гравця
+        if (hero.playerIndex === playerIndex) {
+            hero.respawnTimer--;
+            timersUpdated++;
+            
+            console.log(`📉 Герой ${hero.name}: таймер зменшено до ${hero.respawnTimer}`);
+            
+            // Перевіряємо чи герой готовий до воскресіння
+            if (hero.respawnTimer <= 0) {
+                heroesReadyToRespawn.push(hero);
+                console.log(`✅ Герой ${hero.name} готовий до воскресіння!`);
+            }
+        }
+    });
+    
+    console.log(`📊 Оновлено таймери для ${timersUpdated} героїв`);
+    console.log(`📊 Героїв готових до воскресіння: ${heroesReadyToRespawn.length}`);
+    
+    // Воскрешаємо героїв, які готові
+    heroesReadyToRespawn.forEach(hero => {
+        respawnHero(hero);
+    });
+}
 
 window.clearUnitTablo = clearUnitTablo;
 window.clearMoveCells = clearMoveCells;
 window.updateUnitTablo = updateUnitTablo;
+// Експортуємо функцію для використання в інших файлах
+window.isCellBlocked = isCellBlocked;
 
 
+// Експортуємо функції системи воскресіння
+window.initHeroRespawnFields = initHeroRespawnFields;
+window.initAllHeroesRespawnFields = initAllHeroesRespawnFields;
+window.handleHeroDeath = handleHeroDeath;
+window.updateRespawnTimers = updateRespawnTimers;
+window.respawnHero = respawnHero;
+window.findFreeCellNearCastle = findFreeCellNearCastle;
 
 
+// ============================================
+// ІНІЦІАЛІЗАЦІЯ СИСТЕМИ ВОСКРЕСІННЯ
+// ============================================
+
+/**
+ * Ініціалізує систему воскресіння після повного завантаження гри
+ */
+function initRespawnSystem() {
+    console.log('🔧 Ініціалізація системи воскресіння героїв...');
+    
+    // Затримка для того, щоб всі юніти встигли завантажитися
+    setTimeout(() => {
+        if (typeof initAllHeroesRespawnFields === 'function') {
+            initAllHeroesRespawnFields();
+            console.log('✅ Система воскресіння героїв ініціалізована');
+        } else {
+            console.error('❌ Функція initAllHeroesRespawnFields не знайдена!');
+        }
+    }, 1500); // 1.5 секунди затримки для надійності
+}
+
+// Ініціалізуємо систему воскресіння після завантаження DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 DOM завантажено, ініціалізуємо систему воскресіння...');
+        initRespawnSystem();
+    });
+} else {
+    console.log('📄 DOM вже завантажено, ініціалізуємо систему воскресіння...');
+    initRespawnSystem();
+}
+
+// Експортуємо функцію ініціалізації
+window.initRespawnSystem = initRespawnSystem;

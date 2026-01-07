@@ -48,15 +48,12 @@ function selectUnitCard(card) {
 /**
  * Купує вибраний юніт
  */
-/**
- * Купує вибраний юніт
- */
 function buyUnit() {
     
     if (isBuying) {
         return;
     }
-    
+
     if (!selectedUnit) {
       
         return;
@@ -85,6 +82,7 @@ function buyUnit() {
     if (currentPlayer.gold < unit.coin) {
         alert(`❌ Недостатньо золота!\nПотрібно: ${unit.coin}, є: ${currentPlayer.gold}`);
         // console.log(`❌ Недостатньо золота: ${currentPlayer.gold} < ${unit.coin}`);
+        window.closeShop();
         isBuying = false; // ⬅️ ДОДАЙТЕ: Скидаємо прапорець
         return;
     }
@@ -95,7 +93,17 @@ function buyUnit() {
     if (currentUnitsCount >= maxUnitsOnField) {
         alert(`❌ Досягнуто максимальну кількість юнітів!\nМаксимум: ${maxUnitsOnField}`);
         // console.log(`❌ Ліміт юнітів: ${currentUnitsCount} >= ${maxUnitsOnField}`);
+        window.closeShop();
         isBuying = false; // ⬅️ ДОДАЙТЕ: Скидаємо прапорець
+        return;
+    }
+    
+    // Перевірка 3: Чи можна купити юніта в цьому замку?
+    const buyCheck = canBuyUnitInCastle(selectedCastle);
+    if (!buyCheck.canBuy) {
+        alert(buyCheck.message);
+        window.closeShop();
+        isBuying = false; // Скидаємо прапорець
         return;
     }
     
@@ -131,7 +139,7 @@ function buyUnit() {
         // Ініціалізуємо екземпляри здібностей для юніта
 if (window.AbilityFactory) {
     newUnit.abilityInstances = AbilityFactory.createAbilities(newUnit);
-    console.log(`✨ Ініціалізовано ${newUnit.abilityInstances.length} здібностей для ${newUnit.name}`);
+    // console.log(`✨ Ініціалізовано ${newUnit.abilityInstances.length} здібностей для ${newUnit.name}`);
 }
     
     // Знаходимо вільну позицію біля замку
@@ -143,26 +151,17 @@ if (window.AbilityFactory) {
     
     // Додаємо юніта на карту
     unitsOnMap.push(newUnit);
-    //console.log('✅ Куплено юніта:', {
-       // name: newUnit.name,
-       // attacked: newUnit.attacked,
-      //  moved: newUnit.moved,
-       // range: newUnit.range,
-       // playerIndex: newUnit.playerIndex
-    //});
-    // Створюємо візуальний елемент на карті
+        // ✅ ДОДАНО: Застосовуємо аури для всіх юнітів після покупки нового
+        if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
+            window.EffectsManager.applyAurasForNewUnit(newUnit);
+          }
+   
     const cellPlayer = createUnitVisual(newUnit);
 
     // Оновлюємо лічильник юнітів
     updateUnitsCount();
     
-    // console.log(`✅ Куплено юніта: ${unit.name} за ${unit.coin} золота`);
-    // console.log(`   Розміщено на позиції (${newUnit.x}, ${newUnit.y})`);
-
-    // Закриваємо магазин ПЕРЕД тим як дозволити рух
-    // if (typeof window.saveGameState === 'function') {
-    //     window.saveGameState();
-    // }
+    
     closeShop();
 
     // Скидаємо вибір ПЕРЕД тим як дозволити рух
@@ -234,15 +233,15 @@ function findFreePositionNearCastle(castle) {
             continue;
         }
         
-        // Перевіряємо чи немає там вже юніта
-        const hasUnit = unitsOnMap.some(u => u.x === pos.x && u.y === pos.y);
-        if (!hasUnit) {
-            return pos;
-        }
+                // Перевіряємо чи немає там вже юніта (будь-якого гравця)
+                const hasUnit = unitsOnMap.some(u => u.x === pos.x && u.y === pos.y);
+                if (!hasUnit) {
+                    return pos;
+                }
     }
     
-    // Якщо всі позиції зайняті, повертаємо першу доступну
-    return positions[0];
+    // Якщо всі позиції зайняті, повертаємо null
+    return null;
 }
 
 /**
@@ -390,4 +389,73 @@ function removeUnit(unit) {
         return true;
     }
     return false;
+}
+
+
+/**
+ * Перевіряє, чи зайнята клітинка на карті
+ * @param {number} x - координата X клітинки
+ * @param {number} y - координата Y клітинки
+ * @returns {boolean} - true якщо клітинка зайнята, false якщо вільна
+ */
+function isCellOccupied(x, y, playerIndex = null) {
+    // Перевіряємо чи координати в межах карти
+    if (x < 0 || y < 0 || !mapData || !mapData[y] || !mapData[y][x]) {
+        return true; // Якщо за межами карти - вважаємо зайнятою
+    }
+    
+    // Перевіряємо чи є на цій клітинці юніт
+    const hasUnit = unitsOnMap.some(unit => {
+        if (unit.x === x && unit.y === y) {
+            // Якщо вказано playerIndex, перевіряємо чи це юніт іншого гравця
+            if (playerIndex !== null) {
+                return unit.playerIndex !== playerIndex; // Зайнято тільки якщо це юніт іншого гравця
+            }
+            return true; // Зайнято будь-яким юнітом
+        }
+        return false;
+    });
+    
+    return hasUnit;
+}
+
+/**
+ * Перевіряє, чи можна купити юніта в замку
+ * @param {Object} castle - об'єкт замку
+ * @returns {Object} - результат перевірки {canBuy: boolean, message: string}
+ */
+function canBuyUnitInCastle(castle) {
+    // Перевіряємо чи замок належить поточному гравцю
+    if (castle.playerIndex !== currentPlayerIndex) {
+        return {
+            canBuy: false,
+            message: "❌ Цей замок не належить вам!"
+        };
+    }
+    
+        // Перевіряємо чи клітинка замку зайнята ЮНІТОМ ІНШОГО ГРАВЦЯ
+    // Дозволяємо купувати, якщо на замку стоїть юніт того ж гравця
+    if (isCellOccupied(castle.x, castle.y, currentPlayerIndex)) {
+        return {
+            canBuy: false,
+            message: "❌ На замку стоїть юніт іншого гравця!"
+        };
+    }
+    
+    // Шукаємо вільну позицію навколо замку
+    const freePosition = findFreePositionNearCastle(castle);
+    
+    // Якщо знайшли вільну позицію
+    if (freePosition && !isCellOccupied(freePosition.x, freePosition.y)) {
+        return {
+            canBuy: true,
+            message: "✅ Можна купити юніта"
+        };
+    }
+    
+    // Якщо всі позиції зайняті
+    return {
+        canBuy: false,
+        message: "❌ Немає вільної позиції біля замку! Пересуньте юніта перед замком!."
+    };
 }

@@ -11,9 +11,6 @@ function updateAllUnitsVisualState() {
     });
 }
 
-/**
- * Оновлює візуальний стан одного юніта
- */
 function updateUnitVisualState(unit) {
     // Спочатку шукаємо wrapper
     const wrapper = document.querySelector(
@@ -33,7 +30,10 @@ function updateUnitVisualState(unit) {
         return;
     }
     
-    // Перевіряємо чи юніт закінчив хід (і ходив, і атакував)
+    // Знаходимо health fill для зміни кольору
+    const healthFill = wrapper.querySelector('.unit-health-fill');
+    
+    // Перевіряємо стани юніта
     const isExhausted = unit.moved && unit.attacked;
     
     // Додаємо або видаляємо клас exhausted
@@ -48,6 +48,21 @@ function updateUnitVisualState(unit) {
         cellPlayer.classList.add('active-player-unit');
     } else {
         cellPlayer.classList.remove('active-player-unit');
+    }
+    
+    // Оновлюємо колір HP bar тільки для активного гравця
+    if (healthFill && unit.playerIndex === currentPlayerIndex) {
+        // Видаляємо класи станів
+        healthFill.classList.remove('unit-moved-only', 'unit-fresh');
+        
+        // Додаємо відповідний клас
+        if (unit.moved) {
+            // Юніт пересунувся - жовтий
+            healthFill.classList.add('unit-moved-only');
+        } else {
+            // Юніт не пересувався - зелений
+            healthFill.classList.add('unit-fresh');
+        }
     }
 }
 
@@ -85,16 +100,23 @@ function updateActivePlayerUnitsVisuals() {
         const healthFill = wrapper.querySelector('.unit-health-fill');
         if (!healthFill) return;
         
+        // Спочатку видаляємо всі класи станів
+        healthFill.classList.remove('inactive-player-health', 'unit-moved-only', 'unit-fresh');
+        
         if (unit.playerIndex === currentPlayerIndex) {
-            // Активний гравець - стандартний зелений колір (видаляємо клас)
-            healthFill.classList.remove('inactive-player-health');
+            // Активний гравець
+            if (unit.moved) {
+                // Пересунувся - жовтий
+                healthFill.classList.add('unit-moved-only');
+            } else {
+                // Не пересувався - зелений
+                healthFill.classList.add('unit-fresh');
+            }
         } else {
             // Неактивні гравці - помаранчевий колір
             healthFill.classList.add('inactive-player-health');
         }
     });
-    
-   // console.log(`✅ Оновлено колір health bar для гравця ${currentPlayerIndex + 1}`);
 }
 
 // Експортуємо функції в глобальну область

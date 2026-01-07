@@ -52,6 +52,8 @@ units: unitsOnMap.map(unit => ({
     step: unit.step,
     range: unit.range,
     coin: unit.coin,
+    // ✅ ДОДАНО: Для прогрес-системи
+    upgradeCost: unit.upgradeCost || null,
     // Для героїв
     level: unit.level,
     LevelAttack: unit.LevelAttack,

@@ -43,8 +43,8 @@ function createUnitWithHealthBar(unit, imgElement) {
     
     healthFill.style.width = hpPercent + '%';
     
-    // Визначаємо колір
-    healthFill.classList.add(getHealthColorClass(hpPercent));
+    // НЕ додаємо класи кольорів HP при створенні
+    // healthFill.classList.add(getHealthColorClass(hpPercent));
     
     healthBarContainer.appendChild(healthFill);
     wrapper.appendChild(healthBarContainer);
@@ -77,23 +77,11 @@ window.updateUnitHealthBar = function(unit) {
     const maxHp = unit.maxHp || unit.hp;
     const hpPercent = Math.max(0, (currentHp / maxHp) * 100);
     
-    // Оновлюємо ширину
+    // Оновлюємо ТІЛЬКИ ширину, не змінюємо колір
     healthFill.style.width = hpPercent + '%';
     
-    // Оновлюємо колір
-    // ✅ ВИПРАВЛЕНО: Зберігаємо клас inactive-player-health якщо він є
-const hasInactiveClass = healthFill.classList.contains('inactive-player-health');
-
-// Видаляємо старі класи кольорів
-healthFill.classList.remove('health-high', 'health-medium', 'health-low', 'health-critical');
-
-// Додаємо новий клас кольору
-healthFill.classList.add(getHealthColorClass(hpPercent));
-
-// Відновлюємо клас inactive-player-health якщо він був
-if (hasInactiveClass) {
-    healthFill.classList.add('inactive-player-health');
-}
+    // НЕ видаляємо класи станів (unit-moved-only, inactive-player-health)
+    // НЕ додаємо класи кольорів HP
     
     console.log(`💚 Оновлено health bar: ${unit.name} (${Math.round(hpPercent)}%)`);
 };

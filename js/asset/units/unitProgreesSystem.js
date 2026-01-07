@@ -329,6 +329,10 @@ unitsOnMap[index] = upgradedUnit;
         }
     });
     // console.log("пппп");
+        // ✅ ДОДАНО: Застосовуємо аури для всіх юнітів після апгрейду
+        if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
+            window.EffectsManager.applyAllAuras();
+          }
     // console.log(`✅ На полі вдосконалено ${upgradedCount} юнітів`);
     
     // 3. Оновлюємо відображення (якщо магазин відкритий)

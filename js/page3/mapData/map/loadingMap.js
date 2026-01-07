@@ -131,12 +131,32 @@ if (savedState.capturedGoldHouses) {
                         restoredUnit.effects = savedUnit.effects || [];
                         restoredUnit.activeEffects = savedUnit.activeEffects || [];
                         restoredUnit.isHero = false;
-                        
+
+                        // ✅ ДОДАНО: Відновлюємо рівень для звичайних юнітів
+                        restoredUnit.level = savedUnit.level || 1;
+                        restoredUnit.upgradeCost = savedUnit.upgradeCost || templateUnit?.upgradeCost;
+
+                        if (window.createColoredUnit && player) {
+                            const coloredUnit = window.createColoredUnit(restoredUnit, player.originalIndex);
+                            Object.assign(restoredUnit, coloredUnit);
+                        }
+                        console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}, upgradeCost: ${restoredUnit.upgradeCost} (з збереження: ${savedUnit.upgradeCost}, з шаблону: ${templateUnit?.upgradeCost})`);
                         // Застосовуємо колір гравця
                         if (window.createColoredUnit && player) {
                             const coloredUnit = window.createColoredUnit(restoredUnit, player.originalIndex);
                             Object.assign(restoredUnit, coloredUnit);
                         }
+
+                        // ✅ ДОДАНО: Ініціалізуємо здібності
+if (window.AbilityFactory) {
+    restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
+    console.log(`✨ Відновлено ${restoredUnit.abilityInstances.length} здібностей для ${restoredUnit.name}`);
+    
+    // ✅ ДОДАНО: Синхронізуємо здібності з прогресом
+    if (typeof syncAbilitiesWithProgress === 'function' && savedUnit.abilitiesProgress) {
+        syncAbilitiesWithProgress(restoredUnit, savedUnit.abilitiesProgress);
+    }
+}
                         
                         console.log(`🎨 Відновлено звичайного юніта ${restoredUnit.name} для гравця ${savedUnit.playerIndex + 1}`);
                         return restoredUnit;
@@ -319,6 +339,8 @@ unitsOnMap = savedState.units.map(savedUnit => {
         // Для героїв - відновлюємо прогрес і регенеруємо зображення
         if (savedUnit.isHero) {
             restoredUnit.level = savedUnit.level;
+            restoredUnit.upgradeCost = savedUnit.upgradeCost;
+           console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}, upgradeCost: ${restoredUnit.upgradeCost} (з збереження: ${savedUnit.upgradeCost})`);
             restoredUnit.LevelAttack = savedUnit.LevelAttack;
             restoredUnit.LevelArmor = savedUnit.LevelArmor;
             restoredUnit.abilitiesProgress = savedUnit.abilitiesProgress;
@@ -334,11 +356,22 @@ unitsOnMap = savedState.units.map(savedUnit => {
                 }
             }
         }
+         // ✅ ДОДАНО: Для звичайних юнітів - відновлюємо рівень та інші поля прогрес-системи
+         if (!savedUnit.isHero) {
+            restoredUnit.level = savedUnit.level || 1;
+            restoredUnit.upgradeCost = savedUnit.upgradeCost || templateUnit?.upgradeCost;
+            console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}`);
+        }
     
     // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
     if (window.AbilityFactory) {
         restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
         console.log(`✨ Відновлено ${restoredUnit.abilityInstances.length} здібностей для ${restoredUnit.name}`);
+
+        // ✅ ДОДАНО: Синхронізуємо здібності з прогресом
+    if (typeof syncAbilitiesWithProgress === 'function' && savedUnit.abilitiesProgress) {
+        syncAbilitiesWithProgress(restoredUnit, savedUnit.abilitiesProgress);
+    }
     }
     // ✅ Відновлюємо кулдауни здібностей героїв
 if (savedState.heroCooldowns && window.heroAbilitySystem) {
@@ -351,6 +384,12 @@ if (savedState.heroCooldowns && window.heroAbilitySystem) {
     return restoredUnit;
 });
 window.unitsOnMap = unitsOnMap;
+                // Після рядка 353: window.unitsOnMap = unitsOnMap;
+// Після рядка 353: window.unitsOnMap = unitsOnMap;
+// ✅ ДОДАНО: Застосовуємо аури для всіх юнітів після завантаження
+if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
+    window.EffectsManager.applyAllAuras();
+  }
                 
                 console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
                 // ✅ ДОДАНО: Відновлюємо кулдауни здібностей героїв
@@ -593,6 +632,13 @@ if (loadedFromSave && unitsOnMap.length > 0) {
                 createUnitVisual(unit);
             }
         });
+
+
+         // ✅ ДОДАНО: Оновлюємо колір health bar одразу після створення візуальних елементів
+         if (typeof window.updateAllUnitsVisualState === 'function') {
+            console.log('🎨 Оновлюю колір health bar одразу після створення візуальних елементів');
+            window.updateAllUnitsVisualState();
+        }
         if (typeof window.applyTileDefenseBonuses === 'function') {
             unitsOnMap.forEach(unit => {
                 window.applyTileDefenseBonuses(unit);
@@ -603,8 +649,12 @@ if (loadedFromSave && unitsOnMap.length > 0) {
         if (typeof updatePlayerDisplay === 'function') {
             updatePlayerDisplay();
         }
-        
+        // На:
+if (typeof window.updateActivePlayerUnitsVisuals === 'function') {
+    window.updateActivePlayerUnitsVisuals();
+}
         console.log('✅ Гру повністю відновлено!');
+        
     }, 500);
 }
 // ============================================
@@ -622,4 +672,60 @@ window.gameData = {
 
 // console.log('🎯 gameData експортовано:', window.gameData);
 
-console.log("лоадінгОМАП44444444444");
+console.log("лоадінгОМАП55555555");
+
+
+
+/**
+ * Синхронізує abilityInstances з abilitiesProgress після завантаження
+ * @param {Object} unit - юніт для синхронізації
+ * @param {Array} abilitiesProgress - прогрес здібностей зі збереження
+ */
+function syncAbilitiesWithProgress(unit, abilitiesProgress) {
+    if (!unit.abilityInstances || !Array.isArray(unit.abilityInstances)) {
+        console.warn(`⚠️ ${unit.name}: немає abilityInstances для синхронізації`);
+        return;
+    }
+    
+    if (!abilitiesProgress || !Array.isArray(abilitiesProgress)) {
+        console.log(`📋 ${unit.name}: немає abilitiesProgress для синхронізації`);
+        return;
+    }
+    
+    console.log(`🔄 Синхронізую здібності для ${unit.name}:`, {
+        abilityInstances: unit.abilityInstances.length,
+        abilitiesProgress: abilitiesProgress.length
+    });
+    
+    abilitiesProgress.forEach(savedProgress => {
+        // Знаходимо відповідну здібність у abilityInstances
+        const abilityInstance = unit.abilityInstances.find(
+            ability => ability.key === savedProgress.key || ability.name === savedProgress.name
+        );
+        
+        if (abilityInstance) {
+            // Синхронізуємо прогрес
+            if (savedProgress.level !== undefined) {
+                abilityInstance.level = savedProgress.level;
+            }
+            if (savedProgress.cooldown !== undefined) {
+                abilityInstance.cooldown = savedProgress.cooldown;
+            }
+            if (savedProgress.usedThisTurn !== undefined) {
+                abilityInstance.usedThisTurn = savedProgress.usedThisTurn;
+            }
+            if (savedProgress.enabled !== undefined) {
+                abilityInstance.enabled = savedProgress.enabled;
+            }
+            
+            console.log(`✅ Синхронізовано здібність ${abilityInstance.name}:`, {
+                level: abilityInstance.level,
+                cooldown: abilityInstance.cooldown,
+                usedThisTurn: abilityInstance.usedThisTurn,
+                enabled: abilityInstance.enabled
+            });
+        } else {
+            console.warn(`⚠️ Не знайдено здібність для синхронізації:`, savedProgress);
+        }
+    });
+}

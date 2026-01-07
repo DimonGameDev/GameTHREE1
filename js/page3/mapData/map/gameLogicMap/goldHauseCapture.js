@@ -272,6 +272,11 @@ function executeCaptureGoldHouse() {
         // ⬇️ ВАЖЛИВО: Завершуємо хід юніта
         unit.moved = true;
         unit.attacked = true; // Також блокуємо атаку
+
+            // Оновлюємо візуальний стан після атаки
+    if (typeof window.updateUnitVisualState === 'function') {
+        window.updateUnitVisualState(unit);
+    }
         
         // ⬇️ ДОДАНО: Очищаємо жовті клітинки руху
         if (typeof clearMoveCells === 'function') {

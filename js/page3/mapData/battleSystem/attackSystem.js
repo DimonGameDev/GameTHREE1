@@ -479,11 +479,19 @@ if (target.unit.isHero && window.heroAuraSystem && window.heroAuraSystem.checkLo
                 // Герой помер
                 console.log('💀 Герой знищений!');
                 destroyUnit(target.unit);
+                 // Перевіряємо чи гравець програв після смерті цього юніта
+                 if (typeof window.checkPlayerDefeatAfterUnitDeath === 'function') {
+                    window.checkPlayerDefeatAfterUnitDeath(target.unit);
+                }
             }
         } else {
             // Звичайний юніт
             console.log('💀 Ціль знищена!');
             destroyUnit(target.unit);
+             // Перевіряємо чи гравець програв після смерті цього юніта
+             if (typeof window.checkPlayerDefeatAfterUnitDeath === 'function') {
+                window.checkPlayerDefeatAfterUnitDeath(target.unit);
+            }
         }
     } else {
         if (typeof updateUnitTablo === 'function' && selectedUnitForMove === target.unit) {
@@ -552,7 +560,37 @@ function showDamagePopup(damage, x, y, isCritical = false) {
 /**
  * Знищує юніта
  */
+/**
+ * Знищує юніта
+ */
 function destroyUnit(unit) {
+    console.log(`💀 Функція destroyUnit викликана для ${unit.name}`);
+    
+    // Перевіряємо чи це герой
+    if (unit.isHero) {
+        console.log(`👑 Це герой ${unit.name} - викликаємо спеціальну обробку смерті`);
+        // Використовуємо нову функцію для героїв
+        if (typeof window.handleHeroDeath === 'function') {
+            window.handleHeroDeath(unit);
+        } else {
+            console.error('❌ Функція handleHeroDeath не знайдена!');
+            console.log('⚠️ Використовуємо стандартне видалення для героя');
+            // Стандартне видалення якщо функція не знайдена
+            standardDestroyUnit(unit);
+        }
+        return;
+    }
+    
+    // Для звичайних юнітів - стандартне видалення
+    standardDestroyUnit(unit);
+}
+
+/**
+ * Стандартне видалення юніта (для звичайних юнітів)
+ */
+function standardDestroyUnit(unit) {
+    console.log(`⚔️ Стандартне видалення юніта ${unit.name}`);
+    
     // Видаляємо з масиву
     const index = unitsOnMap.findIndex(u => 
         u.x === unit.x && u.y === unit.y && u.playerIndex === unit.playerIndex
@@ -560,23 +598,31 @@ function destroyUnit(unit) {
     
     if (index !== -1) {
         unitsOnMap.splice(index, 1);
+        console.log(`🗑️ Юніт ${unit.name} видалений з unitsOnMap`);
+    } else {
+        console.warn(`⚠️ Юніт ${unit.name} не знайдений в unitsOnMap`);
     }
     
     // Видаляємо wrapper юніта (разом з health bar)
-const wrapper = document.querySelector(
-    `.unit-wrapper[data-unit-id="${unit.id}"]`
-);
+    const wrapper = document.querySelector(
+        `.unit-wrapper[data-unit-id="${unit.id}"]`
+    );
 
-if (wrapper) {
-    wrapper.remove();
-    console.log(`💀 Видалено візуальний елемент юніта: ${unit.name}`);
-} else {
-    console.warn(`⚠️ Не знайдено wrapper для видалення юніта: ${unit.name}`);
-}
+    if (wrapper) {
+        wrapper.remove();
+        console.log(`💀 Видалено візуальний елемент юніта: ${unit.name}`);
+    } else {
+        console.warn(`⚠️ Не знайдено wrapper для видалення юніта: ${unit.name}`);
+    }
     
     // Оновлюємо лічильник юнітів
     if (typeof updateUnitsCount === 'function') {
         updateUnitsCount();
+    }
+    
+    // Перевіряємо чи гравець програв після смерті цього юніта
+    if (typeof window.checkPlayerDefeatAfterUnitDeath === 'function') {
+        window.checkPlayerDefeatAfterUnitDeath(unit);
     }
 }
 

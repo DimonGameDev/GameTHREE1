@@ -56,3 +56,16 @@
 .unit-health-fill.inactive-player-health {
     background: linear-gradient(90deg, #0066FF, #0099FF) !important; /* 🔵 Яскравий синій */
 }
+
+
+/* Колір для юнітів, які тільки пересунулися (жовтий) */
+.unit-health-fill.unit-moved-only {
+    background: linear-gradient(90deg, #FFD700, #FFA500) !important;
+    box-shadow: 0 0 4px #FFD700 !important;
+}
+
+/* Колір для свіжих юнітів (зелений) */
+.unit-health-fill.unit-fresh {
+    background: linear-gradient(90deg, #00FF00, #00CC00) !important;
+    box-shadow: 0 0 4px #00FF00 !important;
+}
