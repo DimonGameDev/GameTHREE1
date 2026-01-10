@@ -16,10 +16,19 @@ function openHeroesModal() {
         return;
     }
     
-    // Перевіряємо, чи є герої у гравця
-    const playerHeroes = unitsOnMap.filter(unit => 
+    // ✅ ВИПРАВЛЕННЯ: Додаємо мертвих героїв до списку
+    // Живі герої
+    const aliveHeroes = unitsOnMap.filter(unit => 
         unit.isHero && unit.playerIndex === currentPlayerIndex
     );
+    
+    // Мертві герої
+    const deadHeroes = deadHeroesWaitingForRespawn.filter(hero => 
+        hero.playerIndex === currentPlayerIndex
+    );
+    
+    // Об'єднуємо списки
+    const playerHeroes = [...aliveHeroes, ...deadHeroes];
     
     if (playerHeroes.length === 0) {
         alert("⚠️ У вас ще немає героїв!");
@@ -45,10 +54,10 @@ function openHeroesModal() {
         displayHeroInfo(playerHeroes[0]); // Показуємо першого героя
         
         updateHeroesManaInModal();
+        updateAllHeroRespawnTimers();
         // Блокуємо скрол body на мобільних
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
-        document.body.style.width = '100%';
     }
 }
 
@@ -89,6 +98,15 @@ function displayHeroInfo(hero) {
     // Оновлюємо головне зображення героя
     if (modEfeHerImg) {
         modEfeHerImg.src = hero.img || "";
+        
+        // ✅ ВИПРАВЛЕННЯ: Додаємо ефект для мертвих героїв
+        if (hero.isDead === true) {
+            modEfeHerImg.style.opacity = "0.5";
+            modEfeHerImg.style.filter = "grayscale(70%)";
+        } else {
+            modEfeHerImg.style.opacity = "1";
+            modEfeHerImg.style.filter = "none";
+        }
     }
     
     // Оновлюємо статистику
@@ -100,14 +118,53 @@ function displayHeroInfo(hero) {
     if (modEfeHerItemHpNew) modEfeHerItemHpNew.textContent = hero.hp || 0;
     
     // Критичний удар (якщо є)
-if (modEfeHerItemCriticalStrike) {
-    modEfeHerItemCriticalStrike.textContent = hero.critChance ? `${hero.critChance}%` : "0%"; // Змінено з criticalChance на critChance
-}
-if (modEfeHerItemCriticalBlow) {
-    modEfeHerItemCriticalBlow.textContent = hero.critBlow ? `x${hero.critBlow}` : "x0"; // Змінено з criticalDamage на critBlow, додано "x"
-}
+    if (modEfeHerItemCriticalStrike) {
+        modEfeHerItemCriticalStrike.textContent = hero.critChance ? `${hero.critChance}%` : "0%";
+    }
+    if (modEfeHerItemCriticalBlow) {
+        modEfeHerItemCriticalBlow.textContent = hero.critBlow ? `x${hero.critBlow}` : "x0";
+    }
     
-updateHeroesManaInModal();
+    // ✅ ВИПРАВЛЕННЯ: Додаємо інформацію про воскресіння для мертвих героїв
+    if (hero.isDead === true) {
+        // Створюємо або оновлюємо елемент для інформації про воскресіння
+        let respawnInfo = document.querySelector('.respawn-info');
+        if (!respawnInfo) {
+            respawnInfo = document.createElement('div');
+            respawnInfo.className = 'respawn-info';
+            respawnInfo.style.marginTop = '10px';
+            respawnInfo.style.padding = '10px';
+            respawnInfo.style.backgroundColor = 'rgba(255, 0, 0, 0.2)';
+            respawnInfo.style.borderRadius = '5px';
+            respawnInfo.style.border = '1px solid red';
+            respawnInfo.style.color = 'white';
+            respawnInfo.style.textAlign = 'center';
+            
+            // Знаходимо місце для вставки (після статистики)
+            const statsContainer = document.querySelector('.modEfeHerItem'); // або інший контейнер
+            if (statsContainer) {
+                statsContainer.parentNode.insertBefore(respawnInfo, statsContainer.nextSibling);
+            }
+        }
+        
+        if (hero.respawnTimer > 0) {
+            respawnInfo.textContent = `⚡ Воскресне через ${hero.respawnTimer} ходів`;
+            respawnInfo.style.backgroundColor = 'rgba(255, 165, 0, 0.2)';
+            respawnInfo.style.border = '1px solid orange';
+        } else {
+            respawnInfo.textContent = '✅ Готовий до воскресіння!';
+            respawnInfo.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
+            respawnInfo.style.border = '1px solid green';
+        }
+    } else {
+        // Видаляємо інформацію про воскресіння, якщо герой живий
+        const respawnInfo = document.querySelector('.respawn-info');
+        if (respawnInfo) {
+            respawnInfo.remove();
+        }
+    }
+    
+    updateHeroesManaInModal();
     // Оновлюємо іконки вибору героїв (якщо є кілька)
     updateHeroSelection();
     
@@ -125,10 +182,69 @@ function updateHeroSelection() {
     heroImages.forEach((img, index) => {
         if (img) {
             if (playerHeroes[index]) {
-                // Встановлюємо картинку та ЯВНО скидаємо opacity
-                img.src = playerHeroes[index].img;
-                img.style.opacity = "1"; // ВАЖЛИВО: скидаємо opacity на повну видимість
+                const hero = playerHeroes[index];
+                
+                // Встановлюємо картинку
+                img.src = hero.img;
                 img.style.cursor = "pointer";
+                
+                // Додаємо dataset атрибути для ідентифікації героя
+                img.dataset.heroId = hero.id || '';
+                img.dataset.heroName = hero.name || '';
+                img.dataset.playerIndex = hero.playerIndex || '';
+                
+                // ✅ ВИПРАВЛЕННЯ: Додаємо таймер для мертвих героїв
+                if (hero.isDead === true) {
+                    // Герой мертвий - додаємо таймер
+                    img.style.opacity = "0.5"; // Робимо тьмянішим
+                    img.style.filter = "grayscale(70%)"; // Додаємо сірий фільтр
+                    
+                    // Створюємо або оновлюємо елемент для таймера
+                    let timerElement = img.parentElement.querySelector('.respawn-timer');
+                    if (!timerElement) {
+                        timerElement = document.createElement('div');
+                        timerElement.className = 'respawn-timer';
+                        timerElement.style.position = 'absolute';
+                        timerElement.style.top = '5px';
+                        timerElement.style.right = '5px';
+                        timerElement.style.fontSize = '16px';
+                        timerElement.style.fontWeight = 'bold';
+                        timerElement.style.color = 'white';
+                        timerElement.style.textShadow = '1px 1px 2px black';
+                        timerElement.style.zIndex = '10';
+                        timerElement.style.background = 'rgba(0, 0, 0, 0.8)';
+                        timerElement.style.borderRadius = '50%';
+                        timerElement.style.width = '30px';
+                        timerElement.style.height = '30px';
+                        timerElement.style.display = 'flex';
+                        timerElement.style.alignItems = 'center';
+                        timerElement.style.justifyContent = 'center';
+                        timerElement.style.border = '2px solid gold';
+                        timerElement.style.pointerEvents = 'none';
+                        img.parentElement.style.position = 'relative';
+                        img.parentElement.appendChild(timerElement);
+                    }
+                    
+                    // Встановлюємо значення таймера
+                    timerElement.textContent = hero.respawnTimer > 0 ? hero.respawnTimer : "⚡";
+                    
+                    // Додаємо підказку
+                    img.title = hero.respawnTimer > 0 
+                        ? `Воскресне через ${hero.respawnTimer} ходів` 
+                        : "Готовий до воскресіння!";
+                } else {
+                    // Герой живий - скидаємо стилі
+                    img.style.opacity = "1";
+                    img.style.filter = "none";
+                    
+                    // Видаляємо таймер, якщо він є
+                    const timerElement = img.parentElement.querySelector('.respawn-timer');
+                    if (timerElement) {
+                        timerElement.remove();
+                    }
+                    
+                    img.title = "";
+                }
                 
                 // Виділяємо активного героя рамкою
                 if (index === window.currentHeroIndex) {
@@ -147,9 +263,138 @@ function updateHeroSelection() {
             } else {
                 // Порожній слот - робимо тьмяним
                 img.style.opacity = "0.2";
+                img.style.filter = "none";
                 img.style.cursor = "default";
                 img.onclick = null;
+                
+                // Видаляємо dataset атрибути
+                delete img.dataset.heroId;
+                delete img.dataset.heroName;
+                delete img.dataset.playerIndex;
+                
+                // Видаляємо таймер, якщо він є
+                const timerElement = img.parentElement.querySelector('.respawn-timer');
+                if (timerElement) {
+                    timerElement.remove();
+                }
+                
+                img.title = "";
             }
+        }
+    });
+}
+
+
+
+
+/**
+ * Оновлює таймер воскресіння на картинці героя
+ * @param {Object} hero - об'єкт героя
+ */
+function updateHeroRespawnTimer(hero) {
+    if (!hero || !hero.isDead) return;
+    
+    console.log(`🔄 Оновлення таймера для героя ${hero.name}: ${hero.respawnTimer}`);
+    
+    // Знаходимо всі картинки героїв у модальному вікні
+    const heroImages = [modalEfectHeroes1, modalEfectHeroes2, modalEfectHeroes3];
+    
+    // Шукаємо картинку, яка відповідає цьому герою
+    let targetImg = null;
+    let targetIndex = -1;
+    
+    // Спочатку пробуємо знайти за ID (якщо є)
+    heroImages.forEach((img, index) => {
+        if (img && img.dataset && img.dataset.heroId === hero.id) {
+            targetImg = img;
+            targetIndex = index;
+        }
+    });
+    
+    // Якщо не знайшли за ID, пробуємо знайти за іменем та гравцем
+    if (!targetImg) {
+        heroImages.forEach((img, index) => {
+            if (img && img.dataset && img.dataset.heroName === hero.name && 
+                parseInt(img.dataset.playerIndex) === hero.playerIndex) {
+                targetImg = img;
+                targetIndex = index;
+            }
+        });
+    }
+    
+    // Якщо все ще не знайшли, виходимо
+    if (!targetImg) {
+        console.log(`⚠️ Картинка для героя ${hero.name} не знайдена в модальному вікні`);
+        return;
+    }
+    
+    console.log(`✅ Знайдено картинку для героя ${hero.name} (індекс ${targetIndex})`);
+    
+    // Знаходимо таймер для цієї картинки
+    const timerElement = targetImg.parentElement ? targetImg.parentElement.querySelector('.respawn-timer') : null;
+    
+    if (timerElement) {
+        // Оновлюємо значення таймера
+        timerElement.textContent = hero.respawnTimer > 0 ? hero.respawnTimer : "⚡";
+        
+        // Оновлюємо підказку
+        targetImg.title = hero.respawnTimer > 0 
+            ? `Воскресне через ${hero.respawnTimer} ходів` 
+            : "Готовий до воскресіння!";
+            
+        console.log(`✅ Оновлено таймер для ${hero.name}: ${timerElement.textContent}`);
+    } else {
+        console.log(`⚠️ Таймер не знайдений для героя ${hero.name}`);
+        
+        // Якщо таймера немає, а герой мертвий - створюємо його
+        if (hero.isDead === true) {
+            // Створюємо таймер
+            const newTimerElement = document.createElement('div');
+            newTimerElement.className = 'respawn-timer';
+            newTimerElement.style.position = 'absolute';
+            newTimerElement.style.top = '5px';
+            newTimerElement.style.right = '5px';
+            newTimerElement.style.fontSize = '16px';
+            newTimerElement.style.fontWeight = 'bold';
+            newTimerElement.style.color = 'white';
+            newTimerElement.style.textShadow = '1px 1px 2px black';
+            newTimerElement.style.zIndex = '10';
+            newTimerElement.style.background = 'rgba(0, 0, 0, 0.8)';
+            newTimerElement.style.borderRadius = '50%';
+            newTimerElement.style.width = '30px';
+            newTimerElement.style.height = '30px';
+            newTimerElement.style.display = 'flex';
+            newTimerElement.style.alignItems = 'center';
+            newTimerElement.style.justifyContent = 'center';
+            newTimerElement.style.border = '2px solid gold';
+            newTimerElement.style.pointerEvents = 'none';
+            
+            // Встановлюємо значення
+            newTimerElement.textContent = hero.respawnTimer > 0 ? hero.respawnTimer : "⚡";
+            
+            // Додаємо в DOM
+            targetImg.parentElement.style.position = 'relative';
+            targetImg.parentElement.appendChild(newTimerElement);
+            
+            // Оновлюємо підказку
+            targetImg.title = hero.respawnTimer > 0 
+                ? `Воскресне через ${hero.respawnTimer} ходів` 
+                : "Готовий до воскресіння!";
+                
+            console.log(`✅ Створено новий таймер для ${hero.name}: ${newTimerElement.textContent}`);
+        }
+    }
+}
+
+/**
+ * Оновлює всі таймери воскресіння в модальному вікні
+ */
+function updateAllHeroRespawnTimers() {
+    const playerHeroes = window.currentPlayerHeroes || [];
+    
+    playerHeroes.forEach(hero => {
+        if (hero.isDead) {
+            updateHeroRespawnTimer(hero);
         }
     });
 }
@@ -157,6 +402,7 @@ function updateHeroSelection() {
 /**
  * Відображає здібності героя
  */
+
 function displayHeroAbilities(hero) {
     if (!hero.abilitiesProgress || hero.abilitiesProgress.length === 0) {
         return;
@@ -439,3 +685,8 @@ function updateHeroesManaInModal() {
         manaHeroesNow.textContent = "0";
     }
 }
+
+
+// Експортуємо функції для оновлення таймерів воскресіння
+window.updateHeroRespawnTimer = updateHeroRespawnTimer;
+window.updateAllHeroRespawnTimers = updateAllHeroRespawnTimers;

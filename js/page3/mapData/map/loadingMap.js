@@ -672,7 +672,7 @@ window.gameData = {
 
 // console.log('🎯 gameData експортовано:', window.gameData);
 
-console.log("лоадінгОМАП55555555");
+console.log("лоадінгОМАП77777777");
 
 
 

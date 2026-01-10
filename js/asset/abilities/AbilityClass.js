@@ -30,11 +30,12 @@ class Ability {
                     this.healAmount = customValues.power;
                     break;
                     case "mixed":
-                    if (typeof customValues.power === 'object') {
-                      this.attackBoostPercent = customValues.power.attackBoostPercent || this.attackBoostPercent;
-                      this.armorBoost = customValues.power.armorBoost || this.armorBoost;
-                      this.hpRegenPercent = customValues.power.hpRegenPercent || this.hpRegenPercent;
-                    }
+                      if (typeof customValues.power === 'object') {
+                        // ✅ ВИПРАВЛЕННЯ: Перевіряємо обидва варіанти - attackBoostPercent та attackBoost
+                        this.attackBoost = customValues.power.attackBoost || customValues.power.attackBoostPercent || this.attackBoost;
+                        this.armorBoost = customValues.power.armorBoost || this.armorBoost;
+                        this.hpRegenPercent = customValues.power.hpRegenPercent || this.hpRegenPercent;
+                      }
                     break;
                 }
               }

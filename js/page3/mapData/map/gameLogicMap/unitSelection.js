@@ -1212,11 +1212,9 @@ function initHeroRespawnFields(hero, respawnTimer = 4) {
         range: hero.range || 0
     };
     
-    console.log(`✅ Ініціалізовано поля воскресіння для героя ${hero.name}:`);
-    console.log(`   - Таймер воскресіння: ${hero.respawnTimer} ходів`);
-    console.log(`   - Оригінальне HP: ${hero.originalStats.hp}`);
-    console.log(`   - Оригінальна атака: ${hero.originalStats.attack}`);
-    console.log(`   - Оригінальна броня: ${hero.originalStats.armor}`);
+    console.log(`✅ Ініціалізовано поля воскресіння для героя ${hero.name}`);
+    console.log(`   - isDead: ${hero.isDead}`);
+    console.log(`   - respawnTimer: ${hero.respawnTimer}`);
 }
 
 /**
@@ -1253,6 +1251,7 @@ function handleHeroDeath(hero) {
     // Позначаємо героя як мертвого
     hero.isDead = true;
     
+    hero.respawnTimer = 4;
     // Зберігаємо оригінальні координати (для пошуку замка)
     hero.deathX = hero.x;
     hero.deathY = hero.y;
@@ -1265,6 +1264,15 @@ function handleHeroDeath(hero) {
     console.log(`   - Координати смерті: (${hero.deathX}, ${hero.deathY})`);
     console.log(`   - Всього героїв в очікуванні: ${deadHeroesWaitingForRespawn.length}`);
     
+
+    if (typeof window.updateHeroRespawnTimer === 'function') {
+        window.updateHeroRespawnTimer(hero);
+    }
+
+        // Додаємо таймер на картинку героя на карті
+        if (typeof window.addRespawnTimerToHeroImage === 'function') {
+            window.addRespawnTimerToHeroImage(hero);
+        }
     // Видаляємо героя з масиву unitsOnMap (він буде в deadHeroesWaitingForRespawn)
     const index = unitsOnMap.findIndex(u => u.id === hero.id);
     if (index !== -1) {
@@ -1283,6 +1291,101 @@ function handleHeroDeath(hero) {
     if (typeof updateUnitsCount === 'function') {
         updateUnitsCount();
     }
+}
+
+
+/**
+ * Додає таймер воскресіння на картинку героя на карті
+ * @param {Object} hero - герой
+ */
+function addRespawnTimerToHeroImage(hero) {
+    if (!hero || !hero.isDead) return;
+    
+    console.log(`⏰ Додавання таймера воскресіння на картинку героя ${hero.name}`);
+    
+    // Знаходимо wrapper героя на карті
+    const wrapper = document.querySelector(`.unit-wrapper[data-unit-id="${hero.id}"]`);
+    if (!wrapper) {
+        console.log(`❌ Wrapper для героя ${hero.name} не знайдено`);
+        return;
+    }
+    
+    // Знаходимо картинку героя всередині wrapper
+    const heroImage = wrapper.querySelector('.cellPlayer');
+    if (!heroImage) {
+        console.log(`❌ Картинка героя ${hero.name} не знайдено`);
+        return;
+    }
+    
+    // Створюємо елемент для таймера
+    let timerElement = wrapper.querySelector('.respawn-timer-on-map');
+    if (!timerElement) {
+        timerElement = document.createElement('div');
+        timerElement.className = 'respawn-timer-on-map';
+        timerElement.style.position = 'absolute';
+        timerElement.style.top = '0';
+        timerElement.style.left = '0';
+        timerElement.style.width = '100%';
+        timerElement.style.height = '100%';
+        timerElement.style.display = 'flex';
+        timerElement.style.justifyContent = 'center';
+        timerElement.style.alignItems = 'center';
+        timerElement.style.fontSize = '24px';
+        timerElement.style.fontWeight = 'bold';
+        timerElement.style.color = '#ff0000';
+        timerElement.style.textShadow = '0 0 5px #000, 0 0 10px #000';
+        timerElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        timerElement.style.borderRadius = '5px';
+        timerElement.style.zIndex = '100';
+        timerElement.style.pointerEvents = 'none';
+        
+        wrapper.appendChild(timerElement);
+    }
+    
+    // Оновлюємо значення таймера
+    timerElement.textContent = hero.respawnTimer > 0 ? hero.respawnTimer : "⚡";
+    
+    // Додаємо підказку
+    heroImage.title = hero.respawnTimer > 0 
+        ? `Воскресне через ${hero.respawnTimer} ходів` 
+        : "Готовий до воскресіння!";
+    
+    console.log(`✅ Таймер додано на картинку героя ${hero.name}: ${timerElement.textContent}`);
+}
+
+/**
+ * Оновлює таймер воскресіння на картинці героя на карті
+ * @param {Object} hero - герой
+ */
+function updateHeroRespawnTimerOnMap(hero) {
+    if (!hero || !hero.isDead) return;
+    
+    console.log(`🔄 Оновлення таймера на карті для героя ${hero.name}: ${hero.respawnTimer}`);
+    
+    // Знаходимо wrapper героя на карті
+    const wrapper = document.querySelector(`.unit-wrapper[data-unit-id="${hero.id}"]`);
+    if (!wrapper) return;
+    
+    // Знаходимо елемент таймера
+    const timerElement = wrapper.querySelector('.respawn-timer-on-map');
+    if (!timerElement) {
+        // Якщо таймера немає, додаємо його
+        addRespawnTimerToHeroImage(hero);
+        return;
+    }
+    
+    // Оновлюємо значення таймера
+    timerElement.textContent = hero.respawnTimer > 0 ? hero.respawnTimer : "⚡";
+    
+    // Оновлюємо підказку
+    const heroImage = wrapper.querySelector('.cellPlayer');
+    if (heroImage) {
+        heroImage.title = hero.respawnTimer > 0 
+            ? `Воскресне через ${hero.respawnTimer} ходів` 
+            : "Готовий до воскресіння!";
+    }
+    
+    console.log(`✅ Оновлено таймер на карті для ${hero.name}: ${timerElement.textContent}`);
 }
 
 /**
@@ -1411,76 +1514,107 @@ function respawnHero(hero) {
 function createHeroVisualElement(hero) {
     console.log(`🎨 Створення візуального елемента для воскреслого героя ${hero.name}`);
     
-    // Знаходимо елемент карти
+    // Використовуємо ту саму функцію, що і для створення героїв на старті
+        // Використовуємо ту саму функцію, що і для створення героїв на старті
+        if (typeof window.createHeroVisual === 'function') {
+            // Спочатку переконуємося, що герой має всі необхідні поля
+            const heroForVisual = {
+                ...hero,
+                // Якщо немає originalIndex, використовуємо playerIndex
+                originalIndex: hero.originalIndex !== undefined ? hero.originalIndex : hero.playerIndex
+            };
+            
+            const wrapper = window.createHeroVisual(heroForVisual);
+            
+            // Оновлюємо координати в wrapper (на всяк випадок)
+            if (wrapper) {
+                wrapper.dataset.x = hero.x;
+                wrapper.dataset.y = hero.y;
+                wrapper.style.left = `${hero.x * (cellSizeAll || 60)}px`;
+                wrapper.style.top = `${hero.y * (cellSizeAll || 60)}px`;
+            }
+
+            setTimeout(() => {
+                if (typeof window.updateUnitVisualState === 'function') {
+                    window.updateUnitVisualState(hero);
+                }
+            }, 100);
+
+                            // Оновлюємо таймер на карті
+                            if (typeof window.updateHeroRespawnTimerOnMap === 'function') {
+                                window.updateHeroRespawnTimerOnMap(hero);
+                            }
+            
+            console.log(`✅ Герой ${hero.name} створено за допомогою createHeroVisual`);
+            return;
+        }
+    
+    // Якщо функції немає, створюємо вручну (копіюємо логіку з loadingHeroesOnMap.js)
     const mapElement = document.querySelector('.map');
     if (!mapElement) {
         console.error('❌ Елемент карти не знайдено!');
         return;
     }
     
-    // Створюємо wrapper для юніта
-    const wrapper = document.createElement('div');
-    wrapper.className = 'unit-wrapper';
+    // Створюємо img елемент (ТОЧНО ТАК ЖЕ, як у createHeroVisual)
+    let cellPlayer = document.createElement("img");
+    cellPlayer.classList.add("cellPlayer");
+    cellPlayer.src = hero.img || hero.image || '../../img/units/default.png';
+    
+    // Додаємо border (ТОЧНО ТАК ЖЕ, як у createHeroVisual)
+        // Додаємо border (ТОЧНО ТАК ЖЕ, як у createHeroVisual)
+        if (colorFlag) {
+            // Використовуємо originalIndex як у оригінальній функції, або playerIndex як запасний варіант
+            const colorIndex = hero.originalIndex !== undefined ? hero.originalIndex : hero.playerIndex;
+            if (colorFlag[colorIndex]) {
+                cellPlayer.style.border = `1px dashed ${colorFlag[colorIndex]}`;
+            }
+        }
+        cellPlayer.style.boxSizing = "border-box";
+        cellPlayer.style.pointerEvents = "none";
+    
+    // Створюємо wrapper з health bar (ТОЧНО ТАК ЖЕ, як у createHeroVisual)
+    let wrapper;
+    if (typeof window.createUnitWithHealthBar === 'function') {
+        wrapper = window.createUnitWithHealthBar(hero, cellPlayer);
+    } else {
+        // Запасний варіант
+        wrapper = document.createElement('div');
+        wrapper.className = 'unit-wrapper';
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = `${hero.x * (cellSizeAll || 60)}px`;
+        wrapper.style.top = `${hero.y * (cellSizeAll || 60)}px`;
+        wrapper.style.width = `${cellSizeAll || 60}px`;
+        wrapper.style.height = `${cellSizeAll || 60}px`;
+        wrapper.style.zIndex = '10';
+        wrapper.appendChild(cellPlayer);
+    }
+    
     wrapper.dataset.unitId = hero.id;
     wrapper.dataset.x = hero.x;
     wrapper.dataset.y = hero.y;
     
-    // Встановлюємо позицію
-    const cellSize = cellSizeAll || 60;
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = `${hero.x * cellSize}px`;
-    wrapper.style.top = `${hero.y * cellSize}px`;
-    wrapper.style.width = `${cellSize}px`;
-    wrapper.style.height = `${cellSize}px`;
-    wrapper.style.zIndex = '10';
+    // Додаємо обробник кліку
+    wrapper.addEventListener('click', function() {
+        handleUnitClick(hero, wrapper);
+    });
     
-       // Створюємо зображення юніта
-       const unitImage = document.createElement('img');
+    // Додаємо до карти
+     // Додаємо до карти
+     mapElement.appendChild(wrapper);
     
-       // Визначаємо шлях до зображення героя
-       let imagePath = hero.img || hero.image;
-       if (!imagePath || imagePath.trim() === '') {
-        console.warn(`⚠️ Герой ${hero.name} не має зображення. Використовуємо стандартне.`);
-        imagePath = '../../img/units/default.png';
-    } else {
-        // Перевіряємо чи це повний URL або відносний шлях
-        if (!imagePath.startsWith('http') && !imagePath.startsWith('/') && !imagePath.startsWith('../')) {
-            // Додаємо базовий шлях якщо потрібно
-            imagePath = '../../' + imagePath;
-        }
-        console.log(`🖼️ Шлях до зображення героя ${hero.name}: ${imagePath}`);
-    }
-       
-       unitImage.src = imagePath;
-       unitImage.alt = hero.name;
-       unitImage.style.width = '100%';
-       unitImage.style.height = '100%';
-       unitImage.style.objectFit = 'contain';
-       
-       // Обробка помилки завантаження зображення
-       unitImage.onerror = function() {
-           console.error(`❌ Не вдалося завантажити зображення для героя ${hero.name}: ${imagePath}`);
-           console.log(`   Спробуємо резервний шлях: ../../img/units/default.png`);
-           this.src = '../../img/units/default.png';
-       };
-       
-       // Додаємо клас для героя
-       unitImage.classList.add('hero-unit');
-       
-       // Додаємо зображення до wrapper
-       wrapper.appendChild(unitImage);
-    
-    // Додаємо health bar (якщо є така система)
-    if (typeof window.createHealthBar === 'function') {
-        window.createHealthBar(hero, wrapper);
-    }
-    
-    // Додаємо wrapper до карти
-    mapElement.appendChild(wrapper);
-    
-    console.log(`✅ Візуальний елемент для ${hero.name} створено на (${hero.x}, ${hero.y})`);
-}
+     console.log(`✅ Візуальний елемент для ${hero.name} створено на (${hero.x}, ${hero.y})`);
+     
+     // Оновлюємо візуальний стан героя
+     setTimeout(() => {
+         if (typeof window.updateUnitVisualState === 'function') {
+             window.updateUnitVisualState(hero);
+         }
+     }, 100);
+ }
 
+/**
+ * Оновлює таймери воскресіння для всіх мертвих героїв
 /**
  * Оновлює таймери воскресіння для всіх мертвих героїв
  * @param {number} playerIndex - індекс гравця, який закінчив хід
@@ -1493,18 +1627,32 @@ function updateRespawnTimers(playerIndex) {
     
     // Проходимо по всіх мертвих героях
     deadHeroesWaitingForRespawn.forEach(hero => {
-        // Зменшуємо таймер тільки для героїв цього гравця
+        // ✅ ВИПРАВЛЕННЯ: Зменшуємо таймер тільки для героїв цього гравця
         if (hero.playerIndex === playerIndex) {
-            hero.respawnTimer--;
-            timersUpdated++;
-            
-            console.log(`📉 Герой ${hero.name}: таймер зменшено до ${hero.respawnTimer}`);
-            
-            // Перевіряємо чи герой готовий до воскресіння
-            if (hero.respawnTimer <= 0) {
+            // ✅ ВИПРАВЛЕННЯ: Зменшуємо таймер тільки якщо він більше 0
+            if (hero.respawnTimer > 0) {
+                hero.respawnTimer--;
+                timersUpdated++;
+                
+                console.log(`📉 Герой ${hero.name}: таймер зменшено до ${hero.respawnTimer}`);
+                
+                // ✅ ВИПРАВЛЕННЯ: Оновлюємо таймер у модальному вікні
+                if (typeof window.updateHeroRespawnTimer === 'function') {
+                    window.updateHeroRespawnTimer(hero);
+                }
+                
+                // Перевіряємо чи герой готовий до воскресіння
+                if (hero.respawnTimer <= 0) {
+                    heroesReadyToRespawn.push(hero);
+                    console.log(`✅ Герой ${hero.name} готовий до воскресіння!`);
+                }
+            } else {
+                // Таймер вже 0 або менше - герой готовий до воскресіння
                 heroesReadyToRespawn.push(hero);
-                console.log(`✅ Герой ${hero.name} готовий до воскресіння!`);
+                console.log(`✅ Герой ${hero.name} вже готовий до воскресіння (таймер: ${hero.respawnTimer})`);
             }
+        } else {
+            console.log(`⏭️ Герой ${hero.name} пропущений (належить гравцю ${hero.playerIndex + 1}, а не ${playerIndex + 1})`);
         }
     });
     
@@ -1516,6 +1664,10 @@ function updateRespawnTimers(playerIndex) {
         respawnHero(hero);
     });
 }
+
+// Експортуємо нові функції для таймерів на карті
+window.addRespawnTimerToHeroImage = addRespawnTimerToHeroImage;
+window.updateHeroRespawnTimerOnMap = updateHeroRespawnTimerOnMap;
 
 window.clearUnitTablo = clearUnitTablo;
 window.clearMoveCells = clearMoveCells;

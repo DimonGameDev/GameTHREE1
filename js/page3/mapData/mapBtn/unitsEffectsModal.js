@@ -136,3 +136,7 @@ if (document.readyState === 'loading') {
 } else {
     setTimeout(initUnitsEffectsModal, 200);
 }
+
+
+
+

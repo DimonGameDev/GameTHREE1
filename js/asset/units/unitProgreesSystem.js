@@ -330,9 +330,9 @@ unitsOnMap[index] = upgradedUnit;
     });
     // console.log("пппп");
         // ✅ ДОДАНО: Застосовуємо аури для всіх юнітів після апгрейду
-        if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
-            window.EffectsManager.applyAllAuras();
-          }
+        // if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
+        //     window.EffectsManager.applyAllAuras();
+        //   }
     // console.log(`✅ На полі вдосконалено ${upgradedCount} юнітів`);
     
     // 3. Оновлюємо відображення (якщо магазин відкритий)
@@ -385,10 +385,21 @@ unitsOnMap[index] = upgradedUnit;
     }
     
     // Перерисовуємо карту
-    if (typeof renderUnitsOnMap === 'function') {
-        renderUnitsOnMap();
-    }
-    
+    // if (typeof renderUnitsOnMap === 'function') {
+    //     renderUnitsOnMap();
+    // }
+    // Оновлюємо візуальний стан всіх юнітів
+// Оновлюємо візуальний стан всіх юнітів
+// if (typeof updateAllUnitsVisualState === 'function') {
+//     updateAllUnitsVisualState();
+// } else if (typeof window.updateUnitVisualState === 'function') {
+//     // Якщо немає функції для всіх, оновлюємо кожного окремо
+//     unitsOnMap.forEach(unit => {
+//         if (unit.playerIndex === playerIndex) {
+//             window.updateUnitVisualState(unit);
+//         }
+//     });
+// }
     return true;
 }
 
