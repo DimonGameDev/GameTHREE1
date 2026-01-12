@@ -30,7 +30,7 @@ let deadHeroesWaitingForRespawn = [];
  */
 function isCellBlocked(x, y, currentPlayerIndex) {
     // Детальний лог для дебагу
-    console.log(`🔍 Перевірка блокування клітинки (${x}, ${y}) для гравця ${currentPlayerIndex + 1}`);
+    // console.log(`🔍 Перевірка блокування клітинки (${x}, ${y}) для гравця ${currentPlayerIndex + 1}`);
     
     // Шукаємо юніта на цій клітинці
     const unitOnCell = unitsOnMap.find(unit => {
@@ -39,7 +39,7 @@ function isCellBlocked(x, y, currentPlayerIndex) {
     
     // Якщо на клітинці немає юніта - вона не заблокована
     if (!unitOnCell) {
-        console.log(`✅ Клітинка (${x}, ${y}) вільна - немає юнітів`);
+        // console.log(`✅ Клітинка (${x}, ${y}) вільна - немає юнітів`);
         return false;
     }
     
@@ -50,20 +50,20 @@ function isCellBlocked(x, y, currentPlayerIndex) {
     const isEnemyUnit = unitPlayerIndex !== currentPlayerIndex;
     
     // Детальний лог
-    console.log(`📊 Дані юніта на клітинці (${x}, ${y}):`);
-    console.log(`   - Назва: ${unitOnCell.name || unitOnCell.type}`);
-    console.log(`   - Гравець юніта: ${unitPlayerIndex + 1}`);
-    console.log(`   - Поточний гравець: ${currentPlayerIndex + 1}`);
-    console.log(`   - Це ворожий юніт? ${isEnemyUnit ? '✅ ТАК' : '❌ НІ'}`);
+    // console.log(`📊 Дані юніта на клітинці (${x}, ${y}):`);
+    // console.log(`   - Назва: ${unitOnCell.name || unitOnCell.type}`);
+    // console.log(`   - Гравець юніта: ${unitPlayerIndex + 1}`);
+    // console.log(`   - Поточний гравець: ${currentPlayerIndex + 1}`);
+    // console.log(`   - Це ворожий юніт? ${isEnemyUnit ? '✅ ТАК' : '❌ НІ'}`);
     
     // Якщо це ворожий юніт - клітинка заблокована
     if (isEnemyUnit) {
-        console.log(`🚫 Клітинка (${x}, ${y}) ЗАБЛОКОВАНА ворожим юнітом ${unitOnCell.name || unitOnCell.type}`);
+        // console.log(`🚫 Клітинка (${x}, ${y}) ЗАБЛОКОВАНА ворожим юнітом ${unitOnCell.name || unitOnCell.type}`);
         return true;
     }
     
     // Якщо це свій юніт - клітинка не заблокована
-    console.log(`✅ Клітинка (${x}, ${y}) НЕ заблокована - свій юніт`);
+    // console.log(`✅ Клітинка (${x}, ${y}) НЕ заблокована - свій юніт`);
     return false;
 }
 
@@ -243,7 +243,7 @@ function highlightMoveCells(unit) {
             // 🆕 ДОДАНО: Перевірка чи клітинка заблокована ворожим юнітом
             const isBlockedByEnemy = isCellBlocked(nx, ny, unit.playerIndex);
             if (isBlockedByEnemy) {
-                console.log(`⛔ Пропускаємо клітинку (${nx}, ${ny}) - заблокована ворожим юнітом`);
+                // console.log(`⛔ Пропускаємо клітинку (${nx}, ${ny}) - заблокована ворожим юнітом`);
                 continue; // Пропускаємо цю клітинку
             }
             
@@ -1212,9 +1212,9 @@ function initHeroRespawnFields(hero, respawnTimer = 4) {
         range: hero.range || 0
     };
     
-    console.log(`✅ Ініціалізовано поля воскресіння для героя ${hero.name}`);
-    console.log(`   - isDead: ${hero.isDead}`);
-    console.log(`   - respawnTimer: ${hero.respawnTimer}`);
+//     console.log(`✅ Ініціалізовано поля воскресіння для героя ${hero.name}`);
+//     console.log(`   - isDead: ${hero.isDead}`);
+//     console.log(`   - respawnTimer: ${hero.respawnTimer}`);
 }
 
 /**
@@ -1232,7 +1232,7 @@ function initAllHeroesRespawnFields() {
         }
     });
     
-    console.log(`✅ Ініціалізовано поля воскресіння для ${heroesInitialized} героїв`);
+    // console.log(`✅ Ініціалізовано поля воскресіння для ${heroesInitialized} героїв`);
 }
 
 /**
@@ -1259,10 +1259,10 @@ function handleHeroDeath(hero) {
     // Додаємо героя до списку очікування воскресіння
     deadHeroesWaitingForRespawn.push(hero);
     
-    console.log(`⏳ Герой ${hero.name} доданий до списку очікування воскресіння`);
-    console.log(`   - Таймер воскресіння: ${hero.respawnTimer} ходів`);
-    console.log(`   - Координати смерті: (${hero.deathX}, ${hero.deathY})`);
-    console.log(`   - Всього героїв в очікуванні: ${deadHeroesWaitingForRespawn.length}`);
+    // console.log(`⏳ Герой ${hero.name} доданий до списку очікування воскресіння`);
+    // console.log(`   - Таймер воскресіння: ${hero.respawnTimer} ходів`);
+    // console.log(`   - Координати смерті: (${hero.deathX}, ${hero.deathY})`);
+    // console.log(`   - Всього героїв в очікуванні: ${deadHeroesWaitingForRespawn.length}`);
     
 
     if (typeof window.updateHeroRespawnTimer === 'function') {

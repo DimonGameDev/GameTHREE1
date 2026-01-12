@@ -6,6 +6,20 @@
  * Зберігає поточний стан гри
  */
 function saveGameState() {
+    // 🔍 ДІАГНОСТИКА: Перевіряємо героїв перед збереженням
+    console.log('💾 ПЕРЕВІРКА ГЕРОЇВ ПЕРЕД ЗБЕРЕЖЕННЯМ:');
+    unitsOnMap.forEach((unit, index) => {
+        if (unit.isHero) {
+            console.log(`  Герой ${unit.name}:`, {
+                playerIndex: unit.playerIndex,
+                originalIndex: unit.originalIndex,
+                hasOriginalIndex: unit.originalIndex !== undefined,
+                player: players[unit.playerIndex] ? {
+                    originalIndex: players[unit.playerIndex].originalIndex
+                } : 'гравець не знайдений'
+            });
+        }
+    });
     const gameState = {
         // Мета-інформація
         savedAt: new Date().toISOString(),
@@ -14,7 +28,6 @@ function saveGameState() {
         maxUnitsOnField: maxUnitsOnField,
         
         
-        // Дані гравців
         players: players.map(player => ({
             originalIndex: player.originalIndex,
             race: player.race,
@@ -23,19 +36,44 @@ function saveGameState() {
             gold: player.gold,
             heroes: player.heroes,
             active: player.active,
-            unitMana: player.unitMana
+            unitMana: player.unitMana,
+            // ✅ ДОДАНО: Зберігаємо доступні юніти з їх рівнями та upgradeCost
+            availableUnits: player.availableUnits ? player.availableUnits.map(unit => ({
+                unitId: unit.unitId,
+                name: unit.name,
+                level: unit.level,
+                upgradeCost: unit.upgradeCost,
+                coin: unit.coin,
+                img: unit.img,
+                type: unit.type,
+                race: unit.race
+            })) : []
         })),
         
         // Юніти на карті
         // Юніти на карті
+//         // 🔍 ДІАГНОСТИКА: Перевіряємо героїв перед збереженням
+// console.log('💾 ПЕРЕВІРКА ГЕРОЇВ ПЕРЕД ЗБЕРЕЖЕННЯМ:');
+//         unitsOnMap.forEach((unit, index) => {
+//             if (unit.isHero) {
+//                 console.log(`  Герой ${unit.name}:`, {
+//                     playerIndex: unit.playerIndex,
+//                     originalIndex: unit.originalIndex,
+//                     hasOriginalIndex: unit.originalIndex !== undefined,
+//                     player: players[unit.playerIndex] ? {
+//                         originalIndex: players[unit.playerIndex].originalIndex
+//                     } : 'гравець не знайдений'
+//                 });
+//             }
+//         });        
 units: unitsOnMap.map(unit => ({
+    
     id: unit.id,
     name: unit.name, // ✅ ДОДАНО
     img: unit.img,
     heroTemplateId: unit.heroTemplateId,
     isHero: unit.isHero,
-    playerIndex: unit.playerIndex,
-    originalIndex: unit.originalIndex,
+    originalIndex: unit.originalIndex !== undefined ? unit.originalIndex : (players[unit.playerIndex] ? players[unit.playerIndex].originalIndex : 0),
     x: unit.x,
     y: unit.y,
     hp: unit.hp,
@@ -59,7 +97,7 @@ units: unitsOnMap.map(unit => ({
     LevelAttack: unit.LevelAttack,
     LevelArmor: unit.LevelArmor,
     abilitiesProgress: unit.abilitiesProgress,
-    // Ефекти
+    originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
     effects: unit.effects,
     activeEffects: unit.activeEffects
 })),
@@ -185,7 +223,18 @@ function saveGameToSlot(slotId, saveName) {
             gold: player.gold,
             heroes: player.heroes,
             active: player.active,
-            unitMana: player.unitMana
+            unitMana: player.unitMana,
+            // ✅ ДОДАНО: Зберігаємо доступні юніти з їх рівнями та upgradeCost
+            availableUnits: player.availableUnits ? player.availableUnits.map(unit => ({
+                unitId: unit.unitId,
+                name: unit.name,
+                level: unit.level,
+                upgradeCost: unit.upgradeCost,
+                coin: unit.coin,
+                img: unit.img,
+                type: unit.type,
+                race: unit.race
+            })) : []
         })),
         units: unitsOnMap.map(unit => ({
             id: unit.id,
@@ -215,6 +264,7 @@ function saveGameToSlot(slotId, saveName) {
             LevelArmor: unit.LevelArmor,
             abilitiesProgress: unit.abilitiesProgress,
             effects: unit.effects,
+            originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
             activeEffects: unit.activeEffects
         })),
         heroCooldowns: window.heroActiveAbilitySystem ? 

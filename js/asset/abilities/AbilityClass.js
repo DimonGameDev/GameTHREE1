@@ -464,7 +464,8 @@ createControlEffect(source) {
     source: source.id,
     sourceName: source.name,
     abilityName: this.name,
-    duration: this.duration ? this.duration * activePlayers : activePlayers, // 🔴 ЗМІНИТИ
+    duration: this.duration || 1, // Тривалість в ходах
+    appliedByPlayerIndex: source.playerIndex, // Хто наклав ефект
     type: "control",
     effectType: this.effect  // immobilize, stun, etc.
   };

@@ -113,15 +113,27 @@ static applyAllAuras() {
                   return false;
               }
               
-              // Старий підхід для ефектів з duration
-              if (effect.duration !== undefined) {
-                  effect.duration--;
-                  if (effect.duration <= 0) {
-                      this.removeEffect(unit, effect);
-                      cleanedCount++;
-                      return false;
-                  }
-              }
+               // Старий підхід для ефектів з duration
+               if (effect.duration !== undefined) {
+                // ✅ ВИПРАВЛЕНО: Для control ефектів зменшуємо duration тільки коли настає хід того, хто наклав
+                if (effect.type === "control" && effect.appliedByPlayerIndex === playerIndex) {
+                    effect.duration--;
+                    if (effect.duration <= 0) {
+                        this.removeEffect(unit, effect);
+                        cleanedCount++;
+                        return false;
+                    }
+                }
+                // Для інших ефектів - стара логіка
+                else if (effect.type !== "control") {
+                    effect.duration--;
+                    if (effect.duration <= 0) {
+                        this.removeEffect(unit, effect);
+                        cleanedCount++;
+                        return false;
+                    }
+                }
+            }
               return true;
           });
       });
