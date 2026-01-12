@@ -182,10 +182,13 @@ static removeEffect(unit, effect) {
       console.log(`🌿 ${unit.name} звільнено від знерухомлення!`);
     }
   } else if (effect.effectType === "disarm") {
-    // 🔴 ПРОСТО ЗМІНИТИ: Повертаємо можливість атакувати
-    unit.attacked = false;
-    console.log(`🔓 ${unit.name} звільнено від наручників!`);
-  }
+    // 🔴 ЗМІНИТИ: Повертаємо оригінальну атаку
+    if (unit.originalAttack !== undefined) {
+        unit.attack = unit.originalAttack;
+        delete unit.originalAttack;
+        console.log(`🔓 ${unit.name} звільнено від наручників! Атака відновлена: ${unit.attack}`);
+    }
+}
   break;
     case "debuff":
       // Повертаємо значення назад

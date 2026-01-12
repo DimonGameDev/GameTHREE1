@@ -98,6 +98,7 @@ units: unitsOnMap.map(unit => ({
     LevelArmor: unit.LevelArmor,
     abilitiesProgress: unit.abilitiesProgress,
     originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
+originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
     effects: unit.effects,
     activeEffects: unit.activeEffects
 })),
@@ -265,6 +266,7 @@ function saveGameToSlot(slotId, saveName) {
             abilitiesProgress: unit.abilitiesProgress,
             effects: unit.effects,
             originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
+            originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
             activeEffects: unit.activeEffects
         })),
         heroCooldowns: window.heroActiveAbilitySystem ? 

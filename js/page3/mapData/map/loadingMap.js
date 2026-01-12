@@ -208,6 +208,12 @@ if (savedUnit.originalStep !== undefined) {
     restoredUnit.step = 0; // Юніт все ще знерухомлений
     console.log(`🌿 ${restoredUnit.name} відновлено знерухомлення (originalStep: ${restoredUnit.originalStep})`);
 }
+// ✅ ДОДАНО: Відновлюємо originalAttack для ефекту "Наручники"
+if (savedUnit.originalAttack !== undefined) {
+    restoredUnit.originalAttack = savedUnit.originalAttack;
+    restoredUnit.attack = 0; // Юніт все ще не може атакувати
+    console.log(`🔒 ${restoredUnit.name} відновлено наручники (originalAttack: ${restoredUnit.originalAttack})`);
+}
         // Для героїв - відновлюємо прогрес і регенеруємо зображення
         if (savedUnit.isHero) {
                         // 🔧 Якщо heroTemplateId відсутній, намагаємося його знайти
@@ -1075,12 +1081,12 @@ function reapplyActiveEffects() {
                         unit.step = Math.max(0, unit.step - (effect.stepReduction || 999));
                         console.log(`🌿 ${unit.name} знерухомлено після завантаження! Крок: ${unit.step}`);
                         reappliedCount++;
-                    }
-                    break;
-                case "debuff":
-                    if (effect.effectType === "stepReduction") {
-                        unit.step = Math.max(0, unit.step - (effect.stepReduction || 0));
-                        console.log(`📉 ${unit.name} втратив ${effect.stepReduction} кроків після завантаження`);
+                    } else if (effect.effectType === "disarm") {
+                        if (!unit.originalAttack) {
+                            unit.originalAttack = unit.attack;
+                        }
+                        unit.attack = 0;
+                        console.log(`🔒 ${unit.name} в наручниках після завантаження! Атака: 0`);
                         reappliedCount++;
                     }
                     break;

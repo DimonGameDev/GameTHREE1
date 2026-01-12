@@ -475,7 +475,8 @@ createControlEffect(source) {
     effect.stepReduction = this.stepReduction || 999;
   } else if (this.effect === "disarm") {  // 🔴 ДОДАТИ
     effect.canAttack = false;
-  }
+    effect.attackReduction = 999; // Зменшуємо атаку до 0
+}
   
   return effect;
 }
@@ -581,11 +582,14 @@ switch (effect.type) {
         console.log(`🌿 ${unit.name} знерухомлено! Крок: ${unit.step}`);
         this.showAuraEffect(unit, 'control');
       } else if (effect.effectType === "disarm") {
-        // 🔴 ПРОСТО ЗМІНИТИ: Встановлюємо прапорець attacked
-        unit.attacked = true;
-        console.log(`🔒 ${unit.name} в наручниках! Не може атакувати`);
+        // 🔴 ЗМІНИТИ: Зберігаємо originalAttack та встановлюємо атаку на 0
+        if (!unit.originalAttack) {
+            unit.originalAttack = unit.attack;
+        }
+        unit.attack = 0;
+        console.log(`🔒 ${unit.name} в наручниках! Атака: 0 (було: ${unit.originalAttack})`);
         this.showAuraEffect(unit, 'disarm');
-      }
+    }
       break;
     case "debuff":
       if (effect.effectType === "armorReduction") {
