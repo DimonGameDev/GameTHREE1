@@ -96,7 +96,12 @@ function nextTurn() {
             if (unit.playerIndex === previousPlayerIndex) {
                 unit.moved = false;
                 unit.attacked = false;
-
+// 🔴 ДОДАТИ: Гарантовано відновлюємо canAttack для всіх юнітів попереднього гравця
+                // (на випадок, якщо ефект наручок не був правильно знятий)
+                if (unit.canAttack === false) {
+                    unit.canAttack = true;
+                    console.log(`🔓 ${unit.name}: примусово відновлено canAttack (на випадок помилки з наручниками)`);
+                }
 
                 if (unit.usedPortalThisTurn && unit.originalStep !== undefined) {
                     unit.step = unit.originalStep;
@@ -114,22 +119,60 @@ function nextTurn() {
 if (unit.activeEffects && unit.activeEffects.length > 0) {
     unit.activeEffects = unit.activeEffects.filter(effect => {
         // 🆕 Перевірка по раунду (універсальна для будь-якої кількості гравців)
-        if (effect.expiresOnRound !== undefined) {
-            if (currentRound >= effect.expiresOnRound) {
-                console.log(`⏰ Ефект "${effect.type}" закінчився у ${unit.name} (раунд ${currentRound})`);
-                
-                // // 🆕 Знімаємо всі бонуси якщо це ally_buff
-                // if (effect.type === 'ally_buff') {
-                //     if (effect.stepPlus) unit.step = Math.max(0, (unit.step || 0) - effect.stepPlus);
-                //     if (effect.attackBoost) unit.attack = Math.max(0, (unit.attack || 0) - effect.attackBoost);
-                //     if (effect.armorBoost) unit.armor = Math.max(0, (unit.armor || 0) - effect.armorBoost);
-                //     console.log(`👋 ${unit.name}: знято бонуси (-${effect.stepPlus} крок, -${effect.attackBoost} атака, -${effect.armorBoost} броня)`);
-                // }
-                
-                return false; // Видаляємо
+        // Знайдіть у nextTurn.js місце, де обробляються ефекти (рядки 119-130) і додайте:
+
+if (effect.expiresOnRound !== undefined) {
+    if (currentRound >= effect.expiresOnRound) {
+        console.log(`⏰ Ефект "${effect.type}" закінчився у ${unit.name} (раунд ${currentRound})`);
+        
+        // 🔴 ДОДАТИ: Відновлюємо значення для ефектів контролю
+        if (effect.type === "control") {
+            if (effect.effectType === "disarm") {
+                // Відновлюємо атаку та canAttack
+                if (unit.originalAttack !== undefined) {
+                    unit.attack = unit.originalAttack;
+                    delete unit.originalAttack;
+                }
+                // 🔴 ДОДАТИ: Відновлюємо дальність
+                if (unit.originalRange !== undefined) {
+                    unit.range = unit.originalRange;
+                    delete unit.originalRange;
+                }
+                unit.canAttack = true; // 🔴 ДОДАТИ: дозволяємо атакувати знову
+                console.log(`🔓 ${unit.name} знято наручники! Атака відновлена: ${unit.attack}, Дальність відновлена: ${unit.range}, canAttack: true`);
+            } else if (effect.effectType === "immobilize") {
+                // Відновлюємо кроки
+                if (unit.originalStep !== undefined) {
+                    unit.step = unit.originalStep;
+                    delete unit.originalStep;
+                    console.log(`🌱 ${unit.name} звільнено від коріння! Кроки відновлені: ${unit.step}`);
+                }
             }
-            return true;
         }
+        
+        // 🔴 ДОДАТИ: Відновлюємо значення для дебаффів
+        if (effect.type === "debuff") {
+            if (effect.effectType === "armorReduction") {
+              // Відновлюємо броню
+              if (unit.originalArmor !== undefined) {
+                unit.armor = unit.originalArmor;
+                delete unit.originalArmor;
+                console.log(`🛡️ ${unit.name} броня відновлена: ${unit.armor}`);
+              }
+            } else if (effect.effectType === "attackReduction") {
+              // Відновлюємо атаку
+              if (unit.originalAttack !== undefined) {
+                unit.attack = unit.originalAttack;
+                delete unit.originalAttack;
+                console.log(`⚔️ ${unit.name} атака відновлена: ${unit.attack}`);
+              }
+            }
+          }
+        
+        return false; // Видаляємо
+    }
+    return true;
+}
         
         // Стара логіка для turnsLeft (якщо ще використовується)
         if (effect.turnsLeft !== undefined) {
@@ -224,7 +267,7 @@ if (currentPlayerIndex >= players.length) {
                 unit.activeEffects = unit.activeEffects.filter(effect => {
                     // Ефекти з appliedByPlayerIndex знімаються коли цей гравець починає хід
                     if (effect.appliedByPlayerIndex === currentPlayerIndex && 
-                        (effect.type === 'ally_buff' || effect.type === 'curse' || effect.type === 'armor_per_enemy' || effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor'  || effect.type === 'blood_rage')) {
+                        (effect.type === 'ally_buff' || effect.type === 'curse' || effect.type === 'armor_per_enemy' || effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor'  || effect.type === 'blood_rage' || effect.type === 'step' || effect.type === 'attack' || effect.type === 'armor')) {
                         
                         // Для ally_buff - віднімаємо бонуси
                         if (effect.type === 'ally_buff') {
@@ -259,7 +302,24 @@ if (effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor')
                             if (effect.bonusArmor) unit.armor = Math.max(0, (unit.armor || 0) - effect.bonusArmor);
                             console.log(`🛡️ ${unit.name}: знято бонусну броню (-${effect.bonusArmor})`);
                         }
+                        // Для step - знімаємо бонус кроків
+                        // 🔴 ДОДАТИ: Для step ефектів - знімаємо бонус кроків
+                        if (effect.type === 'step') {
+                            if (effect.stepBonus) unit.step = Math.max(0, (unit.step || 0) - effect.stepBonus);
+                            console.log(`👟 ${unit.name}: ефект прискорення закінчився (-${effect.stepBonus} кроків)`);
+                        }
                         
+                        // 🔴 ДОДАТИ: Для attack ефектів - знімаємо бонус атаки
+                        if (effect.type === 'attack') {
+                            if (effect.attackBonus) unit.attack = Math.max(0, (unit.attack || 0) - effect.attackBonus);
+                            console.log(`⚔️ ${unit.name}: ефект посилення атаки закінчився (-${effect.attackBonus} атаки)`);
+                        }
+                        
+                        // 🔴 ДОДАТИ: Для armor ефектів - знімаємо бонус броні
+                        if (effect.type === 'armor') {
+                            if (effect.armorBonus) unit.armor = Math.max(0, (unit.armor || 0) - effect.armorBonus);
+                            console.log(`🛡️ ${unit.name}: ефект посилення броні закінчився (-${effect.armorBonus} броні)`);
+                        }
                         return false;
                     }
                     return true;

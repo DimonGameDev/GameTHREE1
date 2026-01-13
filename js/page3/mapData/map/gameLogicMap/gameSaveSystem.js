@@ -99,8 +99,14 @@ units: unitsOnMap.map(unit => ({
     abilitiesProgress: unit.abilitiesProgress,
     originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
 originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
+originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
     effects: unit.effects,
-    activeEffects: unit.activeEffects
+    activeEffects: unit.activeEffects,
+    // ✅ ДОДАНО: Зберігаємо кулдауни здібностей
+    abilityCooldowns: unit.abilityInstances ? unit.abilityInstances.map(ability => ({
+        key: ability.key || ability.name,
+        currentCooldown: ability.currentCooldown || 0
+    })) : []
 })),
         
         // Захоплені хатки золота
@@ -249,6 +255,7 @@ function saveGameToSlot(slotId, saveName) {
             y: unit.y,
             hp: unit.hp,
             newhp: unit.newhp,
+            maxHp: unit.maxHp, // ✅ ДОДАТИ ЦЕЙ РЯДОК
             moved: unit.moved,
             attacked: unit.attacked,
             canAttack: unit.canAttack,
@@ -267,7 +274,13 @@ function saveGameToSlot(slotId, saveName) {
             effects: unit.effects,
             originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
             originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
-            activeEffects: unit.activeEffects
+            originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
+            activeEffects: unit.activeEffects,
+            // ✅ ДОДАНО: Зберігаємо кулдауни здібностей
+            abilityCooldowns: unit.abilityInstances ? unit.abilityInstances.map(ability => ({
+                key: ability.key || ability.name,
+                currentCooldown: ability.currentCooldown || 0
+            })) : []
         })),
         heroCooldowns: window.heroActiveAbilitySystem ? 
     Array.from(window.heroActiveAbilitySystem.currentCooldowns.entries()) : [],

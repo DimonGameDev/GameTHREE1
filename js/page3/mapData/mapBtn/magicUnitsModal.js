@@ -928,6 +928,9 @@ if (activeHealAbility.actionType === "heal") {
     }
     
     clearHealTargets();
+    if (typeof clearMoveCells === 'function') {
+        clearMoveCells();
+    }
 }
 
 /**

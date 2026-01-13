@@ -906,3 +906,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Оновлюємо стан кнопки "Далі"
   updateNextButtonState();
 });
+
+console.log("сторінка 2.01");

@@ -178,7 +178,11 @@ function highlightMoveCells(unit) {
     // 🆕 ДОДАНО: Лог для дебагу
     console.log(`🚶 Початок розрахунку руху для ${unit.name}`);
     console.log(`📊 Параметри: крок=${unit.step}, координати=(${unit.x},${unit.y}), гравець=${unit.playerIndex + 1}`);
-    
+    // ⬇️ ДОДАТИ: Перевірка чи юніт вже ходив
+    if (unit.moved) {
+        console.log('⚠️ Юніт вже ходив цього ходу, рух заблокований');
+        return;
+    }
     // Очищаємо старі підсвічені клітинки
     clearMoveCells();
     

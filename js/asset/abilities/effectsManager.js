@@ -105,37 +105,39 @@ static applyAllAuras() {
           if (!unit.activeEffects || unit.activeEffects.length === 0) return;
           
           unit.activeEffects = unit.activeEffects.filter(effect => {
-              // ✅ НОВИЙ ПІДХІД: Ефект знімається коли настає хід того, хто його застосував
-              if (effect.appliedByPlayer !== undefined && effect.appliedByPlayer === playerIndex) {
-                  this.removeEffect(unit, effect);
-                  cleanedCount++;
-                  console.log(`🔄 Ефект від гравця ${playerIndex + 1} закінчився`);
-                  return false;
-              }
-              
-               // Старий підхід для ефектів з duration
-               if (effect.duration !== undefined) {
-                // ✅ ВИПРАВЛЕНО: Для control ефектів зменшуємо duration тільки коли настає хід того, хто наклав
-                if (effect.type === "control" && effect.appliedByPlayerIndex === playerIndex) {
-                    effect.duration--;
-                    if (effect.duration <= 0) {
-                        this.removeEffect(unit, effect);
-                        cleanedCount++;
-                        return false;
-                    }
-                }
-                // Для інших ефектів - стара логіка
-                else if (effect.type !== "control") {
-                    effect.duration--;
-                    if (effect.duration <= 0) {
-                        this.removeEffect(unit, effect);
-                        cleanedCount++;
-                        return false;
-                    }
-                }
+            // ✅ ВИПРАВЛЕНО: Знімаємо тільки control-ефекти одразу
+            if (effect.type === "control" && 
+                ((effect.appliedByPlayer !== undefined && effect.appliedByPlayer === playerIndex) ||
+                 (effect.appliedByPlayerIndex !== undefined && effect.appliedByPlayerIndex === playerIndex))) {
+                this.removeEffect(unit, effect);
+                cleanedCount++;
+                console.log(`🔄 Control-ефект від гравця ${playerIndex + 1} закінчився`);
+                return false;
             }
-              return true;
-          });
+            
+            // ✅ ЗАЛИШИТИ оригінальну логіку для duration (включаючи debuff)
+             if (effect.duration !== undefined) {
+              // ✅ ВИПРАВЛЕНО: Для control ефектів зменшуємо duration
+              if (effect.type === "control" && effect.appliedByPlayerIndex === playerIndex) {
+                  effect.duration--;
+                  if (effect.duration <= 0) {
+                      this.removeEffect(unit, effect);
+                      cleanedCount++;
+                      return false;
+                  }
+              }
+              // Для інших ефектів - стара логіка
+              if ((effect.type === "control" || effect.type === "debuff") && effect.appliedByPlayerIndex === playerIndex) {
+                  effect.duration--;
+                  if (effect.duration <= 0) {
+                      this.removeEffect(unit, effect);
+                      cleanedCount++;
+                      return false;
+                  }
+              }
+          }
+            return true;
+        });
       });
       
       if (cleanedCount > 0) {
@@ -186,8 +188,15 @@ static removeEffect(unit, effect) {
     if (unit.originalAttack !== undefined) {
         unit.attack = unit.originalAttack;
         delete unit.originalAttack;
-        console.log(`🔓 ${unit.name} звільнено від наручників! Атака відновлена: ${unit.attack}`);
     }
+    // 🔴 ДОДАТИ: Повертаємо оригінальну дальність
+    if (unit.originalRange !== undefined) {
+        unit.range = unit.originalRange;
+        delete unit.originalRange;
+    }
+    // 🔴 ДОДАТИ: Дозволяємо атакувати знову
+    unit.canAttack = true;
+    console.log(`🔓 ${unit.name} звільнено від наручників! Атака відновлена: ${unit.attack}, Дальність відновлена: ${unit.range}, canAttack: true`);
 }
   break;
     case "debuff":

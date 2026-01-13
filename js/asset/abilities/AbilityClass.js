@@ -431,14 +431,20 @@ createAuraEffect(source) {
 }
 
       // Створити ефект бафу
-  createBuffEffect(source) {
-    const effect = {
-      source: source.id,
-      sourceName: source.name,
-      abilityName: this.name,
-      duration: this.duration || 1,
-      type: this.type
-    };
+      createBuffEffect(source) {
+        const effect = {
+          source: source.id,
+          sourceName: source.name,
+          abilityName: this.name,
+          duration: this.duration || 1,
+          appliedByPlayerIndex: source.playerIndex, // 🔴 ДОДАТИ: Хто наклав ефект
+          type: this.type
+        };
+        
+        // 🔴 ДОДАТИ: Розраховуємо expiresOnRound
+        if (window.currentRound !== undefined) {
+          effect.expiresOnRound = window.currentRound + (this.duration || 1);
+        }
     
     // Додаємо конкретні значення залежно від типу бафу
     switch (this.type) {
@@ -456,9 +462,10 @@ createAuraEffect(source) {
     return effect;
   }
   // Створити ефект контролю
-  // Створити ефект контролю
+// Знайдіть функцію createControlEffect (рядки 459-482) і додайте expiresOnRound:
+
 createControlEffect(source) {
-  const activePlayers = window.players ? window.players.length : 4; // 🔴 ДОДАТИ
+  const activePlayers = window.players ? window.players.length : 4;
   
   const effect = {
     source: source.id,
@@ -470,42 +477,53 @@ createControlEffect(source) {
     effectType: this.effect  // immobilize, stun, etc.
   };
   
+  // 🔴 ДОДАТИ: Розраховуємо expiresOnRound
+  if (window.currentRound !== undefined) {
+    effect.expiresOnRound = window.currentRound + (this.duration || 1);
+  }
+  
   // Додаємо конкретні значення залежно від типу контролю
   if (this.effect === "immobilize") {
     effect.stepReduction = this.stepReduction || 999;
-  } else if (this.effect === "disarm") {  // 🔴 ДОДАТИ
+  } else if (this.effect === "disarm") {
     effect.canAttack = false;
     effect.attackReduction = 999; // Зменшуємо атаку до 0
-}
+  }
   
   return effect;
 }
 
-  // Створити ефект дебафу
-  createDebuffEffect(source) {
-    const activePlayers = window.players ? window.players.length : 4; // 🔴 ДОДАТИ ЦЕЙ РЯДОК
-    
-    const effect = {
-      source: source.id,
-      sourceName: source.name,
-      abilityName: this.name,
-      duration: this.duration ? this.duration * activePlayers : activePlayers, // 🔴 ЗМІНИТИ ЦЕЙ РЯДОК
-      type: "debuff",
-      effectType: this.effect
-    };
-    
-    // Додаємо конкретні значення залежно від типу дебафу
-    switch (this.effect) {
-      case "armorReduction":
-        effect.armorReduction = this.armorReduction || 0;
-        break;
-      case "attackReduction":
-        effect.attackReduction = this.attackReduction || 0;
-        break;
+    // Створити ефект дебафу
+    createDebuffEffect(source) {
+      const activePlayers = window.players ? window.players.length : 4;
+      
+      const effect = {
+        source: source.id,
+        sourceName: source.name,
+        abilityName: this.name,
+        duration: this.duration || 1,
+        type: "debuff",
+        effectType: this.effect,
+    appliedByPlayerIndex: source.playerIndex, // 🔴 ДОДАТИ: Хто наклав ефект
+      };
+      
+      // 🔴 ДОДАТИ: Розраховуємо expiresOnRound
+      if (window.currentRound !== undefined) {
+        effect.expiresOnRound = window.currentRound + (this.duration || 1);
+      }
+      
+      // Додаємо конкретні значення залежно від типу дебафу
+      switch (this.effect) {
+        case "armorReduction":
+          effect.armorReduction = this.armorReduction || 0;
+          break;
+        case "attackReduction":
+          effect.attackReduction = this.attackReduction || 0;
+          break;
+      }
+      
+      return effect;
     }
-    
-    return effect;
-  }
   
     
     // Додати тимчасовий ефект юніту
@@ -582,26 +600,39 @@ switch (effect.type) {
         console.log(`🌿 ${unit.name} знерухомлено! Крок: ${unit.step}`);
         this.showAuraEffect(unit, 'control');
       } else if (effect.effectType === "disarm") {
-        // 🔴 ЗМІНИТИ: Зберігаємо originalAttack та встановлюємо атаку на 0
+        // 🔴 ВИПРАВЛЕНО: Зберігаємо originalAttack та встановлюємо canAttack = false
         if (!unit.originalAttack) {
             unit.originalAttack = unit.attack;
         }
+        // 🔴 ДОДАТИ: Зберігаємо originalRange
+        if (!unit.originalRange) {
+            unit.originalRange = unit.range;
+        }
+        
         unit.attack = 0;
-        console.log(`🔒 ${unit.name} в наручниках! Атака: 0 (було: ${unit.originalAttack})`);
+        unit.range = 0; // 🔴 ДОДАТИ: Встановлюємо дальність в 0
+        unit.canAttack = false; // 🔴 ДОДАТИ: блокуємо можливість атакувати
+        console.log(`🔒 ${unit.name} в наручниках! Атака: 0 (було: ${unit.originalAttack}), Дальність: 0 (було: ${unit.originalRange}), canAttack: false`);
         this.showAuraEffect(unit, 'disarm');
     }
       break;
-    case "debuff":
-      if (effect.effectType === "armorReduction") {
-        unit.armor = Math.max(0, (unit.armor || 0) - effect.armorReduction);
-        console.log(`🔻 ${unit.name} втратив ${effect.armorReduction} броні від "${effect.abilityName}"`);
-        this.showAuraEffect(unit, 'debuff-armor');
-      } else if (effect.effectType === "attackReduction") {
-        unit.attack = Math.max(0, (unit.attack || 0) - effect.attackReduction);
-        console.log(`🔻 ${unit.name} втратив ${effect.attackReduction} атаки від "${effect.abilityName}"`);
-        this.showAuraEffect(unit, 'debuff-attack');
-      }
-      break;
+      case "debuff":
+        if (effect.effectType === "armorReduction") {
+          if (!unit.originalArmor) {
+            unit.originalArmor = unit.armor || 0;
+          }
+          unit.armor = Math.max(0, (unit.armor || 0) - effect.armorReduction);
+          console.log(`🔻 ${unit.name} втратив ${effect.armorReduction} броні від "${effect.abilityName}" (було: ${unit.originalArmor}, стало: ${unit.armor})`);
+          this.showAuraEffect(unit, 'debuff-armor');
+        } else if (effect.effectType === "attackReduction") {
+          if (!unit.originalAttack) {
+            unit.originalAttack = unit.attack || 0;
+          }
+          unit.attack = Math.max(0, (unit.attack || 0) - effect.attackReduction);
+          console.log(`🔻 ${unit.name} втратив ${effect.attackReduction} атаки від "${effect.abilityName}" (було: ${unit.originalAttack}, стало: ${unit.attack})`);
+          this.showAuraEffect(unit, 'debuff-attack');
+        }
+        break;
 }
     }
     showAuraEffect(unit, effectType) {

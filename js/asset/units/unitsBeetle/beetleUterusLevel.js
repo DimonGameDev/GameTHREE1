@@ -16,7 +16,7 @@ let beetleUterusLevels = {
       description: "Сильний воїн з важкою сокирою",
       img: beetleUterusImg,
       abilities: [
-        { key: "parasite", power: 8 },
+        { key: "parasite", power: 20 },
       ],
       effects: []
     },

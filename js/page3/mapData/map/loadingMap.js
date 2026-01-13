@@ -197,6 +197,7 @@ unitsOnMap = savedState.units.map(savedUnit => {
     restoredUnit.y = savedUnit.y;
     restoredUnit.hp = savedUnit.hp;
     restoredUnit.newhp = savedUnit.newhp;
+    restoredUnit.maxHp = savedUnit.maxHp || savedUnit.hp; 
     restoredUnit.moved = savedUnit.moved;
     restoredUnit.attacked = savedUnit.attacked;
     restoredUnit.canAttack = savedUnit.canAttack;
@@ -211,8 +212,23 @@ if (savedUnit.originalStep !== undefined) {
 // ✅ ДОДАНО: Відновлюємо originalAttack для ефекту "Наручники"
 if (savedUnit.originalAttack !== undefined) {
     restoredUnit.originalAttack = savedUnit.originalAttack;
-    restoredUnit.attack = 0; // Юніт все ще не може атакувати
+    // restoredUnit.attack = 0; // Юніт все ще не може атакувати
     console.log(`🔒 ${restoredUnit.name} відновлено наручники (originalAttack: ${restoredUnit.originalAttack})`);
+}
+// ✅ ДОДАНО: Відновлюємо originalArmor для ефекту "Мітка"
+if (savedUnit.originalArmor !== undefined) {
+    restoredUnit.originalArmor = savedUnit.originalArmor;
+    // Відновлюємо зменшену броню (потрібно знати на скільки вона зменшена)
+    // Це буде зроблено при відновленні activeEffects
+    console.log(`🎯 ${restoredUnit.name} відновлено мітку (originalArmor: ${restoredUnit.originalArmor})`);
+}
+
+// ✅ ДОДАНО: Відновлюємо originalAttack для ефекту "Паразит" (якщо ще не відновлено)
+if (savedUnit.originalAttack !== undefined && restoredUnit.originalAttack === undefined) {
+    restoredUnit.originalAttack = savedUnit.originalAttack;
+    // Відновлюємо зменшену атаку (потрібно знати на скільки вона зменшена)
+    // Це буде зроблено при відновленні activeEffects
+    console.log(`🐛 ${restoredUnit.name} відновлено паразита (originalAttack: ${restoredUnit.originalAttack})`);
 }
         // Для героїв - відновлюємо прогрес і регенеруємо зображення
         if (savedUnit.isHero) {
@@ -290,7 +306,7 @@ if (savedUnit.originalAttack !== undefined) {
             // console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}`);
         }
     
-    // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
+        // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
     // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
     if (window.AbilityFactory && !savedUnit.isHero) {
         restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
@@ -299,6 +315,19 @@ if (savedUnit.originalAttack !== undefined) {
         // ✅ ДОДАНО: Синхронізуємо здібності з прогресом
         if (typeof syncAbilitiesWithProgress === 'function' && savedUnit.abilitiesProgress) {
             syncAbilitiesWithProgress(restoredUnit, savedUnit.abilitiesProgress);
+        }
+        
+        // ✅ ДОДАНО: Відновлюємо кулдауни здібностей юнітів
+        if (savedUnit.abilityCooldowns && restoredUnit.abilityInstances) {
+            savedUnit.abilityCooldowns.forEach(savedCooldown => {
+                const ability = restoredUnit.abilityInstances.find(a => 
+                    a.key === savedCooldown.key || a.name === savedCooldown.key
+                );
+                if (ability && savedCooldown.currentCooldown > 0) {
+                    ability.currentCooldown = savedCooldown.currentCooldown;
+                    console.log(`⏳ Відновлено cooldown ${ability.name}: ${ability.currentCooldown}`);
+                }
+            });
         }
     } else if (savedUnit.isHero) {
         // Для героїв - створюємо пустий масив abilityInstances
@@ -312,7 +341,12 @@ if (savedState.heroCooldowns && window.heroAbilitySystem) {
     });
     // console.log(`⏱️ Відновлено ${savedState.heroCooldowns.length} кулдаунів здібностей`);
 }
-    
+if (!savedUnit.isHero && window.getColoredUnitImage && restoredUnit.img) {
+    const player = players[restoredUnit.playerIndex];
+    const originalIndex = player ? player.originalIndex : (restoredUnit.originalIndex || 0);
+    restoredUnit.img = window.getColoredUnitImage(restoredUnit.img, originalIndex);
+    console.log(`🎨 Відновлено колір для ${restoredUnit.name}: гравець ${originalIndex + 1}`);
+}
     return restoredUnit;
 });
 window.unitsOnMap = unitsOnMap;
@@ -993,7 +1027,7 @@ window.gameData = {
 
 // console.log('🎯 gameData експортовано:', window.gameData);
 
-console.log("лоадінгОМ9999999999");
+console.log("лоадінгОМ101010101010");
 
 
 
@@ -1085,12 +1119,51 @@ function reapplyActiveEffects() {
                         if (!unit.originalAttack) {
                             unit.originalAttack = unit.attack;
                         }
+                        // 🔴 ДОДАТИ: Зберігаємо originalRange
+                        if (!unit.originalRange) {
+                            unit.originalRange = unit.range;
+                        }
                         unit.attack = 0;
-                        console.log(`🔒 ${unit.name} в наручниках після завантаження! Атака: 0`);
+                        unit.range = 0; // 🔴 ДОДАТИ: Встановлюємо дальність в 0
+                        console.log(`🔒 ${unit.name} в наручниках після завантаження! Атака: 0, Дальність: 0`);
                         reappliedCount++;
                     }
                     break;
-                // Додайте інші типи ефектів за потреби
+                    case "step":
+                        unit.step = (unit.step || 0) + (effect.stepBonus || 0);
+                        console.log(`👟 ${unit.name} отримав +${effect.stepBonus} кроків після завантаження! Крок: ${unit.step}`);
+                        reappliedCount++;
+                        break;
+                    case "attack":
+                        unit.attack = (unit.attack || 0) + (effect.attackBonus || 0);
+                        console.log(`⚔️ ${unit.name} отримав +${effect.attackBonus} атаки після завантаження! Атака: ${unit.attack}`);
+                        reappliedCount++;
+                        break;
+                        case "armor":
+                            unit.armor = (unit.armor || 0) + (effect.armorBonus || 0);
+                            console.log(`🛡️ ${unit.name} отримав +${effect.armorBonus} броні після завантаження! Броня: ${unit.armor}`);
+                            reappliedCount++;
+                            break;
+                        case "debuff":
+                            if (effect.effectType === "armorReduction") {
+                                if (!unit.originalArmor) {
+                                    unit.originalArmor = unit.armor || 0;
+                                }
+                                unit.armor = Math.max(0, (unit.originalArmor || unit.armor || 0) - (effect.armorReduction || 0));
+                                console.log(`🔻 ${unit.name} втратив ${effect.armorReduction} броні після завантаження! Броня: ${unit.armor}`);
+                                reappliedCount++;
+                            } else if (effect.effectType === "attackReduction") {
+                                console.log(`🔍 DEBUG: ${unit.name} перед дебафом: attack=${unit.attack}, originalAttack=${unit.originalAttack}, attackReduction=${effect.attackReduction}`);
+                                console.log("------------------------------------------------------------------------------------------------");
+                                if (!unit.originalAttack) {
+                                    unit.originalAttack = unit.attack || 0;
+                                }
+                                unit.attack = Math.max(0, (unit.originalAttack || unit.attack || 0) - (effect.attackReduction || 0));
+                                console.log(`🔻 ${unit.name} втратив ${effect.attackReduction} атаки після завантаження! Атака: ${unit.attack}`);
+                                reappliedCount++;
+                            }
+                            break;
+                    // Додайте інші типи ефектів за потреби
             }
         });
     });
