@@ -30,7 +30,10 @@ function openMagicUnitsModal() {
         alert("⚠️ Цей юніт вже атакував цього ходу і не може використовувати здібності!");
         return;
     }
-    
+        // 🆕 ДОДАНО: Очищаємо клітинки для руху при відкритті вікна здібностей
+        if (typeof clearMoveCells === 'function') {
+            clearMoveCells();
+        }
     if (ModalMagicUnits) {
         ModalMagicUnits.style.display = "flex";
         
@@ -1227,9 +1230,14 @@ if (freeAbilities.includes(actionType)) {
     selectedUnitForMove.moved = true;
     console.log(`🚶 Встановлено moved = true (атака дозволена)`);
 } else {
-    // Позначаємо що герой діяв (тільки для атакуючих здібностей)
+    // Для ВСІХ інших здібностей - блокуємо і рух, і атаку
+    selectedUnitForMove.moved = true;
     selectedUnitForMove.attacked = true;
-    console.log(`⚔️ Встановлено attacked = true`);
+    console.log(`⛔ Встановлено moved = true та attacked = true (хід закінчено)`);
+    // selectedUnitForMove = null;
+    // if (typeof clearMoveCells === 'function') {
+    //     clearMoveCells();
+    // }
 }
                 
                 // Оновлюємо візуал

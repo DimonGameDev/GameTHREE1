@@ -114,30 +114,31 @@ static applyAllAuras() {
                 console.log(`🔄 Control-ефект від гравця ${playerIndex + 1} закінчився`);
                 return false;
             }
+            console.log('🔍 Перевірка ефекту:', {
+              type: effect.type,
+              duration: effect.duration,
+              appliedByPlayer: effect.appliedByPlayer,
+              appliedByPlayerIndex: effect.appliedByPlayerIndex,
+              playerIndex: playerIndex
+          });
+            // ✅ ВИПРАВЛЕНО: Обробляємо ВСІ ефекти з duration, включаючи аури
+            if (effect.duration !== undefined && 
+              (effect.appliedByPlayerIndex === playerIndex || effect.appliedByPlayer === playerIndex)) {
+                // Зменшуємо тривалість для ВСІХ ефектів цього гравця
+                effect.duration--;
+                console.log(`⏳ Ефект "${effect.type}" (${effect.abilityName || 'без назви'}): тривалість зменшено до ${effect.duration}`);
+                
+                if (effect.duration <= 0) {
+                    // Знімаємо ефект
+                    this.removeEffect(unit, effect);
+                    cleanedCount++;
+                    console.log(`🧹 Ефект "${effect.type}" закінчився у ${unit.name}`);
+                    return false;
+                }
+            }
             
-            // ✅ ЗАЛИШИТИ оригінальну логіку для duration (включаючи debuff)
-             if (effect.duration !== undefined) {
-              // ✅ ВИПРАВЛЕНО: Для control ефектів зменшуємо duration
-              if (effect.type === "control" && effect.appliedByPlayerIndex === playerIndex) {
-                  effect.duration--;
-                  if (effect.duration <= 0) {
-                      this.removeEffect(unit, effect);
-                      cleanedCount++;
-                      return false;
-                  }
-              }
-              // Для інших ефектів - стара логіка
-              if ((effect.type === "control" || effect.type === "debuff") && effect.appliedByPlayerIndex === playerIndex) {
-                  effect.duration--;
-                  if (effect.duration <= 0) {
-                      this.removeEffect(unit, effect);
-                      cleanedCount++;
-                      return false;
-                  }
-              }
-          }
             return true;
-        });
+          });
       });
       
       if (cleanedCount > 0) {

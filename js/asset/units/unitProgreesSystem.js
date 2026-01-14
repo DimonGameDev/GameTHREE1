@@ -142,8 +142,8 @@ function getUnitIdPrefix(raceKey, unitIndex) {
         'orcs': 'orc',
         'elves': 'elf',
         'humans': 'pipl',
-        'undead': 'beet',
-        'demons': 'demo'
+        'undead': 'beetle',
+        'demons': 'demon'
     };
     
     const prefix = raceIdPrefixes[raceKey];
@@ -261,6 +261,16 @@ const currentShopUnit = player.availableUnits[unitIndex];
     }
     
     const nextLevelUnit = unitLevelsObject[`level${nextLevel}`];
+console.log(`🔍 DEBUG: Шукаю level${nextLevel} в unitLevelsObject:`, unitLevelsObject);
+console.log(`🔍 DEBUG: nextLevelUnit знайдено:`, nextLevelUnit);
+console.log(`🔍 DEBUG: Ключі в unitLevelsObject:`, Object.keys(unitLevelsObject));
+
+if (!nextLevelUnit) {
+    console.error(`❌ Наступний рівень ${nextLevel} не знайдений!`);
+    console.error(`❌ unitLevelsObject:`, unitLevelsObject);
+    console.error(`❌ raceKey: ${raceKey}, unitIndex: ${unitIndex}`);
+    return false;
+}
     if (!nextLevelUnit) {
         // console.error('❌ Наступний рівень не знайдений:', nextLevel);
         return false;
@@ -374,7 +384,7 @@ unitsOnMap[index] = upgradedUnit;
         }
     
     // Визначаємо наступний поріг (якщо не останній рівень)
-    const nextThreshold = nextLevel < PROGRESS_CONFIG.maxLevel ? getManaThreshold(nextLevel) : 0;
+    const nextThreshold = nextLevel < PROGRESS_CONFIG.maxLevel ? getManaThreshold(nextLevel, nextLevelUnit) : 0;
     
     // Показуємо повідомлення
     if (PROGRESS_CONFIG.showNotifications) {

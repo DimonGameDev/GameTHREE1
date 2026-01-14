@@ -6,7 +6,7 @@ let elfWispLevels = {
       unitId: "elf1101",
       level: 1,
       name: "Вісп",
-      hp: 80,
+      hp: 1000,
       armor: 5,
       attack: 40,
       step: 5,

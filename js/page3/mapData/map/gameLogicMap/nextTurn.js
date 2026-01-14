@@ -159,14 +159,14 @@ if (effect.expiresOnRound !== undefined) {
                 delete unit.originalArmor;
                 console.log(`🛡️ ${unit.name} броня відновлена: ${unit.armor}`);
               }
-            } else if (effect.effectType === "attackReduction") {
-              // Відновлюємо атаку
-              if (unit.originalAttack !== undefined) {
-                unit.attack = unit.originalAttack;
-                delete unit.originalAttack;
-                console.log(`⚔️ ${unit.name} атака відновлена: ${unit.attack}`);
+            } else if (effect.effectType === "stepReduction") {
+                // Відновлюємо кроки
+                if (unit.originalStepBeforeAoe !== undefined) {
+                  unit.step = unit.originalStepBeforeAoe;
+                  delete unit.originalStepBeforeAoe;
+                  console.log(`🦶 ${unit.name} кроки відновлені: ${unit.step}`);
+                }
               }
-            }
           }
         
         return false; // Видаляємо
@@ -266,8 +266,10 @@ if (currentPlayerIndex >= players.length) {
             if (unit.activeEffects && unit.activeEffects.length > 0) {
                 unit.activeEffects = unit.activeEffects.filter(effect => {
                     // Ефекти з appliedByPlayerIndex знімаються коли цей гравець починає хід
-                    if (effect.appliedByPlayerIndex === currentPlayerIndex && 
-                        (effect.type === 'ally_buff' || effect.type === 'curse' || effect.type === 'armor_per_enemy' || effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor'  || effect.type === 'blood_rage' || effect.type === 'step' || effect.type === 'attack' || effect.type === 'armor')) {
+                   // Ефекти з appliedByPlayerIndex знімаються коли цей гравець починає хід
+                    // ❗ ВИДАЛЕНО: attack, armor, step, mixed - вони обробляються в effectsManager.js з урахуванням duration
+                    if ((effect.appliedByPlayerIndex === currentPlayerIndex || effect.appliedByPlayer === currentPlayerIndex) && 
+                    (effect.type === 'ally_buff' || effect.type === 'curse' || effect.type === 'armor_per_enemy' || effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor'  || effect.type === 'blood_rage')) {
                         
                         // Для ally_buff - віднімаємо бонуси
                         if (effect.type === 'ally_buff') {
@@ -276,18 +278,18 @@ if (currentPlayerIndex >= players.length) {
                             if (effect.armorBoost) unit.armor = Math.max(0, (unit.armor || 0) - effect.armorBoost);
                         }
                         // Для blood_rage - знімаємо бонус атаки
-if (effect.type === 'blood_rage') {
-    if (effect.attackBoost) unit.attack = Math.max(0, (unit.attack || 0) - effect.attackBoost);
-    console.log(`🔥 ${unit.name}: Кров'яний лют закінчився (-${effect.attackBoost} атаки)`);
-}
+                        if (effect.type === 'blood_rage') {
+                            if (effect.attackBoost) unit.attack = Math.max(0, (unit.attack || 0) - effect.attackBoost);
+                            console.log(`🔥 ${unit.name}: Кров'яний лют закінчився (-${effect.attackBoost} атаки)`);
+                        }
 
                         // Для ground_strike та ground_strike_neighbor - ПОВЕРТАЄМО статки
-if (effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor') {
-    if (effect.stepMinus) unit.step = (unit.step || 0) + effect.stepMinus;
-    if (effect.attackMinus) unit.attack = (unit.attack || 0) + effect.attackMinus;
-    if (effect.armorMinus) unit.armor = (unit.armor || 0) + effect.armorMinus;
-    console.log(`💫 ${unit.name}: ефект удару по землі знято`);
-}
+                        if (effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor') {
+                            if (effect.stepMinus) unit.step = (unit.step || 0) + effect.stepMinus;
+                            if (effect.attackMinus) unit.attack = (unit.attack || 0) + effect.attackMinus;
+                            if (effect.armorMinus) unit.armor = (unit.armor || 0) + effect.armorMinus;
+                            console.log(`💫 ${unit.name}: ефект удару по землі знято`);
+                        }
                         
                         // Для curse - ПОВЕРТАЄМО статки
                         if (effect.type === 'curse') {
@@ -302,24 +304,7 @@ if (effect.type === 'ground_strike' || effect.type === 'ground_strike_neighbor')
                             if (effect.bonusArmor) unit.armor = Math.max(0, (unit.armor || 0) - effect.bonusArmor);
                             console.log(`🛡️ ${unit.name}: знято бонусну броню (-${effect.bonusArmor})`);
                         }
-                        // Для step - знімаємо бонус кроків
-                        // 🔴 ДОДАТИ: Для step ефектів - знімаємо бонус кроків
-                        if (effect.type === 'step') {
-                            if (effect.stepBonus) unit.step = Math.max(0, (unit.step || 0) - effect.stepBonus);
-                            console.log(`👟 ${unit.name}: ефект прискорення закінчився (-${effect.stepBonus} кроків)`);
-                        }
                         
-                        // 🔴 ДОДАТИ: Для attack ефектів - знімаємо бонус атаки
-                        if (effect.type === 'attack') {
-                            if (effect.attackBonus) unit.attack = Math.max(0, (unit.attack || 0) - effect.attackBonus);
-                            console.log(`⚔️ ${unit.name}: ефект посилення атаки закінчився (-${effect.attackBonus} атаки)`);
-                        }
-                        
-                        // 🔴 ДОДАТИ: Для armor ефектів - знімаємо бонус броні
-                        if (effect.type === 'armor') {
-                            if (effect.armorBonus) unit.armor = Math.max(0, (unit.armor || 0) - effect.armorBonus);
-                            console.log(`🛡️ ${unit.name}: ефект посилення броні закінчився (-${effect.armorBonus} броні)`);
-                        }
                         return false;
                     }
                     return true;

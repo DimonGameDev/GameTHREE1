@@ -339,13 +339,17 @@ function updateHeroesButtonState(playerNum) {
       break;
   }
   
-  if (selectedHeroes && selectedHeroes.length === 3) {
-    btn.style.backgroundColor = "#2196F3"; // Синій
-    btn.innerText = "✓ Герої вибрані";
-  } else {
-    btn.style.backgroundColor = ""; // Дефолтний колір
-    btn.innerText = "Герої";
-  }
+  
+if (selectedHeroes && selectedHeroes.length === 3) {
+  btn.style.backgroundColor = "#2196F3"; // Синій
+  btn.innerText = "✓ Герої вибрані";
+} else if (selectedHeroes && selectedHeroes.length > 0) {
+  btn.style.backgroundColor = "#4CAF50"; // Зелений
+  btn.innerText = `Герої (${selectedHeroes.length}/3)`;
+} else {
+  btn.style.backgroundColor = ""; // Дефолтний колір
+  btn.innerText = "Герої";
+}
 }
 
 // Функція перевірки чи всі активні гравці готові
@@ -387,14 +391,14 @@ function checkAllPlayersReady() {
   }
   
   // Перевірка: чи всі вибрали героїв
-  const withoutHeroes = activePlayers.filter(p => !p.heroes || p.heroes.length !== 3);
+  // const withoutHeroes = activePlayers.filter(p => !p.heroes || p.heroes.length !== 3);
   
-  if (withoutHeroes.length > 0) {
-    return { 
-      allReady: false, 
-      message: `⚠️ Не всі гравці вибрали героїв!\n\nГравців без героїв: ${withoutHeroes.length}` 
-    };
-  }
+  // if (withoutHeroes.length > 0) {
+  //   return { 
+  //     allReady: false, 
+  //     message: `⚠️ Не всі гравці вибрали героїв!\n\nГравців без героїв: ${withoutHeroes.length}` 
+  //   };
+  // }
   
   // Перевірка: чи всі готові
   const notReady = activePlayers.filter(p => !p.ready);
@@ -473,10 +477,10 @@ btnP1AllianceRight.onclick = () => {
 
 btnReadyP1.onclick = () => {
   // Перевіряємо чи вибрані герої
-  if (!selectedHeroesP1 || selectedHeroesP1.length !== 3) {
-    alert('❌ Спочатку виберіть 3 героїв!');
-    return;
-  }
+  // if (!selectedHeroesP1 || selectedHeroesP1.length !== 3) {
+  //   alert('❌ Спочатку виберіть 3 героїв!');
+  //   return;
+  // }
   
   readyP1 = !readyP1;
   updateReadyButton(1, readyP1);
@@ -531,10 +535,10 @@ btnP2AllianceRight.onclick = () => {
 // ГРАВЕЦЬ 2 - КНОПКА ГОТОВНОСТІ
 
 btnReadyP2.onclick = () => {
-  if (!selectedHeroesP2 || selectedHeroesP2.length !== 3) {
-    alert('❌ Спочатку виберіть 3 героїв!');
-    return;
-  }
+  // if (!selectedHeroesP2 || selectedHeroesP2.length !== 3) {
+  //   alert('❌ Спочатку виберіть 3 героїв!');
+  //   return;
+  // }
   
   readyP2 = !readyP2;
   updateReadyButton(2, readyP2);
@@ -907,4 +911,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updateNextButtonState();
 });
 
-console.log("сторінка 2.01");
+console.log("сторінка 2.3");

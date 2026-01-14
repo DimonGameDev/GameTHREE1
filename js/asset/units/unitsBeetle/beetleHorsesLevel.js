@@ -12,12 +12,10 @@ let beetleHorsesLevels = {
       step: 4,
       range: 1,
       coin: 350,
-      upgradeCost: 221,
+      upgradeCost: 100,
       description: "Сильний воїн з важкою сокирою",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 200},
-      ],
+      abilities: [],
       effects: []
     },
     level2: {
@@ -30,13 +28,10 @@ let beetleHorsesLevels = {
       step: 4,
       range: 1,
       coin: 350,
-      upgradeCost: 222,
+      upgradeCost: 140,
       description: "Загартований в боях воїн",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level3: {
@@ -52,10 +47,7 @@ let beetleHorsesLevels = {
       upgradeCost: 223,
       description: "Майстер бойової сокири",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 300},
-        // { key: "rage", power: 150},
-      ],
+      abilities: [],
       effects: []
     },
     level4: {
@@ -71,10 +63,7 @@ let beetleHorsesLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level5: {
@@ -90,10 +79,7 @@ let beetleHorsesLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level6: {
@@ -109,10 +95,7 @@ let beetleHorsesLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level7: {
@@ -128,10 +111,7 @@ let beetleHorsesLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level8: {
@@ -147,11 +127,7 @@ let beetleHorsesLevels = {
       upgradeCost: null,
       description: "Легендарний воїн",
       img: beetleHorsesImg,
-      abilities: [
-        // { key: "arrowShot", power: 600},
-        // { key: "rage", power: 500},
-        // { key: "berserk", power: 300},
-      ],
+      abilities: [],
       effects: []
     }
   };

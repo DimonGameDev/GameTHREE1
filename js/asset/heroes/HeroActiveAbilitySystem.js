@@ -739,7 +739,8 @@ if (stepMinus && stepMinus > 0) {
         effectType: "stepReduction",
         stepReduction: stepMinus,
         appliedByPlayer: hero.playerIndex,  // ← Зберігаємо хто застосував
-        source: "aoe_damage_ability_21"
+        source: "aoe_damage_ability_21",
+        duration: 1  // ✅ ДОДАНО: Тривалість 1 хід
     });
 }
                         

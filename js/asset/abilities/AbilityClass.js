@@ -401,7 +401,8 @@ createAuraEffect(source) {
     source: source.id,
     sourceName: source.name,
     abilityName: this.name,
-    duration: activePlayers,
+    // duration: activePlayers,
+    duration: 1,
     type: this.type,
     appliedByPlayer: source.playerIndex  // ⬅️ ДОДАТИ: зберігаємо хто застосував
   };

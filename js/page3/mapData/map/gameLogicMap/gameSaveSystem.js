@@ -97,20 +97,23 @@ units: unitsOnMap.map(unit => ({
     LevelAttack: unit.LevelAttack,
     LevelArmor: unit.LevelArmor,
     abilitiesProgress: unit.abilitiesProgress,
-    originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
-originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
-originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
+    originalStep: unit.originalStep,
+    originalStepBeforeAoe: unit.originalStepBeforeAoe, // ✅ ДОДАНО: Для ефекту AoE damage // ✅ ДОДАНО: Для ефекту "Коріння"
+    originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
+    originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
     effects: unit.effects,
     activeEffects: unit.activeEffects,
     // ✅ ДОДАНО: Зберігаємо кулдауни здібностей
     abilityCooldowns: unit.abilityInstances ? unit.abilityInstances.map(ability => ({
         key: ability.key || ability.name,
         currentCooldown: ability.currentCooldown || 0
-    })) : []
+    })) : [],
+    usedPortalThisTurn: unit.usedPortalThisTurn || false
 })),
         
         // Захоплені хатки золота
-        capturedGoldHouses: window.capturedGoldHouses || []
+        capturedGoldHouses: window.capturedGoldHouses || [],
+        activePortals: window.activePortals || [] 
     };
     
     try {
@@ -272,7 +275,8 @@ function saveGameToSlot(slotId, saveName) {
             LevelArmor: unit.LevelArmor,
             abilitiesProgress: unit.abilitiesProgress,
             effects: unit.effects,
-            originalStep: unit.originalStep, // ✅ ДОДАНО: Для ефекту "Коріння"
+            originalStep: unit.originalStep,
+            originalStepBeforeAoe: unit.originalStepBeforeAoe, // ✅ ДОДАНО: Для ефекту AoE damage // ✅ ДОДАНО: Для ефекту "Коріння"
             originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
             originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
             activeEffects: unit.activeEffects,
@@ -280,11 +284,13 @@ function saveGameToSlot(slotId, saveName) {
             abilityCooldowns: unit.abilityInstances ? unit.abilityInstances.map(ability => ({
                 key: ability.key || ability.name,
                 currentCooldown: ability.currentCooldown || 0
-            })) : []
+            })) : [],
+            usedPortalThisTurn: unit.usedPortalThisTurn || false
         })),
         heroCooldowns: window.heroActiveAbilitySystem ? 
     Array.from(window.heroActiveAbilitySystem.currentCooldowns.entries()) : [],
-        capturedGoldHouses: window.capturedGoldHouses || []
+        capturedGoldHouses: window.capturedGoldHouses || [],
+        activePortals: window.activePortals || [] 
     };
     
     // Обгортаємо в метадані слота

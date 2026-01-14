@@ -201,13 +201,18 @@ unitsOnMap = savedState.units.map(savedUnit => {
     restoredUnit.moved = savedUnit.moved;
     restoredUnit.attacked = savedUnit.attacked;
     restoredUnit.canAttack = savedUnit.canAttack;
+    restoredUnit.step = savedUnit.step; // ✅ ДОДАНО: Відновлюємо кроки
     restoredUnit.effects = savedUnit.effects || [];
 restoredUnit.activeEffects = savedUnit.activeEffects || [];
-// ✅ ДОДАНО: Відновлюємо originalStep для ефекту "Коріння"
+// ✅ ДОДАНО: Відновлюємо originalStep для ефекту "Коріння" та порталу
 if (savedUnit.originalStep !== undefined) {
     restoredUnit.originalStep = savedUnit.originalStep;
-    restoredUnit.step = 0; // Юніт все ще знерухомлений
-    console.log(`🌿 ${restoredUnit.name} відновлено знерухомлення (originalStep: ${restoredUnit.originalStep})`);
+    console.log(`📊 ${restoredUnit.name} відновлено originalStep: ${restoredUnit.originalStep}, step: ${restoredUnit.step}`);
+}
+// ✅ ДОДАНО: Відновлюємо originalStepBeforeAoe для ефекту AoE damage
+if (savedUnit.originalStepBeforeAoe !== undefined) {
+    restoredUnit.originalStepBeforeAoe = savedUnit.originalStepBeforeAoe;
+    console.log(`🌀 ${restoredUnit.name} відновлено originalStepBeforeAoe: ${restoredUnit.originalStepBeforeAoe}, step: ${restoredUnit.step}`);
 }
 // ✅ ДОДАНО: Відновлюємо originalAttack для ефекту "Наручники"
 if (savedUnit.originalAttack !== undefined) {
@@ -363,6 +368,29 @@ if (savedState.capturedGoldHouses) {
     });
     
     console.log(`🏠 Відновлено ${window.capturedGoldHouses.length} хаток`);
+}
+
+// Відновлюємо активні портали
+if (savedState.activePortals) {
+    window.activePortals = savedState.activePortals;
+    console.log(`🌀 Відновлено ${window.activePortals.length} активних порталів`);
+    
+    // ✅ ДОДАНО: Відновлюємо візуальні класи порталів на карті
+    window.activePortals.forEach(portal => {
+        const entryCell = document.querySelector(`.cell[data-x='${portal.entry.x}'][data-y='${portal.entry.y}']`);
+        const exitCell = document.querySelector(`.cell[data-x='${portal.exit.x}'][data-y='${portal.exit.y}']`);
+        
+        if (entryCell) {
+            entryCell.classList.add('portal-entry');
+            entryCell.dataset.portalId = portal.id;
+        }
+        if (exitCell) {
+            exitCell.classList.add('portal-exit');
+            exitCell.dataset.portalId = portal.id;
+        }
+        
+        console.log(`🌀 Візуально відновлено портал: вхід (${portal.entry.x},${portal.entry.y}) → вихід (${portal.exit.x},${portal.exit.y})`);
+    });
 }
             
             // Відновлюємо юнітів (регенеруємо через шаблони для здібностей)
@@ -615,6 +643,28 @@ if (savedState.capturedGoldHouses) {
     });
     
     console.log(`🏠 Відновлено ${window.capturedGoldHouses.length} хаток`);
+}
+// Відновлюємо активні портали
+if (savedState.activePortals) {
+    window.activePortals = savedState.activePortals;
+    console.log(`🌀 Відновлено ${window.activePortals.length} активних порталів`);
+    
+    // ✅ ДОДАНО: Відновлюємо візуальні класи порталів на карті
+    window.activePortals.forEach(portal => {
+        const entryCell = document.querySelector(`.cell[data-x='${portal.entry.x}'][data-y='${portal.entry.y}']`);
+        const exitCell = document.querySelector(`.cell[data-x='${portal.exit.x}'][data-y='${portal.exit.y}']`);
+        
+        if (entryCell) {
+            entryCell.classList.add('portal-entry');
+            entryCell.dataset.portalId = portal.id;
+        }
+        if (exitCell) {
+            exitCell.classList.add('portal-exit');
+            exitCell.dataset.portalId = portal.id;
+        }
+        
+        console.log(`🌀 Візуально відновлено портал: вхід (${portal.entry.x},${portal.entry.y}) → вихід (${portal.exit.x},${portal.exit.y})`);
+    });
 }
                 
                 // Відновлюємо юнітів (регенеруємо через шаблони для здібностей)
@@ -1027,7 +1077,7 @@ window.gameData = {
 
 // console.log('🎯 gameData експортовано:', window.gameData);
 
-console.log("лоадінгОМ101010101010");
+
 
 
 
@@ -1241,3 +1291,5 @@ if (loadedFromSave) {
         });
     }, 500);
 }
+
+console.log("лоадінгОМ11,11,11,11,1,1,");

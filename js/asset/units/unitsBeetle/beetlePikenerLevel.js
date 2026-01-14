@@ -15,9 +15,7 @@ let beetlePikenerLevels = {
       upgradeCost: 200,
       description: "Сильний воїн з важкою сокирою",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 200},
-      ],
+      abilities: [],
       effects: []
     },
     level2: {
@@ -33,10 +31,7 @@ let beetlePikenerLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level3: {
@@ -52,10 +47,7 @@ let beetlePikenerLevels = {
       upgradeCost: 800,
       description: "Майстер бойової сокири",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 300},
-        // { key: "rage", power: 150},
-      ],
+      abilities: [],
       effects: []
     },
     level4: {
@@ -71,10 +63,7 @@ let beetlePikenerLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level5: {
@@ -90,10 +79,7 @@ let beetlePikenerLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level6: {
@@ -109,10 +95,7 @@ let beetlePikenerLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level7: {
@@ -128,10 +111,7 @@ let beetlePikenerLevels = {
       upgradeCost: 400,
       description: "Загартований в боях воїн",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 250},
-        // { key: "rage", power: 100},
-      ],
+      abilities: [],
       effects: []
     },
     level8: {
@@ -147,11 +127,7 @@ let beetlePikenerLevels = {
       upgradeCost: null,
       description: "Легендарний воїн",
       img: beetlePikenerImg,
-      abilities: [
-        // { key: "arrowShot", power: 600},
-        // { key: "rage", power: 500},
-        // { key: "berserk", power: 300},
-      ],
+      abilities: [],
       effects: []
     }
   };
