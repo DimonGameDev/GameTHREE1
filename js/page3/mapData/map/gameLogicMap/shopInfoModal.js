@@ -91,11 +91,12 @@ let originalCloseShop = window.closeShop;
       const currentPlayer = players[currentPlayerIndex];
       if (!currentPlayer) return;
       const raceKey = raceMap[currentPlayer.race];
-      if (!raceKey || !races[raceKey] || !races[raceKey].length) {
-        console.warn("No units for race:", currentPlayer.race);
-        return;
-      }
-      raceUnits = races[raceKey];
+      const raceUnitsList = getRaceUnits(raceKey);
+if (!raceKey || !raceUnitsList || !raceUnitsList.length) {
+  console.warn("No units for race:", currentPlayer.race);
+  return;
+}
+raceUnits = raceUnitsList;
       currentUnitIndex = 0;
       openUnitsInfoModal(currentPlayer.race);
     });

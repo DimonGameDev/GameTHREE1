@@ -1,12 +1,81 @@
 // Клас для створення екземплярів здібностей
 class Ability {
-    constructor(baseAbility, customValues = {}) {
-      // Копіюємо базові властивості зі шаблону
-      Object.assign(this, baseAbility);
+  constructor(baseAbility, customValues = {}) {
+    // Спочатку копіюємо базові властивості зі шаблону
+    Object.assign(this, baseAbility);
+    
+    // 🔧 Якщо є power, використовуємо його для різних типів здібностей
+    if (customValues.power !== undefined) {
+      // Для лікування
+      if (this.actionType === "heal") {
+        this.healAmount = customValues.power;
+      }
       
-      // Перезаписуємо кастомними значеннями юніта
-      Object.assign(this, customValues);
+      // Для аур
+      if (this.actionType === "aura") {
+        switch (this.type) {
+          case "armor":
+            this.armorBonus = customValues.power;
+            break;
+          case "attack":
+            this.attackBonus = customValues.power;
+            break;
+          case "step":
+            this.stepBonus = customValues.power;
+            break;
+          case "hp":
+            this.healAmount = customValues.power;
+            break;
+          case "mixed":
+            if (typeof customValues.power === 'object') {
+              // ✅ ВИПРАВЛЕННЯ: Перевіряємо обидва варіанти - attackBoostPercent та attackBoost
+              this.attackBoost = customValues.power.attackBoost || customValues.power.attackBoostPercent || this.attackBoost;
+              this.armorBoost = customValues.power.armorBoost || this.armorBoost;
+              this.hpRegenPercent = customValues.power.hpRegenPercent || this.hpRegenPercent;
+            }
+            break;
+        }
+      }
       
+      // Для баффів
+      if (this.actionType === "buff") {
+        switch (this.type) {
+          case "step":
+            this.stepBonus = customValues.power;
+            break;
+          case "attack":
+            this.attackBonus = customValues.power;
+            break;
+          case "armor":
+            this.armorBonus = customValues.power;
+            break;
+        }
+      }
+      // 🔴 ДОДАТИ: Для дебаффів
+      if (this.actionType === "debuff") {
+        switch (this.effect) {
+          case "armorReduction":
+            this.armorReduction = customValues.power;
+            break;
+          case "attackReduction":
+            this.attackReduction = customValues.power;
+            break;
+        }
+      }
+      
+      // 🔴 ДОДАТИ: Для контролю
+      if (this.actionType === "control") {
+        switch (this.effect) {
+          case "immobilize":
+            this.stepReduction = customValues.power || 999;
+            break;
+        }
+      }
+    }
+    
+    // Перезаписуємо інші кастомні значення юніта (крім power, який вже обробили)
+    const { power, ...otherCustomValues } = customValues;
+    Object.assign(this, otherCustomValues);
             // 🔧 Якщо є power, використовуємо його для різних типів здібностей
             if (customValues.power !== undefined) {
               // Для лікування
@@ -289,7 +358,16 @@ applyDebuff(caster, target) {
       
       // Знаходимо сусідів в радіусі
       const neighbors = this.findUnitsInRadius(caster, unitsOnMap, this.radius);
-      
+      console.log(`🔍 АУРА "${this.name}" від ${caster.name}:`, {
+        radius: this.radius,
+        targets: this.targets,
+        casterPosition: `(${caster.x},${caster.y})`,
+        totalUnits: unitsOnMap.length,
+        neighbors: neighbors.length,
+        neighborNames: neighbors.map(u => u.name),
+        casterAbilities: caster.abilities, // Додати
+        casterAbilityInstances: caster.abilityInstances // Додати
+    });
       // Фільтруємо за типом цілей
       const validTargets = neighbors.filter(unit => {
         if (this.targets === "allies") {
@@ -395,41 +473,40 @@ applyDebuff(caster, target) {
     }
     
     // Створити ефект аури залежно від типу
-createAuraEffect(source) {
-  const activePlayers = window.players ? window.players.length : 4;
-  const effect = {
-    source: source.id,
-    sourceName: source.name,
-    abilityName: this.name,
-    // duration: activePlayers,
-    duration: 1,
-    type: this.type,
-    appliedByPlayer: source.playerIndex  // ⬅️ ДОДАТИ: зберігаємо хто застосував
-  };
-  
-  // Додаємо конкретні значення залежно від типу
-  switch (this.type) {
-    case "armor":
-      effect.armorBonus = this.armorBonus || 0;
-      break;
-    case "attack":
-      effect.attackBonus = this.attackBonus || 0;
-      break;
-    case "step":
-      effect.stepBonus = this.stepBonus || 0;
-      break;
-    case "hp":
-      effect.healAmount = this.healAmount || 0;
-      break;
-      case "mixed":
-        effect.attackBoost = this.attackBoost || 0;      // ← Було attackBoostPercent
-        effect.armorBoost = this.armorBoost || 0;
-        effect.hpRegenPercent = this.hpRegenPercent || 0;
-        break;
-  }
-  
-  return effect;
-}
+    createAuraEffect(source) {
+      const activePlayers = window.players ? window.players.length : 4;
+      const effect = {
+        source: source.id,
+        sourceName: source.name,
+        abilityName: this.name,
+        duration: 1,
+        type: this.type,
+        appliedByPlayer: source.playerIndex
+      };
+      
+      // Додаємо конкретні значення залежно від типу
+      switch (this.type) {
+        case "armor":
+          effect.armorBonus = this.power || this.armorBonus || 0;  // ← Використовуємо power!
+          break;
+        case "attack":
+          effect.attackBonus = this.power || this.attackBonus || 0; // ← Використовуємо power!
+          break;
+        case "step":
+          effect.stepBonus = this.power || this.stepBonus || 0;     // ← Використовуємо power!
+          break;
+        case "hp":
+          effect.healAmount = this.power || this.healAmount || 0;   // ← Використовуємо power!
+          break;
+        case "mixed":
+          effect.attackBoost = this.attackBoost || 0;
+          effect.armorBoost = this.armorBoost || 0;
+          effect.hpRegenPercent = this.hpRegenPercent || 0;
+          break;
+      }
+      
+      return effect;
+    }
 
       // Створити ефект бафу
       createBuffEffect(source) {
@@ -528,155 +605,38 @@ createControlEffect(source) {
   
     
     // Додати тимчасовий ефект юніту
+   
     addTemporaryEffect(unit, effect) {
-      if (!unit.activeEffects) {
+    if (!unit.activeEffects) {
         unit.activeEffects = [];
-      }
-      
-      unit.activeEffects.push(effect);
-      
-      // Одразу застосовуємо ефект
-      // Одразу застосовуємо ефект
-switch (effect.type) {
-  case "armor":
-    unit.armor = (unit.armor || 0) + effect.armorBonus;
-    console.log(`🛡️ ${unit.name} отримав +${effect.armorBonus} броні від "${effect.abilityName}"`);
-    this.showAuraEffect(unit, 'armor');  // 🆕 ДОДАТИ ЦЕЙ РЯДОК
-    break;
-  case "attack":
-    unit.attack = (unit.attack || 0) + effect.attackBonus;
-    console.log(`⚔️ ${unit.name} отримав +${effect.attackBonus} атаки від "${effect.abilityName}"`);
-    this.showAuraEffect(unit, 'attack');  // 🆕 ДОДАТИ ЦЕЙ РЯДОК
-    break;
-  case "step":
-    unit.step = (unit.step || 0) + effect.stepBonus;
-    console.log(`👟 ${unit.name} отримав +${effect.stepBonus} кроків від "${effect.abilityName}"`);
-    this.showAuraEffect(unit, 'step');  // 🆕 ДОДАТИ ЦЕЙ РЯДОК
-    break;
-  case "hp":
-    const oldHp = unit.newhp || unit.hp;
-    unit.newhp = Math.min(oldHp + effect.healAmount, unit.maxHp);
-    console.log(`💚 ${unit.name} вилікувався на ${effect.healAmount} HP від "${effect.abilityName}"`);
-    if (typeof window.updateUnitHealthBar === 'function') {
-      window.updateUnitHealthBar(unit);
-    }
-    this.showAuraEffect(unit, 'hp');  // 🆕 ДОДАТИ ЦЕЙ РЯДОК
-    break;
-
-    case "mixed":
-    // 1. ФІКСОВАНИЙ бонус до атаки (не відсоток!)
-    if (effect.attackBoost && effect.attackBoost > 0) {
-        unit.attack = (unit.attack || 0) + effect.attackBoost;
-        console.log(`⚔️ ${unit.name} отримав +${effect.attackBoost} атаки від "${effect.abilityName}"`);
     }
     
-    // 2. Фіксований бонус до броні (залишається як є)
-    if (effect.armorBoost && effect.armorBoost > 0) {
-        unit.armor = (unit.armor || 0) + effect.armorBoost;
-        console.log(`🛡️ ${unit.name} отримав +${effect.armorBoost} броні від "${effect.abilityName}"`);
-    }
+    // Перевіряємо чи вже є такий ефект
+    const alreadyHasEffect = unit.activeEffects.some(existingEffect => 
+        existingEffect.abilityName === effect.abilityName && 
+        existingEffect.source === effect.source
+    );
     
-    // 3. Відсотковий реген HP (залишається як є)
-    if (effect.hpRegenPercent && effect.hpRegenPercent > 0) {
-        const maxHp = unit.maxHp || unit.hp;
-        const healAmount = Math.floor(maxHp * (effect.hpRegenPercent / 100));
-        const currentHp = unit.newhp ?? unit.hp;
-        unit.newhp = Math.min(currentHp + healAmount, maxHp);
-        console.log(`💚 ${unit.name} відновив ${healAmount} HP (${effect.hpRegenPercent}%) від "${effect.abilityName}"`);
-        if (typeof window.updateUnitHealthBar === 'function') {
-            window.updateUnitHealthBar(unit);
-        }
-    }
-    
-    this.showAuraEffect(unit, 'mixed');
-    break;
-
-
-    case "control":
-      if (effect.effectType === "immobilize") {
-        if (!unit.originalStep) {
-          unit.originalStep = unit.step;
-        }
-        unit.step = Math.max(0, unit.step - effect.stepReduction);
-        console.log(`🌿 ${unit.name} знерухомлено! Крок: ${unit.step}`);
-        this.showAuraEffect(unit, 'control');
-      } else if (effect.effectType === "disarm") {
-        // 🔴 ВИПРАВЛЕНО: Зберігаємо originalAttack та встановлюємо canAttack = false
-        if (!unit.originalAttack) {
-            unit.originalAttack = unit.attack;
-        }
-        // 🔴 ДОДАТИ: Зберігаємо originalRange
-        if (!unit.originalRange) {
-            unit.originalRange = unit.range;
-        }
-        
-        unit.attack = 0;
-        unit.range = 0; // 🔴 ДОДАТИ: Встановлюємо дальність в 0
-        unit.canAttack = false; // 🔴 ДОДАТИ: блокуємо можливість атакувати
-        console.log(`🔒 ${unit.name} в наручниках! Атака: 0 (було: ${unit.originalAttack}), Дальність: 0 (було: ${unit.originalRange}), canAttack: false`);
-        this.showAuraEffect(unit, 'disarm');
-    }
-      break;
-      case "debuff":
-        if (effect.effectType === "armorReduction") {
-          if (!unit.originalArmor) {
-            unit.originalArmor = unit.armor || 0;
-          }
-          unit.armor = Math.max(0, (unit.armor || 0) - effect.armorReduction);
-          console.log(`🔻 ${unit.name} втратив ${effect.armorReduction} броні від "${effect.abilityName}" (було: ${unit.originalArmor}, стало: ${unit.armor})`);
-          this.showAuraEffect(unit, 'debuff-armor');
-        } else if (effect.effectType === "attackReduction") {
-          if (!unit.originalAttack) {
-            unit.originalAttack = unit.attack || 0;
-          }
-          unit.attack = Math.max(0, (unit.attack || 0) - effect.attackReduction);
-          console.log(`🔻 ${unit.name} втратив ${effect.attackReduction} атаки від "${effect.abilityName}" (було: ${unit.originalAttack}, стало: ${unit.attack})`);
-          this.showAuraEffect(unit, 'debuff-attack');
-        }
-        break;
-}
-    }
-    showAuraEffect(unit, effectType) {
-      // Знаходимо візуальний елемент юніта
-      const wrapper = document.querySelector(`.unit-wrapper[data-unit-id="${unit.id}"]`);
-      if (!wrapper) {
-        console.warn(`⚠️ Wrapper для юніта ${unit.name} не знайдено`);
+    if (alreadyHasEffect) {
+        console.log(`⏭️ ${unit.name} вже має ефект "${effect.abilityName}" від юніта ${effect.source}`);
         return;
-      }
-      
-      // Додаємо клас для анімації
-      const className = `aura-effect-${effectType}`;
-      wrapper.classList.add(className);
-      
-      // Видаляємо клас через 1.5 секунди
-      setTimeout(() => {
-        wrapper.classList.remove(className);
-      }, 1500);
-      
-      console.log(`✨ Візуальний ефект "${effectType}" показано для ${unit.name}`);
     }
-  }
-  
-  // Фабрика для створення здібностей юніта
-  class AbilityFactory {
-    static createAbilities(unit) {
-      if (!unit.abilities || !Array.isArray(unit.abilities)) {
-        return [];
-      }
-  
-      return unit.abilities.map(abilityData => {
-        const baseAbility = abilities[abilityData.key];
-        
-        if (!baseAbility) {
-          console.warn(`Ability "${abilityData.key}" not found in abilities template`);
-          return null;
-        }
-  
-        return new Ability(baseAbility, abilityData);
-      }).filter(ability => ability !== null);
+    
+    // Додаємо ефект
+    unit.activeEffects.push(effect);
+    console.log(`✨ ${unit.name} отримав ефект "${effect.abilityName}"`);
+    
+    // Перераховуємо стати
+    if (window.recalcUnitStats) {
+        window.recalcUnitStats(unit);
+    } else {
+        console.error('❌ recalcUnitStats не знайдено!');
     }
+    
+    // Показуємо візуальний ефект
+    this.showAuraEffect(unit, effect.type);
   }
-  
-  // Додаємо до window для глобального доступу
-  window.Ability = Ability;
-  window.AbilityFactory = AbilityFactory;
+}
+
+// Експортуємо клас глобально
+window.Ability = Ability;

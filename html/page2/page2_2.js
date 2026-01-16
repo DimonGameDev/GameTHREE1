@@ -911,4 +911,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updateNextButtonState();
 });
 
-console.log("сторінка 2.3");
+console.log("сторінка 2.5");

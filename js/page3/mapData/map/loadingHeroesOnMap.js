@@ -36,6 +36,14 @@ function createHeroUnits() {
 // Створюємо юніт-героя
 const heroUnit = {
     ...heroTemplate,
+    // ДОДАТИ baseStats
+    baseStats: {
+        attack: heroTemplate.attack || 0,
+        armor: heroTemplate.armor || 0,
+        step: heroTemplate.step || 0,
+        range: heroTemplate.range || 0,
+        maxHp: heroTemplate.maxHp || heroTemplate.hp || 100
+    },
     // ВАЖЛИВО: Глибоке копіювання для abilitiesProgress
     abilitiesProgress: heroTemplate.abilitiesProgress.map(ability => ({...ability})),
     // ВАЖЛИВО: Глибоке копіювання для effects (якщо є)

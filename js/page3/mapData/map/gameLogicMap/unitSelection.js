@@ -395,9 +395,19 @@ if (typeof window.checkAndShowCastleCaptureButton === 'function') {
                             window.updateUnitVisualState(unit);
                         }
              // Перевіряємо чи є у юніта аури і застосовуємо їх
-    if (window.EffectsManager && window.EffectsManager.hasAuraAbility(unit)) {
-        EffectsManager.applyUnitAuras(unit);
-    }
+                 // Перевіряємо чи є у юніта аури і застосовуємо їх
+                 console.log(`🔍 Перевірка аур для ${unit.name}:`);
+                 console.log(`🔍 abilityInstances:`, unit.abilityInstances);
+                 
+                 if (window.EffectsManager) {
+                     const hasAura = window.EffectsManager.hasAuraAbility(unit);
+                     console.log(`🔍 hasAuraAbility повертає: ${hasAura}`);
+                     
+                     if (hasAura) {
+                         console.log(`🚀 Виклик applyUnitAuras для ${unit.name}`);
+                         EffectsManager.applyUnitAuras(unit);
+                     }
+                 }
 
         }
     
@@ -834,24 +844,78 @@ if (unit.activeEffects && unit.activeEffects.length > 0) {
         console.log('📊 ВСІ КЛЮЧІ:', Object.keys(auraEffects[0]));
         console.log('📊 ВСІ ЗНАЧЕННЯ:', Object.values(auraEffects[0]));
                 // Рахуємо ФІКСОВАНІ бонуси (правильні назви полів!)
-                const auraAttackBoost = auraEffects.reduce((sum, e) => {
-                    const boost = e.attackBonus || e.attackBoost || e.attack || 0;
-                    console.log('🔍 Ефект:', e.abilityName, '→ attack bonus:', boost);
-                    return sum + boost;
-                }, 0);
-                
-                const auraArmorBoost = auraEffects.reduce((sum, e) => {
-                    const boost = e.armorBonus || e.armorBoost || e.armor || 0;
-                    console.log('🔍 Ефект:', e.abilityName, '→ armor bonus:', boost);
-                    return sum + boost;
-                }, 0);
-                
+                // Беремо тільки перший ефект кожної аури (унікальні за abilityName)
+const uniqueAuraEffects = [];
+const seenAuraNames = new Set();
+
+auraEffects.forEach(e => {
+    if (!seenAuraNames.has(e.abilityName)) {
+        seenAuraNames.add(e.abilityName);
+        uniqueAuraEffects.push(e);
+    }
+});
+
+const auraAttackBoost = uniqueAuraEffects.reduce((sum, e) => {
+    const boost = e.attackBonus || e.attackBoost || e.attack || 0;
+    console.log('🔍 Унікальний ефект:', e.abilityName, '→ attack bonus:', boost);
+    return sum + boost;
+}, 0);
+
+const auraArmorBoost = uniqueAuraEffects.reduce((sum, e) => {
+    const boost = e.armorBonus || e.armorBoost || e.armor || 0;
+    console.log('🔍 Унікальний ефект:', e.abilityName, '→ armor bonus:', boost);
+    return sum + boost;
+}, 0);
+               // Додати після рядка 864 (перед console.log(`🔍 ДЕТАЛЬНА ПЕРЕВІРКА`))
+               const getBaseAttackFromTemplate = (unit) => {
+                if (unit.baseUnitKey && window.unitsRegistry) {
+                    const template = window.unitsRegistry[unit.baseUnitKey];
+        if (template) {
+            console.log(`🔍 Шаблон для ${unit.name}: атака=${template.attack}`);
+            return template.attack;
+        }
+    }
+    if (unit.isHero && unit.heroTemplateId && window.heroes) {
+        const heroTemplate = window.heroes[unit.heroTemplateId - 1];
+        if (heroTemplate) {
+            console.log(`🔍 Шаблон героя для ${unit.name}: атака=${heroTemplate.attack}`);
+            return heroTemplate.attack;
+        }
+    }
+    console.log(`⚠️ Не знайдено шаблон для ${unit.name}`);
+    return unit.attack || 0;
+};
+
+const getBaseArmorFromTemplate = (unit) => {
+    if (unit.baseUnitKey && window.unitsRegistry) {
+        const template = window.unitsRegistry[unit.baseUnitKey];
+        if (template) return template.armor;
+    }
+    if (unit.isHero && unit.heroTemplateId && window.heroes) {
+        const heroTemplate = window.heroes[unit.heroTemplateId - 1];
+        if (heroTemplate) return heroTemplate.armor;
+    }
+    return unit.armor || 0;
+}; 
                 console.log('🔍 DEBUG: Бонуси від аур:', { auraAttackBoost, auraArmorBoost });
-        
+        // Додати цей код ПЕРЕД рядком з "Показуємо атаку як 23(+3)":
+// Після рядка: console.log(`🔍 ПЕРЕВІРКА АТАКИ: ${unit.name}`, {...});
+// Додати:
+
+console.log(`🔍 ДЕТАЛЬНА ПЕРЕВІРКА: ${unit.name}`, {
+    unitAttack: unit.attack,
+    unitAttackType: typeof unit.attack,
+    finalAttack: finalAttack,
+    finalAttackType: typeof finalAttack,
+    difference: finalAttack - (unit.attack || 0),
+    auraAttackBoost: auraAttackBoost,
+    unitArmor: unit.armor,
+    auraArmorBoost: auraArmorBoost
+});
         // Показуємо атаку як 23(+3)
         if (daniUnitsAtack && auraAttackBoost > 0) {
-            // finalAttack УЖЕ містить бонус, тому віднімаємо його для відображення
-            const baseAttack = finalAttack - auraAttackBoost;
+            const baseAttack = getBaseAttackFromTemplate(unit);
+            console.log(`📊 ${unit.name}: базова атака=${baseAttack} (з шаблону)`);
             daniUnitsAtack.innerText = `${baseAttack}(+${auraAttackBoost})`;
             daniUnitsAtack.style.color = '#00ff88';
             daniUnitsAtack.style.fontWeight = 'bold';
@@ -864,38 +928,26 @@ if (unit.activeEffects && unit.activeEffects.length > 0) {
         
         // Показуємо броню як 15(+2)
         if (daniUnitsArmor && auraArmorBoost > 0) {
-            let baseArmor = unit.isHero 
-                ? (unit.armor || 0) + (unit.LevelArmor || 0) - auraArmorBoost
-                : (unit.armor || 0) - auraArmorBoost;
+            let baseArmor = getBaseArmorFromTemplate(unit);
+            if (unit.isHero) {
+                baseArmor += (unit.LevelArmor || 0);
+            }
+            console.log(`📊 ${unit.name}: базова броня=${baseArmor} (з шаблону)`);
             
-            // ✅ ВИПРАВЛЕНО: Визначаємо tileBonus локально
             const tileBonusForArmor = unit.tileBonuses 
                 ? (unit.tileBonuses.armor || 0) + (unit.tileBonuses.defense || 0)
                 : 0;
             
-            console.log('🔍 DEBUG: Броня в табло:', {
-                unitArmor: unit.armor,
-                auraArmorBoost: auraArmorBoost,
-                baseArmor: baseArmor,
-                tileBonus: tileBonusForArmor
-            });
-            
             if (tileBonusForArmor > 0) {
-                // Якщо є бонус від клітинки теж: 15+3(+2)
                 daniUnitsArmor.innerText = `${baseArmor}+${tileBonusForArmor}(+${auraArmorBoost})`;
             } else {
-                // Тільки аура: 15(+2)
                 daniUnitsArmor.innerText = `${baseArmor}(+${auraArmorBoost})`;
             }
             daniUnitsArmor.style.color = '#00ff88';
             daniUnitsArmor.style.fontWeight = 'bold';
             console.log(`✨ Табло броня: ${baseArmor}(+${auraArmorBoost})`);
-        } else {
-            console.log('❌ Броня НЕ відображається:', {
-                hasDaniUnitsArmor: !!daniUnitsArmor,
-                auraArmorBoost: auraArmorBoost
-            });
         }
+
     } else {
         // Немає ефектів аури - показуємо звичайну атаку
         if (daniUnitsAtack) {
@@ -962,9 +1014,53 @@ if (unit.activeEffects && unit.activeEffects.length > 0) {
             if (unitType && players[unit.playerIndex] && players[unit.playerIndex].unitMana) {
                 const manaValue = players[unit.playerIndex].unitMana[unitType] || 0;
                 const currentLevel = unit.level || 1;
-                const threshold = window.unitProgressSystem?.getManaThreshold 
-    ? window.unitProgressSystem.getManaThreshold(currentLevel, unit) // 👈 Передаємо юніта
-    : 100;
+                               // Отримуємо магазинний юніт для цього типу
+                                              // Отримуємо магазинний юніт для цього типу
+                let shopUnit = null;
+                const player = players[unit.playerIndex];
+                console.log(`🔍 Пошук магазинного юніта для:`, {
+                    unitId: unit.unitId,
+                    name: unit.name,
+                    playerIndex: unit.playerIndex,
+                    hasPlayer: !!player,
+                    hasAvailableUnits: player ? !!player.availableUnits : false
+                });
+                
+                if (player && player.availableUnits) {
+                    // ДЕБАГ: Виведемо всі магазинні юніти
+                    console.log(`🔍 Магазинні юніти гравця ${unit.playerIndex}:`, 
+                        player.availableUnits.map(u => ({ 
+                            unitId: u.unitId, 
+                            name: u.name, 
+                            upgradeCost: u.upgradeCost 
+                        }))
+                    );
+                    
+                    // Шукаємо юніта з таким же unitId в магазині
+                    shopUnit = player.availableUnits.find(
+                        shopUnit => shopUnit.baseUnitKey === unit.baseUnitKey
+                    );
+                    
+                    if (shopUnit) {
+                        console.log(`✅ Знайдено магазинний юніт:`, shopUnit);
+                    } else {
+                        console.log(`❌ Магазинний юніт не знайдений за unitId=${unit.unitId}`);
+                        
+                        // Спробуємо знайти за назвою
+                        shopUnit = player.availableUnits.find(
+                            shopUnit => shopUnit.name === unit.name
+                        );
+                        
+                        if (shopUnit) {
+                            console.log(`✅ Знайдено магазинний юніт за назвою:`, shopUnit);
+                        }
+                    }
+                }
+                
+                                // Отримуємо вартість прокачки
+                                                // Отримуємо вартість прокачки зі стандартної системи
+                const threshold = STANDARD_UPGRADE_SYSTEM.getUpgradeCost(currentLevel);
+                console.log(`💰 [ТАБЛО] Стандартна вартість для ${unit.name} рівень ${currentLevel}: ${threshold}`);
                 
                 if (isOwnUnit) {
                     // ✅ СВІЙ ЮНІТ - показуємо мана + поріг

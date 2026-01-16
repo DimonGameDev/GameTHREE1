@@ -1,14 +1,20 @@
 function upgradeUnit(unit) {
-    if (!unit.nextLevelId) {
+    if (!unit.baseUnitKey || !unit.level) {
+        alert("⚠️ Неможливо прокачати цього юніта!");
+        return;
+    }
+    
+    const nextLevelNum = unit.level + 1;
+    const unitData = window.unitsRegistry[unit.baseUnitKey];
+    
+    if (!unitData || nextLevelNum > unitData.maxLevel) {
         alert("⚠️ Це максимальний рівень!");
         return;
     }
     
-    // Знаходимо наступний рівень по ID
-    const nextLevel = window.unitsRegistry[unit.nextLevelId];
-    
-    if (!nextLevel) {
-        console.error("Не знайдено юніта з ID:", unit.nextLevelId);
+    const nextLevelData = unitData.levels[nextLevelNum];
+    if (!nextLevelData) {
+        console.error("Не знайдено даних для рівня:", nextLevelNum);
         return;
     }
     
@@ -56,7 +62,7 @@ function upgradeUnit(unit) {
     // Оновлюємо магазин гравця
     updatePlayerAvailableUnit(
         unit.playerIndex, 
-        unit.unitId, 
+        unit.baseUnitKey, 
         nextLevel
     );
     
@@ -120,7 +126,7 @@ function updatePlayerAvailableUnit(playerIndex, unitTypeId, newLevelUnit) {
     
     // Знаходимо індекс юніта цього типу в availableUnits
     const unitIndex = player.availableUnits.findIndex(u => 
-        u.unitId && u.unitId.substring(0, 5) === unitTypeId.substring(0, 5)
+        u.baseUnitKey && u.baseUnitKey === unitTypeId
     );
     
     if (unitIndex === -1) {

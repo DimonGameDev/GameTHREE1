@@ -115,7 +115,9 @@ function buyUnit() {
         goldNumber.innerText = currentPlayer.gold;
     }
     
-   
+    console.log(`🔍 Створення юніта: unit.race = ${unit.race}, currentPlayer.race = ${currentPlayer.race}`);
+    console.log(`🔍 unit об'єкт має race?`, 'race' in unit);
+    console.log(`🔍 currentPlayer об'єкт:`, currentPlayer);
 
     // Створюємо копію юніта для карти
         // Створюємо копію юніта для карти
@@ -134,12 +136,48 @@ function buyUnit() {
             maxHp: unit.hp,
             newhp: unit.hp,
             originalRace: currentPlayer.race,
+            // ✅ ДОДАНО: Зберігаємо race та upgrades
+            race: unit.race || currentPlayer.race,
+            upgrades: unit.upgrades || 0,
             createdAt: Date.now()
         };
+        
+        console.log(`🔍 Створено новий юніт:`, {
+            name: newUnit.name,
+            unitId: newUnit.unitId,
+            race: newUnit.race,
+            upgrades: newUnit.upgrades,
+            level: newUnit.level
+        });
         // Ініціалізуємо екземпляри здібностей для юніта
-if (window.AbilityFactory) {
-    newUnit.abilityInstances = AbilityFactory.createAbilities(newUnit);
-    // console.log(`✨ Ініціалізовано ${newUnit.abilityInstances.length} здібностей для ${newUnit.name}`);
+        // Ініціалізуємо екземпляри здібностей для юніта
+               // Ініціалізуємо екземпляри здібностей для юніта
+if (window.Ability && window.abilities) {
+    newUnit.abilityInstances = [];
+    if (newUnit.abilities && Array.isArray(newUnit.abilities)) {
+        newUnit.abilities.forEach(abilityRef => {
+            // abilityRef = {key: 'armorAura', power: 3}
+            const abilityTemplate = window.abilities[abilityRef.key];
+            if (abilityTemplate) {
+                // Створюємо повний шаблон з power
+                const fullTemplate = {
+                    ...abilityTemplate,
+                    power: abilityRef.power || abilityRef.value || 0
+                };
+                try {
+                    const abilityInstance = new window.Ability(fullTemplate);
+                    newUnit.abilityInstances.push(abilityInstance);
+                    console.log(`✨ Створено здібність: ${abilityInstance.name} (${abilityInstance.actionType}, power: ${abilityRef.power})`);
+                } catch (error) {
+                    console.error('❌ Помилка створення здібності:', error, abilityRef);
+                }
+            } else {
+                console.error(`❌ Не знайдено шаблон здібності для ключа: ${abilityRef.key}`);
+            }
+        });
+    }
+} else {
+    console.error('❌ window.Ability або window.abilities не знайдено');
 }
     
     // Знаходимо вільну позицію біля замку

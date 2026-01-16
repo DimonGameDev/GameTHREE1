@@ -421,12 +421,18 @@ function showSecondBreathPopup(x, y) {
         }
     } else {
         const unitType = getUnitType(attacker);
+        console.log(`🎯 Атака: ${attacker.name} (${attacker.baseUnitKey || attacker.unitId}), unitType=${unitType}, damage=${finalDamage}`);
+        
         if (unitType && players[attacker.playerIndex]) {
             if (players[attacker.playerIndex].unitMana[unitType] === undefined) {
                 players[attacker.playerIndex].unitMana[unitType] = 0;
+                console.log(`🔧 Ініціалізовано unitMana[${unitType}] = 0`);
             }
             players[attacker.playerIndex].unitMana[unitType] += finalDamage;
-            
+            console.log(`💰 unitMana[${unitType}] = ${players[attacker.playerIndex].unitMana[unitType]}`);
+            console.log(`💰 [АТАКА] ${attacker.name} завдав ${finalDamage} шкоди`);
+            console.log(`💰 [АТАКА] unitMana[${unitType}] = ${players[attacker.playerIndex].unitMana[unitType]}`);
+            console.log(`💰 [АТАКА] Поріг для прокачки: ${STANDARD_UPGRADE_SYSTEM.getUpgradeCost(attacker.level || 1)}`);
             // 🎯 ВСТАНОВЛЮЄМО СТАН ПЕРЕД АПГРЕЙДОМ!
 attacker.moved = true;
 attacker.attacked = true;  // 👈 ДЛЯ ВСІХ ЮНІТІВ!
@@ -435,9 +441,16 @@ if (attacker.name && attacker.name.toLowerCase().includes('катапульт'))
     console.log(`🎯 Катапульта атакувала → рух заблокований (moved=true, attacked=true)`);
 }
             
-            if (window.unitProgressSystem && typeof window.unitProgressSystem.checkAndUpgradeIfReady === 'function') {
-                window.unitProgressSystem.checkAndUpgradeIfReady(attacker.playerIndex, unitType);
-            }
+if (window.unitProgressSystem && typeof window.unitProgressSystem.checkAndUpgradeIfReady === 'function') {
+    console.log(`🎯 [АТАКА] Виклик checkAndUpgradeIfReady для ${unitType}`);
+    console.log(`🎯 [АТАКА] unitMana[${unitType}] = ${players[attacker.playerIndex].unitMana[unitType]}`);
+    console.log(`🎯 [АТАКА] Поріг: ${STANDARD_UPGRADE_SYSTEM.getUpgradeCost(attacker.level || 1)}`);
+    const result = window.unitProgressSystem.checkAndUpgradeIfReady(attacker.playerIndex, unitType);
+    console.log(`🎯 [АТАКА] Результат checkAndUpgradeIfReady: ${result}`);
+} else {
+    console.error(`❌ [АТАКА] unitProgressSystem або checkAndUpgradeIfReady не доступні!`);
+    console.log(`window.unitProgressSystem:`, window.unitProgressSystem);
+}
         }
     }
 
@@ -733,38 +746,63 @@ if (document.readyState === 'loading') {
 /**
  * Визначає тип юніта за його unitId або іменем
  */
+// ЗАМІНИТИ весь блок функції (рядки 740-780):
+
+// Старий код:
 window.getUnitType = function(unit) {
-    if (!unit.unitId) return null;
+    if (!unit) return null;
     
-    const match = unit.unitId.match(/\d+/);
-    if (!match) return null;
-    
-    const numberPart = match[0];
-    
-    // 🔴 ВИПРАВЛЕННЯ: для 3-4 значних кодів
-    let typeCode;
-    if (numberPart.length >= 3) {
-        // Відкидаємо останні 2 цифри (рівень)
-        typeCode = numberPart.slice(0, -2);
-    } else {
-        typeCode = numberPart.charAt(0);
+    // Спроба отримати з baseUnitKey
+    if (unit.baseUnitKey) {
+        const parts = unit.baseUnitKey.split(':');
+        return parts.length > 1 ? parts[1] : null;
     }
     
-    const typeMap = {
-        '1': 'warrior',
-        '2': 'archer',
-        '3': 'shaman',
-        '4': 'horse',
-        '5': 'horseman',    // 👈 ЗМІНИТИ з 'pikener' на 'horseman'
-        '6': 'catapult',    // 👈 ЗМІНИТИ з 'horseman' на 'catapult'
-        '7': 'pikener',     // 👈 ЗМІНИТИ з 'catapult' на 'pikener'
-        '8': 'support',
-        '9': 'specialist',
-        '10': 'mage',
-        '11': 'wisp'
-    };
+    // Зворотна сумісність з старими unitId
+    if (unit.unitId) {
+        const match = unit.unitId.match(/\d+/);
+        if (!match) return null;
+        
+        const numberPart = match[0];
+        let typeCode;
+        if (numberPart.length >= 3) {
+            typeCode = numberPart.slice(0, -2);
+        } else {
+            typeCode = numberPart.charAt(0);
+        }
+        
+        const typeMap = {
+            '1': 'warrior',
+            '2': 'archer',
+            '3': 'shaman',
+            '4': 'horse',
+            '5': 'horseman',
+            '6': 'catapult',
+            '7': 'pikener',
+            '8': 'support',
+            '9': 'specialist',
+            '10': 'mage',
+            '11': 'wisp'
+        };
+        
+        return typeMap[typeCode] || null;
+    }
     
-    return typeMap[typeCode] || null;
+    return null;
+};
+
+// НА новий код:
+window.getUnitType = function(unit) {
+    if (!unit) return null;
+    
+    // Отримуємо тип з baseUnitKey
+    if (unit.baseUnitKey) {
+        const parts = unit.baseUnitKey.split(':');
+        return parts.length > 1 ? parts[1] : null;
+    }
+    
+    // Якщо немає baseUnitKey, повертаємо null
+    return null;
 };
 
 

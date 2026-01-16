@@ -1,6 +1,74 @@
 
 window.unitsOnMap = unitsOnMap;
+// ДОДАТИ після рядка 1 (на початку файлу):
 
+/**
+ * Отримує всі юніти 1 рівня для раси з unitsRegistry
+ * @param {string} raceKey - ключ раси (orcs, elves, humans, undead, demons)
+ * @returns {Array} масив юнітів 1 рівня
+ */
+function getRaceUnits(raceKey) {
+    if (!window.unitsRegistry) {
+        console.warn('unitsRegistry ще не ініціалізовано');
+        return [];
+    }
+    
+    const raceUnits = [];
+    const typeOrder = ['warrior', 'archer', 'shaman', 'horse', 'horseman', 'catapult', 'pikener', 'support', 'mage', 'specialist', 'wisp'];
+    
+    // Проходимо по всіх зареєстрованих юнітах
+        // Список псевдонімів, які потрібно пропустити
+        const specialAliases = [
+            'orcs:specialist', 'orcs:support', 'orcs:mage',
+            'elves:specialist', 'elves:support',
+            'humans:specialist', 'humans:support', 
+            'demons:specialist', 'demons:support',
+            'undead:specialist', 'undead:support'
+        ];
+        
+        // Проходимо по всіх зареєстрованих юнітах
+        for (const [key, unitData] of Object.entries(window.unitsRegistry)) {
+            // Пропускаємо старі unitId (які містять тільки цифри)
+            if (key.includes(':')) {
+                // Пропускаємо псевдоніми для спеціальних юнітів
+                if (specialAliases.includes(key)) {
+                    continue;
+                }
+                
+                const [unitRace, unitType] = key.split(':');
+                
+                if (unitRace === raceKey && unitData.levels && unitData.levels[1]) {
+                    // Беремо юніт 1 рівня
+                    const level1Unit = {
+                        ...unitData.levels[1],
+                        unitId: `${raceKey}:${unitType}:1`,
+                        baseUnitKey: key,
+                        name: unitData.name,
+                        img: unitData.img,
+                        race: unitData.race,
+                        role: unitData.role,
+                        level: 1,
+                        abilities: unitData.abilities ? [...unitData.abilities] : []
+                    };
+                    raceUnits.push(level1Unit);
+                }
+            }
+        }
+    
+          // Сортуємо юніти за typeOrder
+    raceUnits.sort((a, b) => {
+        const indexA = typeOrder.indexOf(a.role);
+        const indexB = typeOrder.indexOf(b.role);
+        
+        // Якщо role не знайдено в typeOrder - ставимо в кінець
+        const aIndex = indexA !== -1 ? indexA : 999;
+        const bIndex = indexB !== -1 ? indexB : 999;
+        
+        return aIndex - bIndex;
+    });
+    
+    return raceUnits;
+}
 
 // Перевіряємо чи користувач прийшов з page1 з підтвердженням
 const urlParams = new URLSearchParams(window.location.search);
@@ -47,7 +115,7 @@ if (loadSlotId) {
             // console.log('- players:', players.length, 'гравців');
             players.forEach((player, index) => {
                 const raceKey = raceMap[player.race || "Орки"];
-                const raceUnitsList = races[raceKey] || [];
+                const raceUnitsList = getRaceUnits(raceKey);
                 
                 // ✅ ВИПРАВЛЕНО: Якщо є збережені availableUnits - використовуємо їх
                 if (player.availableUnits && player.availableUnits.length > 0) {
@@ -58,7 +126,9 @@ if (loadSlotId) {
                     player.availableUnits = player.availableUnits.map(savedUnit => {
                         // Шукаємо повний шаблон юніта
                         const fullTemplate = raceUnitsList.find(unit => 
-                            unit.unitId === savedUnit.unitId || unit.name === savedUnit.name
+                            unit.baseUnitKey === savedUnit.baseUnitKey || 
+                            unit.unitId === savedUnit.unitId || 
+                            unit.name === savedUnit.name
                         );
                         
                         if (fullTemplate) {
@@ -88,6 +158,19 @@ if (loadSlotId) {
                     // Старий код: генеруємо доступні юніти з базових шаблонів
                     // console.log(`⚠️ Немає збережених availableUnits, генерую з базових шаблонів для гравця ${player.originalIndex + 1}`);
                     player.availableUnits = [...raceUnitsList];
+                    player.availableUnits.sort((a, b) => {
+                        const specialUnits = ['minotaur', 'bear', 'mag', 'witch', 'golem', 'werewolf', 'engineer', 'cerberus', 'spirit', 'scarab', 'uterus', 'darkelf', 'assassin', 'supervisor', 'armored'];
+                        
+                        const aIsSpecial = specialUnits.some(special => a.baseUnitKey.includes(special));
+                        const bIsSpecial = specialUnits.some(special => b.baseUnitKey.includes(special));
+                        
+                        if (aIsSpecial && !bIsSpecial) return 1; // a спеціальний - в кінець
+                        if (!aIsSpecial && bIsSpecial) return -1; // b спеціальний - a в початок
+                        return 0; // обидва однакові
+                    });
+                    player.availableUnits.forEach((unit, index) => {
+                        unit.shopIndex = index;
+                    });
                     
                     // Застосовуємо кольори до юнітів
                     if (player.availableUnits && Array.isArray(player.availableUnits)) {
@@ -98,6 +181,10 @@ if (loadSlotId) {
                             return unit;
                         });
                     }
+                    // ДОДАТИ: Відновлюємо shopIndex після застосування кольорів
+player.availableUnits.forEach((unit, index) => {
+    unit.shopIndex = index;
+});
                 }
                 
                 // console.log(`🎨 Регенеровано ${player.availableUnits.length} юнітів для гравця ${player.originalIndex + 1}`);
@@ -178,7 +265,10 @@ unitsOnMap = savedState.units.map(savedUnit => {
         // console.log(`🔍 Шукаю шаблон для ${savedUnit.name}, unitId: ${savedUnit.unitId}, playerIndex: ${savedUnit.playerIndex}`);
         
         if (player && player.availableUnits) {
-            templateUnit = player.availableUnits.find(u => u.unitId === savedUnit.unitId);
+            templateUnit = player.availableUnits.find(u => 
+                u.baseUnitKey === savedUnit.baseUnitKey || 
+                (u.unitId && u.unitId === savedUnit.unitId)
+            );
             // console.log(`🔍 Знайдено шаблон:`, templateUnit ? `${templateUnit.name} (${templateUnit.unitId})` : 'НЕ ЗНАЙДЕНО');
             // console.log(`🔍 Abilities в шаблоні:`, templateUnit?.abilities);
         } else {
@@ -201,7 +291,61 @@ unitsOnMap = savedState.units.map(savedUnit => {
     restoredUnit.moved = savedUnit.moved;
     restoredUnit.attacked = savedUnit.attacked;
     restoredUnit.canAttack = savedUnit.canAttack;
-    restoredUnit.step = savedUnit.step; // ✅ ДОДАНО: Відновлюємо кроки
+    // restoredUnit.step = savedUnit.step; // ✅ ДОДАНО: Відновлюємо кроки
+    // Встановлюємо БАЗОВІ характеристики зі збереження
+
+// if (savedUnit.baseAttack !== undefined) {
+//     restoredUnit.attack = savedUnit.baseAttack;
+//     console.log(`📊 ${restoredUnit.name}: базова атака=${savedUnit.baseAttack} (з збереження)`);
+// } else if (templateUnit) {
+//     restoredUnit.attack = templateUnit.attack || 0;
+//     console.log(`📊 ${restoredUnit.name}: атака=${restoredUnit.attack} (з шаблону)`);
+// }
+
+// if (savedUnit.baseArmor !== undefined) {
+//     restoredUnit.armor = savedUnit.baseArmor;
+//     console.log(`📊 ${restoredUnit.name}: базова броня=${savedUnit.baseArmor} (з збереження)`);
+// } else if (templateUnit) {
+//     restoredUnit.armor = templateUnit.armor || 0;
+//     console.log(`📊 ${restoredUnit.name}: броня=${restoredUnit.armor} (з шаблону)`);
+// }
+
+// if (savedUnit.baseStep !== undefined) {
+//     restoredUnit.step = savedUnit.baseStep;
+//     console.log(`📊 ${restoredUnit.name}: базові кроки=${savedUnit.baseStep} (з збереження)`);
+// } else if (templateUnit) {
+//     restoredUnit.step = templateUnit.step || 0;
+//     console.log(`📊 ${restoredUnit.name}: кроки=${restoredUnit.step} (з шаблону)`);
+// }
+
+// if (savedUnit.baseRange !== undefined) {
+//     restoredUnit.range = savedUnit.baseRange;
+// } else if (templateUnit) {
+//     restoredUnit.range = templateUnit.range || 0;
+// }
+
+
+// Зберігаємо базові характеристики в окремому об'єкті
+// Встановлюємо характеристики з шаблону
+if (templateUnit) {
+    restoredUnit.attack = templateUnit.attack || 0;
+    restoredUnit.armor = templateUnit.armor || 0;
+    restoredUnit.step = templateUnit.step || 0;
+    restoredUnit.range = templateUnit.range || 0;
+    console.log(`📊 ${restoredUnit.name}: характеристики з шаблону`, {
+        attack: restoredUnit.attack,
+        armor: restoredUnit.armor,
+        step: restoredUnit.step,
+        range: restoredUnit.range
+    });
+} else {
+    restoredUnit.attack = savedUnit.attack || 0;
+    restoredUnit.armor = savedUnit.armor || 0;
+    restoredUnit.step = savedUnit.step || 0;
+    restoredUnit.range = savedUnit.range || 0;
+}
+
+console.log(`📊 ${restoredUnit.name}: базові характеристики завантажено`, restoredUnit.baseStats);
     restoredUnit.effects = savedUnit.effects || [];
 restoredUnit.activeEffects = savedUnit.activeEffects || [];
 // ✅ ДОДАНО: Відновлюємо originalStep для ефекту "Коріння" та порталу
@@ -303,11 +447,12 @@ if (savedUnit.originalAttack !== undefined && restoredUnit.originalAttack === un
          // ✅ ДОДАНО: Для звичайних юнітів - відновлюємо рівень та інші поля прогрес-системи
          if (!savedUnit.isHero) {
             restoredUnit.level = savedUnit.level || 1;
-            if (savedUnit.upgradeCost !== undefined && savedUnit.upgradeCost !== null) {
-                restoredUnit.upgradeCost = savedUnit.upgradeCost;
-            } else if (templateUnit) {
-                restoredUnit.upgradeCost = templateUnit.upgradeCost;
-            }
+                        // Відновлюємо upgradeCost
+                        if (savedUnit.upgradeCost !== undefined) {
+                            restoredUnit.upgradeCost = savedUnit.upgradeCost;
+                        } else if (templateUnit) {
+                            restoredUnit.upgradeCost = templateUnit.upgradeCost;
+                        }
             // console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}`);
         }
     
@@ -542,7 +687,7 @@ if (loadSlotId) {
             players = savedState.players;
             players.forEach((player, index) => {
                 const raceKey = raceMap[player.race || "Орки"];
-                const raceUnitsList = races[raceKey] || [];
+                const raceUnitsList = getRaceUnits(raceKey);
                 
                 // ✅ ВИПРАВЛЕНО: Якщо є збережені availableUnits - використовуємо їх
                 if (player.availableUnits && player.availableUnits.length > 0) {
@@ -553,7 +698,9 @@ if (loadSlotId) {
                     player.availableUnits = player.availableUnits.map(savedUnit => {
                         // Шукаємо повний шаблон юніта
                         const fullTemplate = raceUnitsList.find(unit => 
-                            unit.unitId === savedUnit.unitId || unit.name === savedUnit.name
+                            unit.baseUnitKey === savedUnit.baseUnitKey || 
+                            unit.unitId === savedUnit.unitId || 
+                            unit.name === savedUnit.name
                         );
                         
                         if (fullTemplate) {
@@ -583,6 +730,9 @@ if (loadSlotId) {
                             window.createColoredUnit(unit, player.originalIndex)
                         );
                     }
+                    player.availableUnits.forEach((unit, index) => {
+                        unit.shopIndex = index;
+                    });
                 } else {
                     // Старий код: генеруємо доступні юніти з базових шаблонів
                     console.log(`⚠️ Немає збережених availableUnits, генерую з базових шаблонів для гравця ${player.originalIndex + 1}`);
@@ -667,105 +817,7 @@ if (savedState.activePortals) {
     });
 }
                 
-                // Відновлюємо юнітів (регенеруємо через шаблони для здібностей)
-// unitsOnMap = savedState.units.map(savedUnit => {
-//     // Знаходимо шаблон юніта
-//     let templateUnit = null;
-    
-//     if (savedUnit.isHero && savedUnit.heroTemplateId) {
-//         // Для героїв - знаходимо шаблон з window.heroes
-//         templateUnit = window.heroes[savedUnit.heroTemplateId - 1];
-//     } else if (savedUnit.unitId) {
-//         // Для звичайних юнітів - знаходимо в availableUnits гравця
-//         // ✅ ВИПРАВЛЕНО: Шукаємо гравця за playerIndex, а не originalIndex
-//         const player = players[savedUnit.playerIndex];
-//         console.log(`🔍 Шукаю шаблон для ${savedUnit.name}, unitId: ${savedUnit.unitId}, playerIndex: ${savedUnit.playerIndex}`);
-        
-//         if (player && player.availableUnits) {
-//             templateUnit = player.availableUnits.find(u => u.unitId === savedUnit.unitId);
-//             console.log(`🔍 Знайдено шаблон:`, templateUnit ? `${templateUnit.name} (${templateUnit.unitId})` : 'НЕ ЗНАЙДЕНО');
-//             console.log(`🔍 Abilities в шаблоні:`, templateUnit?.abilities);
-//         } else {
-//             console.warn(`⚠️ Гравець не знайдений для playerIndex: ${savedUnit.playerIndex}`);
-//         }
-//     }
-    
-//     // Створюємо новий об'єкт юніта на основі шаблону
-//     const restoredUnit = templateUnit ? { ...templateUnit } : { ...savedUnit };
-    
-//           // Відновлюємо збережені дані (НЕ використовуємо Object.assign, щоб не перезаписати abilities)
-//     restoredUnit.id = savedUnit.id;
-//     restoredUnit.playerIndex = savedUnit.playerIndex;
-//     restoredUnit.originalIndex = savedUnit.originalIndex;
-//     restoredUnit.x = savedUnit.x;
-//     restoredUnit.y = savedUnit.y;
-//     restoredUnit.hp = savedUnit.hp;
-//     restoredUnit.newhp = savedUnit.newhp;
-//     restoredUnit.moved = savedUnit.moved;
-//     restoredUnit.attacked = savedUnit.attacked;
-//     restoredUnit.canAttack = savedUnit.canAttack;
-//     restoredUnit.effects = savedUnit.effects || [];
-//     restoredUnit.activeEffects = savedUnit.activeEffects || [];
-//     // abilities залишається з шаблону! ✅
-    
-//         // Для героїв - відновлюємо прогрес і регенеруємо зображення
-//         if (savedUnit.isHero) {
-//             restoredUnit.level = savedUnit.level;
-//             restoredUnit.upgradeCost = savedUnit.upgradeCost;
-//            console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}, upgradeCost: ${restoredUnit.upgradeCost} (з збереження: ${savedUnit.upgradeCost})`);
-//             restoredUnit.LevelAttack = savedUnit.LevelAttack;
-//             restoredUnit.LevelArmor = savedUnit.LevelArmor;
-//             restoredUnit.abilitiesProgress = savedUnit.abilitiesProgress;
-            
-//             // ✅ РЕГЕНЕРУЄМО ЗОБРАЖЕННЯ з правильним кольором
-//             if (restoredUnit.heroTemplateId && window.getColoredHeroImage) {
-//                 const heroTemplate = window.heroes[restoredUnit.heroTemplateId - 1];
-//                 if (heroTemplate) {
-//                     const player = players[savedUnit.playerIndex];
-//                     const colorIndex = player ? player.originalIndex : savedUnit.playerIndex;
-//                     restoredUnit.img = window.getColoredHeroImage(heroTemplate.img, colorIndex);
-//                     console.log(`🎨 Регенеровано зображення героя ${restoredUnit.name} з кольором гравця ${colorIndex + 1}`);
-//                 }
-//             }
-//         }
-//          // ✅ ДОДАНО: Для звичайних юнітів - відновлюємо рівень та інші поля прогрес-системи
-//          if (!savedUnit.isHero) {
-//             restoredUnit.level = savedUnit.level || 1;
-//             if (savedUnit.upgradeCost !== undefined && savedUnit.upgradeCost !== null) {
-//                 restoredUnit.upgradeCost = savedUnit.upgradeCost;
-//             } else if (templateUnit) {
-//                 restoredUnit.upgradeCost = templateUnit.upgradeCost;
-//             }
-//             console.log(`📊 Відновлено рівень ${restoredUnit.level} для ${restoredUnit.name}`);
-//         }
-    
-//     // ✅ КЛЮЧОВИЙ МОМЕНТ: Ініціалізуємо здібності
-//     if (window.AbilityFactory) {
-//         restoredUnit.abilityInstances = AbilityFactory.createAbilities(restoredUnit);
-//         console.log(`✨ Відновлено ${restoredUnit.abilityInstances.length} здібностей для ${restoredUnit.name}`);
-
-//         // ✅ ДОДАНО: Синхронізуємо здібності з прогресом
-//     if (typeof syncAbilitiesWithProgress === 'function' && savedUnit.abilitiesProgress) {
-//         syncAbilitiesWithProgress(restoredUnit, savedUnit.abilitiesProgress);
-//     }
-//     }
-//     // ✅ Відновлюємо кулдауни здібностей героїв
-// if (savedState.heroCooldowns && window.heroAbilitySystem) {
-//     savedState.heroCooldowns.forEach(([key, value]) => {
-//         window.heroAbilitySystem.currentCooldowns.set(key, value);
-//     });
-//     console.log(`⏱️ Відновлено ${savedState.heroCooldowns.length} кулдаунів здібностей`);
-// }
-    
-//     return restoredUnit;
-// });
-// window.unitsOnMap = unitsOnMap;
-                // Після рядка 353: window.unitsOnMap = unitsOnMap;
-// Після рядка 353: window.unitsOnMap = unitsOnMap;
-// ✅ ДОДАНО: Застосовуємо аури для всіх юнітів після завантаження
-if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
-    window.EffectsManager.applyAllAuras();
-  }
+         
                 
                 console.log(`✅ Відновлено: ${players.length} гравців, ${unitsOnMap.length} юнітів, раунд ${currentRound}`);
                 // ✅ ДОДАНО: Відновлюємо кулдауни здібностей героїв
@@ -847,7 +899,28 @@ const allPlayers = gameSettings.players.map((p, originalIndex) => {
             wisp: 0 
         },
         // ⬇️ ДОДАЙТЕ ЦЕ: Кожен гравець має свою копію юнітів
-        availableUnits: races[raceKey] ? [...races[raceKey]] : []
+        availableUnits: (() => {
+            const units = getRaceUnits(raceKey) || [];
+            
+            // Сортуємо спеціальні юніти в кінець (як для збереженої гри)
+            units.sort((a, b) => {
+                const specialUnits = ['minotaur', 'bear', 'mag', 'witch', 'golem', 'werewolf', 'engineer', 'cerberus', 'spirit', 'scarab', 'uterus', 'darkelf', 'assassin', 'supervisor', 'armored'];
+                
+                const aIsSpecial = specialUnits.some(special => a.baseUnitKey.includes(special));
+                const bIsSpecial = specialUnits.some(special => b.baseUnitKey.includes(special));
+                
+                if (aIsSpecial && !bIsSpecial) return 1; // a спеціальний - в кінець
+                if (!aIsSpecial && bIsSpecial) return -1; // b спеціальний - a в початок
+                return 0; // обидва однакові
+            });
+            
+            // Тепер присвоюємо shopIndex після остаточного сортування
+            units.forEach((unit, index) => {
+                unit.shopIndex = index;
+            });
+            
+            return units;
+        })()
         // Спочатку це просто масив посилань на level1 юнітів
     };
 });
@@ -865,6 +938,14 @@ players.forEach((player, index) => {
             return unit;
         });
         console.log(`🎨 Застосовано колір для юнітів гравця ${player.originalIndex + 1}`);
+    }
+});
+// ДОДАТИ: Зберігаємо shopIndex після застосування кольорів
+players.forEach((player, index) => {
+    if (player.availableUnits && Array.isArray(player.availableUnits)) {
+        player.availableUnits.forEach((unit, shopIndex) => {
+            unit.shopIndex = shopIndex;
+        });
     }
 });
     // Оновлюємо замки після створення гравців
@@ -1180,20 +1261,51 @@ function reapplyActiveEffects() {
                     }
                     break;
                     case "step":
+                        // 🔴 ПРОПУСТИТИ аурні ефекти - вони застосовуються через EffectsManager.applyAllAuras()
+                        if (effect.abilityName && (effect.abilityName.includes('Аура') || effect.abilityName.includes('aura'))) {
+                            console.log(`⏭️ Пропускаємо ауру кроків "${effect.abilityName}" для ${unit.name}`);
+                            break;
+                        }
                         unit.step = (unit.step || 0) + (effect.stepBonus || 0);
                         console.log(`👟 ${unit.name} отримав +${effect.stepBonus} кроків після завантаження! Крок: ${unit.step}`);
                         reappliedCount++;
                         break;
-                    case "attack":
-                        unit.attack = (unit.attack || 0) + (effect.attackBonus || 0);
-                        console.log(`⚔️ ${unit.name} отримав +${effect.attackBonus} атаки після завантаження! Атака: ${unit.attack}`);
-                        reappliedCount++;
-                        break;
-                        case "armor":
-                            unit.armor = (unit.armor || 0) + (effect.armorBonus || 0);
-                            console.log(`🛡️ ${unit.name} отримав +${effect.armorBonus} броні після завантаження! Броня: ${unit.armor}`);
+                        case "attack":
+                            // 🔴 ПРОПУСТИТИ аурні ефекти - вони застосовуються через EffectsManager.applyAllAuras()
+                            if (effect.abilityName && (effect.abilityName.includes('Аура') || effect.abilityName.includes('aura'))) {
+                                console.log(`⏭️ Пропускаємо ауру атаки "${effect.abilityName}" для ${unit.name}`);
+                                break;
+                            }
+                            unit.attack = (unit.attack || 0) + (effect.attackBonus || 0);
+                            console.log(`⚔️ ${unit.name} отримав +${effect.attackBonus} атаки після завантаження! Атака: ${unit.attack}`);
                             reappliedCount++;
                             break;
+                            case "armor":
+                                // 🔴 ПРОПУСТИТИ аурні ефекти - вони застосовуються через EffectsManager.applyAllAuras()
+                                if (effect.abilityName && (effect.abilityName.includes('Аура') || effect.abilityName.includes('aura'))) {
+                                    console.log(`⏭️ Пропускаємо ауру броні "${effect.abilityName}" для ${unit.name}`);
+                                    break;
+                                }
+                                unit.armor = (unit.armor || 0) + (effect.armorBonus || 0);
+                                console.log(`🛡️ ${unit.name} отримав +${effect.armorBonus} броні після завантаження! Броня: ${unit.armor}`);
+                                reappliedCount++;
+                                break;
+                            case "mixed":
+                                // 🔴 ПРОПУСТИТИ аурні ефекти - вони застосовуються через EffectsManager.applyAllAuras()
+                                if (effect.abilityName && (effect.abilityName.includes('Аура') || effect.abilityName.includes('aura'))) {
+                                    console.log(`⏭️ Пропускаємо mixed ауру "${effect.abilityName}" для ${unit.name}`);
+                                    break;
+                                }
+                                if (effect.attackBoost && effect.attackBoost > 0) {
+                                    unit.attack = (unit.attack || 0) + effect.attackBoost;
+                                    console.log(`⚔️ ${unit.name} отримав +${effect.attackBoost} атаки після завантаження!`);
+                                }
+                                if (effect.armorBoost && effect.armorBoost > 0) {
+                                    unit.armor = (unit.armor || 0) + effect.armorBoost;
+                                    console.log(`🛡️ ${unit.name} отримав +${effect.armorBoost} броні після завантаження!`);
+                                }
+                                reappliedCount++;
+                                break;
                         case "debuff":
                             if (effect.effectType === "armorReduction") {
                                 if (!unit.originalArmor) {
@@ -1223,6 +1335,12 @@ function reapplyActiveEffects() {
 
 // Викликаємо після завантаження всіх юнітів
 reapplyActiveEffects();
+
+// 🔴 КЛЮЧОВЕ ВИПРАВЛЕННЯ: Застосовуємо аури після повторного застосування ефектів
+if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
+    console.log('🔴 Застосовуємо аури після завантаження');
+    window.EffectsManager.applyAllAuras();
+}
 // ============================================
 // ПРИМУСОВЕ ОНОВЛЕННЯ КОЛЬОРІВ ГЕРОЇВ ПІСЛЯ ЗАВАНТАЖЕННЯ
 // ============================================
@@ -1292,4 +1410,4 @@ if (loadedFromSave) {
     }, 500);
 }
 
-console.log("лоадінгОМ11,11,11,11,1,1,");
+console.log("лоадінгОМ13,13,13,13,13,13,");

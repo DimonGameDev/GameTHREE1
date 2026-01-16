@@ -43,7 +43,9 @@ function openShop() {
     }
     
     // Заповнюємо магазин юнітами
-    fillShopWithUnits(currentPlayer.race);
+    setTimeout(() => {
+        fillShopWithUnits();
+    }, 50);
     
     // ⬇️ ДОДАЄМО ОБРОБНИК КЛІКУ ПОЗА ВІКНОМ
     setTimeout(() => {
@@ -102,7 +104,7 @@ function closeShop() {
 /**
  * Заповнює магазин юнітами для вибраної раси
  */
-function fillShopWithUnits(raceName) {
+function fillShopWithUnits() {
     const currentPlayer = players[currentPlayerIndex];
     
     if (!currentPlayer) {
@@ -113,27 +115,47 @@ function fillShopWithUnits(raceName) {
     // ⬇️ ЗМІНЕНО: Використовуємо availableUnits гравця замість races[raceKey]
     const units = currentPlayer.availableUnits;
     
-    if (!units || units.length === 0) {
-        console.error(`❌ У гравця немає доступних юнітів!`);
+    if (!units || !Array.isArray(units) || units.length === 0) {
+        console.error('❌ Немає доступних юнітів для магазину!');
         return;
     }
     
-    // Очищаємо контейнер
+   // ДОДАТИ ТУТ:
+// Сортуємо за shopIndex перед рендером
+    // ДОДАТИ ТУТ:
+    // Сортуємо за shopIndex перед рендером
+    if (units && Array.isArray(units)) {
+        // Спочатку перевіряємо, чи всі юніти мають shopIndex
+        const hasMissingShopIndex = units.some(unit => unit.shopIndex === undefined);
+        if (hasMissingShopIndex) {
+            console.warn('⚠️ Деякі юніти не мають shopIndex! Присвоюємо...');
+            units.forEach((unit, index) => {
+                if (unit.shopIndex === undefined) {
+                    unit.shopIndex = index;
+                }
+            });
+        }
+        
+        // Сортуємо за shopIndex
+        units.sort((a, b) => (a.shopIndex || 0) - (b.shopIndex || 0));
+    }
+    
+    const scrollWrapper = document.querySelector('.scrollWrapper');
     if (!scrollWrapper) {
-        console.error('❌ scrollWrapper не знайдений!');
-        return;
+        console.error('❌ Елемент з класом .scrollWrapper не знайдений!');
+    console.error('Доступні елементи з класом scrollWrapper:', document.querySelectorAll('.scrollWrapper'));
+    return;
     }
     
+    // Очищаємо попередні карточки
     scrollWrapper.innerHTML = '';
-    scrollWrapper.parentElement.scrollLeft = 0;
     
     // Створюємо карточку для кожного юніта
-    units.forEach((unit, index) => {
-        const modalItem = createUnitCard(unit, index);
-        scrollWrapper.appendChild(modalItem);
-    });
-    
-    //console.log(`✅ Створено ${units.length} карточок юнітів для гравця ${currentPlayerIndex + 1}`);
+   // Створюємо карточку для кожного юніта
+units.forEach((unit) => {
+    const modalItem = createUnitCard(unit, unit.shopIndex || 0);
+    scrollWrapper.appendChild(modalItem);
+});
 }
 
 /**
@@ -142,7 +164,7 @@ function fillShopWithUnits(raceName) {
 function createUnitCard(unit, index) {
     const modalItem = document.createElement('div');
     modalItem.classList.add('modalItem');
-    modalItem.dataset.unitIndex = index;
+    modalItem.dataset.unitIndex = unit.shopIndex || index;
     
     modalItem.innerHTML = `
     <div class="unitLevelNow">${unit.level}</div>

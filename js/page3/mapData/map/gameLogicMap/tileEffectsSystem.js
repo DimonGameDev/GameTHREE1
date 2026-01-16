@@ -82,21 +82,44 @@ function getTileBonuses(x, y, unit) {
 /**
  * Застосовує миттєві бонуси при зупинці юніта
  */
-function applyTileDefenseBonuses(unit) {
-    if (!unit || unit.x === undefined || unit.y === undefined) {
-        return;
-    }
+// function applyTileDefenseBonuses(unit) {
+//     if (!unit || unit.x === undefined || unit.y === undefined) {
+//         return;
+//     }
     
-    const bonuses = getTileBonuses(unit.x, unit.y, unit);
+//     const bonuses = getTileBonuses(unit.x, unit.y, unit);
     
-    if (!bonuses || (bonuses.armor === 0 && bonuses.defense === 0)) {
-        // Юніт на звичайній клітинці - скидаємо бонуси
-        if (unit.tileBonuses) {
-            console.log(`⬇️ ${unit.name} покинув особливу клітинку`);
-            unit.tileBonuses = null;
+//     if (!bonuses || (bonuses.armor === 0 && bonuses.defense === 0)) {
+//         // Юніт на звичайній клітинці - скидаємо бонуси
+//         if (unit.tileBonuses) {
+//             console.log(`⬇️ ${unit.name} покинув особливу клітинку`);
+//             unit.tileBonuses = null;
+//         }
+//         return;
+//     }
+
+
+    function applyTileDefenseBonuses(unit) {
+        if (!unit || unit.x === undefined || unit.y === undefined) {
+            return;
         }
-        return;
-    }
+        
+        // 🔴 ВИПРАВЛЕННЯ: Якщо юніт вже має tileBonuses, не застосовуємо повторно
+        if (unit.tileBonuses) {
+            console.log(`🛡️ ${unit.name} вже має tileBonuses, пропускаємо`);
+            return;
+        }
+        
+        const bonuses = getTileBonuses(unit.x, unit.y, unit);
+        
+        if (!bonuses || (bonuses.armor === 0 && bonuses.defense === 0)) {
+            // Юніт на звичайній клітинці - скидаємо бонуси
+            if (unit.tileBonuses) {
+                console.log(`⬇️ ${unit.name} покинув особливу клітинку`);
+                unit.tileBonuses = null;
+            }
+            return;
+        }
     
     // Зберігаємо бонуси в юніті
     unit.tileBonuses = bonuses;

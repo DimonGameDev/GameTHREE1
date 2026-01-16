@@ -1,7 +1,76 @@
 // ============================================
 // СИСТЕМА ЗБЕРЕЖЕННЯ/ЗАВАНТАЖЕННЯ ГРИ
 // ============================================
-
+/**
+ * Отримати базові характеристики юніта (без бонусів від аур та тимчасових ефектів)
+ * @param {object} unit - юніт
+ * @returns {object} - базові характеристики {attack, armor, step, range}
+ */
+function getBaseUnitStats(unit) {
+    // Спочатку шукаємо в unitsRegistry за unitId (для звичайних юнітів)
+    if (!unit.isHero && window.unitsRegistry) {
+        const unitKey = unit.baseUnitKey || unit.unitId;
+        const template = window.unitsRegistry[unitKey];
+        if (template) {
+            return {
+                attack: template.attack || 0,
+                armor: template.armor || 0,
+                step: template.step || 0,
+                range: template.range || 0
+            };
+        }
+    }
+    
+    // Для героїв шукаємо в heroes
+    if (unit.isHero && unit.heroTemplateId && window.heroes) {
+        const heroTemplate = window.heroes[unit.heroTemplateId - 1];
+        if (heroTemplate) {
+            return {
+                attack: heroTemplate.attack || 0,
+                armor: heroTemplate.armor || 0,
+                step: heroTemplate.step || 0,
+                range: heroTemplate.range || 0
+            };
+        }
+    }
+    
+    // Якщо не знайшли шаблон, намагаємося відняти бонуси аур
+    console.warn(`⚠️ Не знайдено шаблон для ${unit.name}, намагаюся обчислити базові характеристики`);
+    
+    let baseAttack = unit.attack || 0;
+    let baseArmor = unit.armor || 0;
+    let baseStep = unit.step || 0;
+    
+    // Віднімаємо бонуси від активних ефектів аур
+    if (unit.activeEffects && Array.isArray(unit.activeEffects)) {
+        unit.activeEffects.forEach(effect => {
+            if (effect.abilityName && (effect.abilityName.includes('Аура') || effect.abilityName.includes('aura'))) {
+                switch (effect.type) {
+                    case "attack":
+                        baseAttack -= (effect.attackBonus || 0);
+                        break;
+                    case "armor":
+                        baseArmor -= (effect.armorBonus || 0);
+                        break;
+                    case "step":
+                        baseStep -= (effect.stepBonus || 0);
+                        break;
+                    case "mixed":
+                        baseAttack -= (effect.attackBoost || 0);
+                        baseArmor -= (effect.armorBoost || 0);
+                        break;
+                }
+            }
+        });
+    }
+    
+    return {
+        attack: Math.max(0, baseAttack),
+        armor: Math.max(0, baseArmor),
+        step: Math.max(0, baseStep),
+        range: unit.range || 0
+    };
+}
 /**
  * Зберігає поточний стан гри
  */
@@ -85,13 +154,26 @@ units: unitsOnMap.map(unit => ({
     unitId: unit.unitId, // ID шаблону юніта
     race: unit.race, // Раса (для регенерації img)
     type: unit.type, // Тип (warrior, archer, тощо)
-    attack: unit.attack,
-    armor: unit.armor,
-    step: unit.step,
-    range: unit.range,
+    // Зберігаємо базові характеристики
+    baseAttack: getBaseUnitStats(unit).attack,
+    baseArmor: getBaseUnitStats(unit).armor,
+    baseStep: getBaseUnitStats(unit).step,
+    baseRange: getBaseUnitStats(unit).range,
+    // ✅ ДОДАНО: Зберігаємо весь об'єкт baseStats для зручності
+    baseStats: {
+        attack: getBaseUnitStats(unit).attack,
+        armor: getBaseUnitStats(unit).armor,
+        step: getBaseUnitStats(unit).step,
+        range: getBaseUnitStats(unit).range
+    },
+// Також зберігаємо поточні (для сумісності)
+attack: unit.attack,
+armor: unit.armor,
+step: unit.step,
+range: unit.range,
     coin: unit.coin,
     // ✅ ДОДАНО: Для прогрес-системи
-    upgradeCost: unit.upgradeCost || null,
+    upgradeCost: unit.upgradeCost,
     // Для героїв
     level: unit.level,
     LevelAttack: unit.LevelAttack,
