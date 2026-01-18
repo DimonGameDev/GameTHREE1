@@ -48,6 +48,7 @@ const STANDARD_UPGRADE_SYSTEM = {
         
         const currentLevel = unit.level;
         const nextLevel = currentLevel + 1;
+        const oldUnitId = unit.id; // Зберігаємо старий ID для оновлення ефектів
         
         console.log(`📈 [STANDARD] ${currentLevel} → ${nextLevel}`);
         
@@ -56,9 +57,9 @@ const STANDARD_UPGRADE_SYSTEM = {
         
         // Оновлюємо unitId
         if (unit.baseUnitKey) {
-            const oldUnitId = unit.unitId;
+            const oldUnitIdKey = unit.unitId;
             unit.unitId = `${unit.baseUnitKey}:${nextLevel}`;
-            console.log(`🆔 [STANDARD] unitId: ${oldUnitId} → ${unit.unitId}`);
+            console.log(`🆔 [STANDARD] unitId: ${oldUnitIdKey} → ${unit.unitId}`);
         }
         
         // Оновлюємо стати з реєстру (якщо є)
@@ -68,7 +69,63 @@ const STANDARD_UPGRADE_SYSTEM = {
                 const nextLevelStats = unitData.levels[nextLevel];
                 if (nextLevelStats) {
                     console.log(`📊 [STANDARD] Оновлюю стати з реєстру:`, nextLevelStats);
-                    Object.assign(unit, nextLevelStats);
+                    
+                    // Оновлюємо тільки стати, не перезаписуємо abilities та abilityInstances
+                    const statsToUpdate = { ...nextLevelStats };
+                    delete statsToUpdate.abilities; // Не перезаписуємо здібності
+                    
+                    Object.assign(unit, statsToUpdate);
+                    
+                    // Оновлюємо здібності з unitData
+                    if (unitData.abilities) {
+                        unit.abilities = [...unitData.abilities];
+                    }
+                    
+                    // Перестворюємо abilityInstances
+                    if (window.Ability && window.abilities && unit.abilities) {
+                        const oldAbilityInstances = unit.abilityInstances || [];
+                        unit.abilityInstances = [];
+                        
+                        unit.abilities.forEach(abilityRef => {
+                            const abilityTemplate = window.abilities[abilityRef.key];
+                            if (abilityTemplate) {
+                                const fullTemplate = {
+                                    ...abilityTemplate,
+                                    power: abilityRef.power || abilityRef.value || 0
+                                };
+                                try {
+                                    const abilityInstance = new window.Ability(fullTemplate);
+                                    
+                                    // Переносимо cooldown зі старих здібностей
+                                    const oldAbility = oldAbilityInstances.find(a => 
+                                        a.name === abilityInstance.name
+                                    );
+                                    if (oldAbility && oldAbility.currentCooldown) {
+                                        abilityInstance.currentCooldown = oldAbility.currentCooldown;
+                                    }
+                                    
+                                    unit.abilityInstances.push(abilityInstance);
+                                    console.log(`✨ Оновлено здібність: ${abilityInstance.name} (power: ${abilityRef.power})`);
+                                } catch (error) {
+                                    console.error('❌ Помилка створення здібності:', error);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Оновлюємо source в ефектах
+                    if (window.unitsOnMap) {
+                        window.unitsOnMap.forEach(otherUnit => {
+                            if (!otherUnit.activeEffects) return;
+                            
+                            otherUnit.activeEffects.forEach(effect => {
+                                if (effect.source === oldUnitId) {
+                                    effect.source = unit.id;
+                                    console.log(`🔄 Оновлено source в ефекті ${effect.abilityName} з ${oldUnitId} на ${unit.id}`);
+                                }
+                            });
+                        });
+                    }
                 } else {
                     console.log(`⚠️ [STANDARD] Немає даних для рівня ${nextLevel} в реєстрі`);
                 }
@@ -82,6 +139,29 @@ const STANDARD_UPGRADE_SYSTEM = {
     }
 };
 /**
+ * Нормалізує baseUnitKey до стандартного формату
+ */
+function normalizeBaseUnitKey(baseUnitKey) {
+    if (!baseUnitKey || !baseUnitKey.includes(':')) return baseUnitKey;
+    
+    const [race, type] = baseUnitKey.split(':');
+    const raceMap = {
+        'orc': 'orcs',      // На випадок якщо є старі формати
+        'orcs': 'orcs',     // Для повноти
+        'elf': 'elves',
+        'elves': 'elves',   // Для повноти
+        'pipl': 'humans',
+        'humans': 'humans', // Для повноти
+        'demon': 'demons',
+        'demons': 'demons', // Для повноти
+        'beetle': 'undead',
+        'undead': 'undead'  // Для повноти
+    };
+    
+    const normalizedRace = raceMap[race] || race;
+    return `${normalizedRace}:${type}`;
+}
+/**
  * Мапа індексів юнітів на типи
  * Кожна раса має фіксований порядок: warrior, archer, shaman, horse, pikener, horseman, catapult
  */
@@ -90,13 +170,13 @@ const UNIT_TYPE_MAP = {
     1: 'archer',
     2: 'shaman',
     3: 'horse',
-    4: 'horseman',    // 👈 Було pikener
-    5: 'catapult',    // 👈 Було horseman
-    6: 'pikener',     // 👈 Було catapult
-    7: 'support',
-    8: 'specialist',
-    9: 'mage',
-    10: 'wisp'
+    4: 'horseman',
+    5: 'catapult',
+    6: 'pikener',
+    7: 'wisp',      // Змінити
+    8: 'support',   // Змінити
+    9: 'mage',      // Залишити
+    10: 'specialist' // Змінити
 };
 
 const TYPE_TO_INDEX_MAP = {
@@ -104,13 +184,13 @@ const TYPE_TO_INDEX_MAP = {
     'archer': 1,
     'shaman': 2,
     'horse': 3,
-    'horseman': 4,    // 👈 Було 5
-    'catapult': 5,    // 👈 Було 6
-    'pikener': 6,     // 👈 Було 4
-    'support': 7,
-    'specialist': 8,
-    'mage': 9,
-    'wisp': 10
+    'horseman': 4,
+    'catapult': 5,
+    'pikener': 6,
+    'wisp': 7,      // Змінити з 10 на 7
+    'support': 8,   // Змінити з 7 на 8
+    'mage': 9,      // Змінити з 9 на 9 (залишити)
+    'specialist': 10 // Змінити з 8 на 10
 };
 
 /**
@@ -403,18 +483,34 @@ function checkAndUpgradeIfReady(playerIndex, unitType) {
     
  // Шукаємо магазинний юніт за baseUnitKey (правильний спосіб)
 // const raceKey = raceMap[player.race];
-const baseUnitKey = `${raceKey}:${unitType}`; // orcs:bear
-let currentShopUnit = player.availableUnits.find(u => u.baseUnitKey === baseUnitKey);
+// Шукаємо магазинний юніт (з підтримкою обох форматів)
+let currentShopUnit = null;
+
+// 1. Шукаємо за нормалізованим ключем
+const normalizedKey = normalizeBaseUnitKey(`${raceKey}:${unitType}`);
+currentShopUnit = player.availableUnits.find(u => 
+    normalizeBaseUnitKey(u.baseUnitKey) === normalizedKey
+);
+
+// 2. Якщо не знайшли, шукаємо за конвертованим типом
+if (!currentShopUnit && actualUnitType !== unitType) {
+    const actualNormalizedKey = normalizeBaseUnitKey(`${raceKey}:${actualUnitType}`);
+    currentShopUnit = player.availableUnits.find(u => 
+        normalizeBaseUnitKey(u.baseUnitKey) === actualNormalizedKey
+    );
+}
+
+// 3. Якщо все ще не знайшли, шукаємо за будь-яким співпадінням
+if (!currentShopUnit) {
+    currentShopUnit = player.availableUnits.find(u => {
+        const uType = window.getUnitType ? window.getUnitType(u) : null;
+        return uType === unitType || uType === actualUnitType;
+    });
+}
 
 if (!currentShopUnit) {
-    // Спробуємо знайти за конвертованим типом
-    const actualBaseUnitKey = `${raceKey}:${actualUnitType}`; // orcs:support
-    currentShopUnit = player.availableUnits.find(u => u.baseUnitKey === actualBaseUnitKey);
-    
-    if (!currentShopUnit) {
-        console.error(`❌ Магазинний юніт не знайдений за baseUnitKey: ${baseUnitKey} або ${actualBaseUnitKey}`);
-        return false;
-    }
+    console.error(`❌ Магазинний юніт не знайдений для: ${unitType}`);
+    return false;
 }
 
 // Знаходимо правильний індекс після пошуку
@@ -543,7 +639,7 @@ function upgradeAllUnitsOfType(playerIndex, unitType, unitIndex, manaKey = unitT
     let upgradedCount = 0;
     
     unitsOnMap.forEach((unit, index) => {
-        if (unit.playerIndex === playerIndex && unit.baseUnitKey === shopUnit.baseUnitKey) {
+        if (unit.playerIndex === playerIndex && normalizeBaseUnitKey(unit.baseUnitKey) === normalizeBaseUnitKey(shopUnit.baseUnitKey)) {
             console.log(`✅ [UPGRADE_ALL] Знайдено відповідний юніт на полі: ${unit.name}`);
             
             // Зберігаємо стан руху/атаки

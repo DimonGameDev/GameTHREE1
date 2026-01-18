@@ -11,20 +11,19 @@ class Ability {
         this.healAmount = customValues.power;
       }
       
-      // Для аур
       if (this.actionType === "aura") {
         switch (this.type) {
           case "armor":
-            this.armorBonus = customValues.power;
+            this.armorBonus = customValues.power !== undefined ? customValues.power : (this.armorBonus || 0);
             break;
           case "attack":
-            this.attackBonus = customValues.power;
+            this.attackBonus = customValues.power !== undefined ? customValues.power : (this.attackBonus || 0);
             break;
           case "step":
-            this.stepBonus = customValues.power;
+            this.stepBonus = customValues.power !== undefined ? customValues.power : (this.stepBonus || 0);
             break;
           case "hp":
-            this.healAmount = customValues.power;
+            this.healAmount = customValues.power !== undefined ? customValues.power : (this.healAmount || 0);
             break;
           case "mixed":
             if (typeof customValues.power === 'object') {
@@ -477,6 +476,7 @@ applyDebuff(caster, target) {
       const activePlayers = window.players ? window.players.length : 4;
       const effect = {
         source: source.id,
+        sourceKey: source.baseUnitKey || `${source.race}:${source.role}`, // НОВЕ ПОЛЕ
         sourceName: source.name,
         abilityName: this.name,
         duration: 1,
@@ -487,16 +487,16 @@ applyDebuff(caster, target) {
       // Додаємо конкретні значення залежно від типу
       switch (this.type) {
         case "armor":
-          effect.armorBonus = this.power || this.armorBonus || 0;  // ← Використовуємо power!
+          effect.armorBonus = this.armorBonus || this.power || 0;  // ← Спочатку armorBonus, потім power!
           break;
         case "attack":
-          effect.attackBonus = this.power || this.attackBonus || 0; // ← Використовуємо power!
+          effect.attackBonus = this.attackBonus || this.power || 0; // ← Спочатку attackBonus, потім power!
           break;
         case "step":
-          effect.stepBonus = this.power || this.stepBonus || 0;     // ← Використовуємо power!
+          effect.stepBonus = this.stepBonus || this.power || 0;     // ← Спочатку stepBonus, потім power!
           break;
         case "hp":
-          effect.healAmount = this.power || this.healAmount || 0;   // ← Використовуємо power!
+          effect.healAmount = this.healAmount || this.power || 0;   // ← Спочатку healAmount, потім power!
           break;
         case "mixed":
           effect.attackBoost = this.attackBoost || 0;
@@ -512,10 +512,11 @@ applyDebuff(caster, target) {
       createBuffEffect(source) {
         const effect = {
           source: source.id,
+          sourceKey: source.baseUnitKey || `${source.race}:${source.role}`, // НОВЕ ПОЛЕ
           sourceName: source.name,
           abilityName: this.name,
           duration: this.duration || 1,
-          appliedByPlayerIndex: source.playerIndex, // 🔴 ДОДАТИ: Хто наклав ефект
+          appliedByPlayerIndex: source.playerIndex,
           type: this.type
         };
         
@@ -547,12 +548,13 @@ createControlEffect(source) {
   
   const effect = {
     source: source.id,
+    sourceKey: source.baseUnitKey || `${source.race}:${source.role}`, // НОВЕ ПОЛЕ
     sourceName: source.name,
     abilityName: this.name,
-    duration: this.duration || 1, // Тривалість в ходах
-    appliedByPlayerIndex: source.playerIndex, // Хто наклав ефект
+    duration: this.duration || 1,
+    appliedByPlayerIndex: source.playerIndex,
     type: "control",
-    effectType: this.effect  // immobilize, stun, etc.
+    effectType: this.effect
   };
   
   // 🔴 ДОДАТИ: Розраховуємо expiresOnRound
@@ -577,12 +579,13 @@ createControlEffect(source) {
       
       const effect = {
         source: source.id,
+        sourceKey: source.baseUnitKey || `${source.race}:${source.role}`, // НОВЕ ПОЛЕ
         sourceName: source.name,
         abilityName: this.name,
         duration: this.duration || 1,
         type: "debuff",
         effectType: this.effect,
-    appliedByPlayerIndex: source.playerIndex, // 🔴 ДОДАТИ: Хто наклав ефект
+    appliedByPlayerIndex: source.playerIndex,
       };
       
       // 🔴 ДОДАТИ: Розраховуємо expiresOnRound
@@ -607,35 +610,35 @@ createControlEffect(source) {
     // Додати тимчасовий ефект юніту
    
     addTemporaryEffect(unit, effect) {
-    if (!unit.activeEffects) {
-        unit.activeEffects = [];
+      if (!unit.activeEffects) {
+          unit.activeEffects = [];
+      }
+      
+      // Перевіряємо чи вже є такий ефект за sourceKey або source
+      const alreadyHasEffect = unit.activeEffects.some(existingEffect => 
+          existingEffect.abilityName === effect.abilityName && 
+          (existingEffect.source === effect.source || existingEffect.sourceKey === effect.sourceKey)
+      );
+      
+      if (alreadyHasEffect) {
+          console.log(`⏭️ ${unit.name} вже має ефект "${effect.abilityName}" від юніта ${effect.source}`);
+          return;
+      }
+      
+      // Додаємо ефект
+      unit.activeEffects.push(effect);
+      console.log(`✨ ${unit.name} отримав ефект "${effect.abilityName}"`);
+      
+      // Перераховуємо стати
+      if (window.recalcUnitStats) {
+          window.recalcUnitStats(unit);
+      } else {
+          console.error('❌ recalcUnitStats не знайдено!');
+      }
+      
+      // Показуємо візуальний ефект
+      this.showAuraEffect(unit, effect.type);
     }
-    
-    // Перевіряємо чи вже є такий ефект
-    const alreadyHasEffect = unit.activeEffects.some(existingEffect => 
-        existingEffect.abilityName === effect.abilityName && 
-        existingEffect.source === effect.source
-    );
-    
-    if (alreadyHasEffect) {
-        console.log(`⏭️ ${unit.name} вже має ефект "${effect.abilityName}" від юніта ${effect.source}`);
-        return;
-    }
-    
-    // Додаємо ефект
-    unit.activeEffects.push(effect);
-    console.log(`✨ ${unit.name} отримав ефект "${effect.abilityName}"`);
-    
-    // Перераховуємо стати
-    if (window.recalcUnitStats) {
-        window.recalcUnitStats(unit);
-    } else {
-        console.error('❌ recalcUnitStats не знайдено!');
-    }
-    
-    // Показуємо візуальний ефект
-    this.showAuraEffect(unit, effect.type);
-  }
 }
 
 // Експортуємо клас глобально

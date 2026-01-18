@@ -35,38 +35,66 @@ function upgradeUnit(unit) {
     
     // Створюємо прокачаного юніта
     const upgradedUnit = {
-        ...nextLevel,
+        ...nextLevelData,
         x: unit.x,
         y: unit.y,
-        newhp: Math.min((unit.newhp || unit.hp) + 50, nextLevel.hp),
+        newhp: Math.min((unit.newhp || unit.hp) + 50, nextLevelData.hp),
         playerIndex: unit.playerIndex,
         moved: unit.moved,
         attacked: unit.attacked,
         id: unit.id,
-        effects: unit.effects || []
+        effects: unit.effects || [],
+        // Додаємо abilities з unitData
+        abilities: unitData.abilities ? [...unitData.abilities] : [],
+        baseUnitKey: unit.baseUnitKey,
+        level: nextLevelNum
     };
     
-    // Замінюємо юніта на карті
-    const replaced = replaceUnit(unit.id, upgradedUnit);
-    
-    if (!replaced) {
-        console.error('❌ Не вдалося замінити юніта на карті');
-        // Повертаємо золото назад
-        currentPlayer.gold += unit.upgradeCost;
-        if (typeof goldNumber !== 'undefined' && goldNumber) {
-            goldNumber.innerText = currentPlayer.gold;
-        }
-        return;
+    // Створюємо abilityInstances
+    if (window.Ability && window.abilities && upgradedUnit.abilities) {
+        upgradedUnit.abilityInstances = [];
+        const oldAbilityInstances = unit.abilityInstances || [];
+        
+        upgradedUnit.abilities.forEach(abilityRef => {
+            const abilityTemplate = window.abilities[abilityRef.key];
+            if (abilityTemplate) {
+                const fullTemplate = {
+                    ...abilityTemplate,
+                    power: abilityRef.power || abilityRef.value || 0
+                };
+                try {
+                    const abilityInstance = new window.Ability(fullTemplate);
+                    
+                    // Переносимо cooldown зі старих здібностей
+                    const oldAbility = oldAbilityInstances.find(a => 
+                        a.name === abilityInstance.name
+                    );
+                    if (oldAbility && oldAbility.currentCooldown) {
+                        abilityInstance.currentCooldown = oldAbility.currentCooldown;
+                    }
+                    
+                    upgradedUnit.abilityInstances.push(abilityInstance);
+                } catch (error) {
+                    console.error('❌ Помилка створення здібності:', error);
+                }
+            }
+        });
     }
     
-    // Оновлюємо магазин гравця
-    updatePlayerAvailableUnit(
-        unit.playerIndex, 
-        unit.baseUnitKey, 
-        nextLevel
-    );
-    
-    alert(`✅ ${nextLevel.name} прокачано до ${nextLevel.level} рівня!`);
+    // Оновлюємо source в ефектах інших юнітів
+    if (window.unitsOnMap) {
+        window.unitsOnMap.forEach(otherUnit => {
+            if (!otherUnit.activeEffects) return;
+            
+            otherUnit.activeEffects.forEach(effect => {
+                if (effect.source === unit.id) {
+                    effect.source = upgradedUnit.id;
+                }
+            });
+        });
+    }
+
+    return upgradedUnit;
 }
 
 /**

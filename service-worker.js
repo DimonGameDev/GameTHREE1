@@ -1,4 +1,4 @@
-const CACHE_NAME = 'version-of-war-v1.0.70';
+const CACHE_NAME = 'version-of-war-v1.0.71';
 
 // Файли які кешуються при встановленні
 const urlsToCache = [

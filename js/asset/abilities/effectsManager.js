@@ -182,44 +182,44 @@ console.log('🔍 ability об\'єкт:', {
   
   // Видалити ефект аури
   static removeAuraEffect(unit, ability, sourceUnit) {
-      if (!unit.activeEffects) return;
-      
-      const effectIndex = unit.activeEffects.findIndex(e => 
-          e.type === ability.type && 
-          e.source === sourceUnit.id &&
-          e.abilityName === ability.name
-      );
-      
-      if (effectIndex >= 0) {
-          unit.activeEffects.splice(effectIndex, 1);
-          console.log(`🧹 Видалено ауру "${ability.name}" з ${unit.name}`);
-          window.recalcUnitStats(unit);
-      }
-  }
+    if (!unit.activeEffects) return;
+    
+    const effectIndex = unit.activeEffects.findIndex(e => 
+        e.type === ability.type && 
+        (e.source === sourceUnit.id || e.sourceKey === (sourceUnit.baseUnitKey || `${sourceUnit.race}:${sourceUnit.role}`)) &&
+        e.abilityName === ability.name
+    );
+    
+    if (effectIndex >= 0) {
+        unit.activeEffects.splice(effectIndex, 1);
+        console.log(`🧹 Видалено ауру "${ability.name}" з ${unit.name}`);
+        window.recalcUnitStats(unit);
+    }
+}
   
   // Очистити застарілі аури
   static cleanupAuraEffects(ability, sourceUnit, allUnits) {
-      allUnits.forEach(unit => {
-          if (unit.id === sourceUnit.id) return;
-          
-          // Знаходимо аури від цього sourceUnit
-          const auraEffects = unit.activeEffects?.filter(e => 
-              e.type === ability.type && 
-              e.source === sourceUnit.id &&
-              e.abilityName === ability.name
-          );
-          
-          if (!auraEffects || auraEffects.length === 0) return;
-          
-          // Перевіряємо чи юніт ще в радіусі
-          const distance = Math.abs(sourceUnit.x - unit.x) + Math.abs(sourceUnit.y - unit.y);
-          
-          if (distance > ability.radius) {
-              // Видаляємо ауру
-              this.removeAuraEffect(unit, ability, sourceUnit);
-          }
-      });
-  }
+    allUnits.forEach(unit => {
+        if (unit.id === sourceUnit.id) return;
+        
+        // Знаходимо аури від цього sourceUnit за sourceKey або source
+        const auraEffects = unit.activeEffects?.filter(e => 
+            e.type === ability.type && 
+            (e.source === sourceUnit.id || e.sourceKey === (sourceUnit.baseUnitKey || `${sourceUnit.race}:${sourceUnit.role}`)) &&
+            e.abilityName === ability.name
+        );
+        
+        if (!auraEffects || auraEffects.length === 0) return;
+        
+        // Перевіряємо чи юніт ще в радіусі
+        const distance = Math.abs(sourceUnit.x - unit.x) + Math.abs(sourceUnit.y - unit.y);
+        
+        if (distance > ability.radius) {
+            // Видаляємо ауру
+            this.removeAuraEffect(unit, ability, sourceUnit);
+        }
+    });
+}
     // Замінити весь метод applyAllAuras в effectsManager.js
     // Застосувати всі аури (тільки при завантаженні гри)
     static applyAllAuras() {
@@ -353,38 +353,81 @@ static removeEffect(unit, effect) {
 
 // Додати після removeEffect() (після рядка 231)
 static getBaseAttackFromTemplate(unit) {
-  // Шукаємо шаблон юніта
-  if (window.unitsRegistry) {
-    const unitKey = unit.baseUnitKey || unit.unitId;
-    const template = window.unitsRegistry[unitKey];
-      if (template) {
-          console.log(`🔍 Знайдено шаблон для ${unit.name}: атака=${template.attack}`);
-          return template.attack;
-      }
+    // Шукаємо шаблон юніта
+    if (window.unitsRegistry) {
+      const unitKey = unit.baseUnitKey || unit.unitId;
+      const template = window.unitsRegistry[unitKey];
+        if (template) {
+            // Перевіряємо нову структуру з levels
+            if (template.levels) {
+                const level = unit.level || 1;
+                const levelData = template.levels[level];
+                if (levelData && levelData.attack !== undefined) {
+                    console.log(`🔍 Знайдено шаблон для ${unit.name} рівень ${level}: атака=${levelData.attack}`);
+                    return levelData.attack;
+                }
+            }
+            // Запасний варіант для старої структури
+            if (template.attack !== undefined) {
+                console.log(`🔍 Знайдено шаблон для ${unit.name}: атака=${template.attack} (без levels)`);
+                return template.attack;
+            }
+        }
+    }
+    
+    // Для героїв
+    if (unit.isHero && unit.heroTemplateId && window.heroes) {
+        const heroTemplate = window.heroes[unit.heroTemplateId - 1];
+        if (heroTemplate) {
+            console.log(`🔍 Знайдено шаблон героя для ${unit.name}: атака=${heroTemplate.attack}`);
+            return heroTemplate.attack;
+        }
+    }
+    
+    console.log(`⚠️ Не знайдено шаблон для ${unit.name}`);
+    return undefined;
   }
-  
-  // Для героїв
-  if (unit.isHero && unit.heroTemplateId && window.heroes) {
-      const heroTemplate = window.heroes[unit.heroTemplateId - 1];
-      if (heroTemplate) {
-          console.log(`🔍 Знайдено шаблон героя для ${unit.name}: атака=${heroTemplate.attack}`);
-          return heroTemplate.attack;
-      }
-  }
-  
-  console.log(`⚠️ Не знайдено шаблон для ${unit.name}`);
-  return undefined;
-}
     
     // Перевірити чи має юніт хоча б одну ауру
     static hasAuraAbility(unit) {
-      if (!unit.abilityInstances) return false;
-      return unit.abilityInstances.some(ability => 
-        ability.actionType === "aura" && ability.mode === "passive"
-      );
+        if (!unit.abilityInstances) return false;
+        return unit.abilityInstances.some(ability => 
+          ability.actionType === "aura" && ability.mode === "passive"
+        );
+      }
+  
+      // Очистити ефекти від померлого юніта
+      static cleanupEffectsFromDeadUnit(deadUnitId, deadUnitBaseKey) {
+          if (!window.unitsOnMap) return;
+          
+          let cleanedCount = 0;
+          
+          window.unitsOnMap.forEach(unit => {
+              if (!unit.activeEffects || unit.activeEffects.length === 0) return;
+              
+              const initialLength = unit.activeEffects.length;
+              
+              // Видаляємо ефекти за source або sourceKey
+              unit.activeEffects = unit.activeEffects.filter(effect => 
+                  effect.source !== deadUnitId && 
+                  effect.sourceKey !== deadUnitBaseKey
+              );
+              
+              if (unit.activeEffects.length !== initialLength) {
+                  cleanedCount += (initialLength - unit.activeEffects.length);
+                  console.log(`🧹 Видалено ефекти від померлого юніта з ${unit.name}`);
+                  
+                  if (window.recalcUnitStats) {
+                      window.recalcUnitStats(unit);
+                  }
+              }
+          });
+          
+          if (cleanedCount > 0) {
+              console.log(`✅ Очищено ${cleanedCount} ефектів від померлого юніта`);
+          }
+      }
     }
-  }
-
 
 
   
@@ -520,6 +563,10 @@ if (window.unitsOnMap && window.unitsOnMap.length > 0) {
       }
   }, 1000);
 }
+
+
+
+// console.log('✅ effectsManager.js завантажено');
 
 // Додати в кінець effectsManager.js
 console.log('✅ effectsManager.js завантажено');

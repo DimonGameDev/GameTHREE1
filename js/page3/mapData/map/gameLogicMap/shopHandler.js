@@ -119,7 +119,11 @@ function fillShopWithUnits() {
         console.error('❌ Немає доступних юнітів для магазину!');
         return;
     }
-    
+    console.log('🔍 Порядок юнітів для гравця:', currentPlayerIndex);
+    console.log('🔍 Раса:', currentPlayer.race);
+    units.forEach((unit, index) => {
+        console.log(`  ${index}: ${unit.name} (role: ${unit.role}, baseUnitKey: ${unit.baseUnitKey})`);
+    });
    // ДОДАТИ ТУТ:
 // Сортуємо за shopIndex перед рендером
     // ДОДАТИ ТУТ:

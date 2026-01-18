@@ -181,7 +181,7 @@ window.unitsRegistry["orcs:mag"] = {
   },
 
   abilities: [
-    { key: "attackAura", power: 3 }
+    { key: "hasteAlly", power: 1 }
   ]
 };
  

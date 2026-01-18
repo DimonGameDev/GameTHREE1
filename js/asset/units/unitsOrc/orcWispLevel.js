@@ -1,5 +1,5 @@
 // js/asset/units/unitsBeetle/beetleWispLevel.js
-let orcWispImg = "../../img/units/orc/orcWisp/blue/wispBlue.png";
+let orcWispImg = "../../img/units/orc/orcWisp/blue/orcWispBlue.png";
 
 // let orcWispLevels = {
 //     level1: {
@@ -201,6 +201,8 @@ window.unitsRegistry["orcs:wisp"] = {
   },
 
   abilities: [
-    // { key: "arrowShot", power: 200}
+    { key: "supportAura", 
+      power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
+    }
   ]
 };

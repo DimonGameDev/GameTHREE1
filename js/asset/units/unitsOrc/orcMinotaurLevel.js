@@ -157,7 +157,7 @@ window.unitsRegistry = window.unitsRegistry || {};
 window.unitsRegistry["orcs:minotaur"] = {
   baseUnitKey: "orcs:minotaur",
   race: "orc",
-  role: "warrior",
+  role: "specialist",
   name: "Мінотавр",
   img: "../../img/units/orc/orcMinotaur/blue/orcMinotaurBlue.png",
 

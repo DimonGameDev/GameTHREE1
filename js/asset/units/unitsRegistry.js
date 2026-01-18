@@ -90,9 +90,18 @@ window.updateRacesFromRegistry = function() {
         // Сортуємо
         const typeOrder = ['warrior', 'archer', 'shaman', 'horse', 'horseman', 'catapult', 'pikener', 'support', 'specialist', 'mage', 'wisp'];
         raceUnits.sort((a, b) => {
+            // wisp завжди в кінці
+            if (a.role === 'wisp') return 1;
+            if (b.role === 'wisp') return -1;
+            
             const indexA = typeOrder.indexOf(a.role);
             const indexB = typeOrder.indexOf(b.role);
-            return indexA - indexB;
+            
+            // Якщо role не знайдено - ставимо в кінець
+            const aIndex = indexA !== -1 ? indexA : 999;
+            const bIndex = indexB !== -1 ? indexB : 999;
+            
+            return aIndex - bIndex;
         });
         
         window.races[raceKey] = raceUnits;

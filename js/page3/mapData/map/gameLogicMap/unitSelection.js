@@ -870,37 +870,58 @@ const auraArmorBoost = uniqueAuraEffects.reduce((sum, e) => {
                const getBaseAttackFromTemplate = (unit) => {
                 if (unit.baseUnitKey && window.unitsRegistry) {
                     const template = window.unitsRegistry[unit.baseUnitKey];
-        if (template) {
-            console.log(`🔍 Шаблон для ${unit.name}: атака=${template.attack}`);
-            return template.attack;
-        }
-    }
-    if (unit.isHero && unit.heroTemplateId && window.heroes) {
-        const heroTemplate = window.heroes[unit.heroTemplateId - 1];
-        if (heroTemplate) {
-            console.log(`🔍 Шаблон героя для ${unit.name}: атака=${heroTemplate.attack}`);
-            return heroTemplate.attack;
-        }
-    }
-    console.log(`⚠️ Не знайдено шаблон для ${unit.name}`);
-    return unit.attack || 0;
-};
+                    if (template && template.levels) {
+                        // Отримуємо атаку для поточного рівня
+                        const level = unit.level || 1;
+                        const levelData = template.levels[level];
+                        if (levelData && levelData.attack !== undefined) {
+                            console.log(`🔍 Шаблон для ${unit.name} рівень ${level}: атака=${levelData.attack}`);
+                            return levelData.attack;
+                        }
+                    }
+                    // Запасний варіант: якщо немає levels, шукаємо безпосередньо в template
+                    if (template && template.attack !== undefined) {
+                        console.log(`🔍 Шаблон для ${unit.name}: атака=${template.attack} (без levels)`);
+                        return template.attack;
+                    }
+                }
+                // Для героїв
+                if (unit.isHero && unit.heroTemplateId && window.heroes) {
+                    const heroTemplate = window.heroes[unit.heroTemplateId - 1];
+                    if (heroTemplate) {
+                        console.log(`🔍 Шаблон героя для ${unit.name}: атака=${heroTemplate.attack}`);
+                        return heroTemplate.attack;
+                    }
+                }
+                console.log(`⚠️ Не знайдено шаблон для ${unit.name}, використовую unit.attack=${unit.attack}`);
+                return unit.attack; // Запасний варіант
+            };
 
-const getBaseArmorFromTemplate = (unit) => {
-    if (unit.baseUnitKey && window.unitsRegistry) {
-        const template = window.unitsRegistry[unit.baseUnitKey];
-        if (template) return template.armor;
-    }
-    if (unit.isHero && unit.heroTemplateId && window.heroes) {
-        const heroTemplate = window.heroes[unit.heroTemplateId - 1];
-        if (heroTemplate) return heroTemplate.armor;
-    }
-    return unit.armor || 0;
-}; 
-                console.log('🔍 DEBUG: Бонуси від аур:', { auraAttackBoost, auraArmorBoost });
-        // Додати цей код ПЕРЕД рядком з "Показуємо атаку як 23(+3)":
-// Після рядка: console.log(`🔍 ПЕРЕВІРКА АТАКИ: ${unit.name}`, {...});
-// Додати:
+            const getBaseArmorFromTemplate = (unit) => {
+                if (unit.baseUnitKey && window.unitsRegistry) {
+                    const template = window.unitsRegistry[unit.baseUnitKey];
+                    if (template && template.levels) {
+                        // Отримуємо броню для поточного рівня
+                        const level = unit.level || 1;
+                        const levelData = template.levels[level];
+                        if (levelData && levelData.armor !== undefined) {
+                            console.log(`🔍 Шаблон для ${unit.name} рівень ${level}: броня=${levelData.armor}`);
+                            return levelData.armor;
+                        }
+                    }
+                    // Запасний варіант: якщо немає levels, шукаємо безпосередньо в template
+                    if (template && template.armor !== undefined) {
+                        console.log(`🔍 Шаблон для ${unit.name}: броня=${template.armor} (без levels)`);
+                        return template.armor;
+                    }
+                }
+                if (unit.isHero && unit.heroTemplateId && window.heroes) {
+                    const heroTemplate = window.heroes[unit.heroTemplateId - 1];
+                    if (heroTemplate) return heroTemplate.armor;
+                }
+                console.log(`⚠️ Не знайдено шаблон броні для ${unit.name}, використовую unit.armor=${unit.armor}`);
+                return unit.armor || 0;
+            };
 
 console.log(`🔍 ДЕТАЛЬНА ПЕРЕВІРКА: ${unit.name}`, {
     unitAttack: unit.attack,

@@ -170,8 +170,8 @@ let orcHorseDescr = "Кавард - це загартований воїн як�
 // units/orcs/horses.js
 window.unitsRegistry = window.unitsRegistry || {};
 
-window.unitsRegistry["orcs:horses"] = {
-  baseUnitKey: "orcs:horses",
+window.unitsRegistry["orcs:horse"] = {
+  baseUnitKey: "orcs:horse",
   race: "orc",
   role: "horse",
   name: "Кінь",

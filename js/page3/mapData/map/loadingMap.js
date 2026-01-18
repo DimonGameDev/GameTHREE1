@@ -16,57 +16,87 @@ function getRaceUnits(raceKey) {
     const raceUnits = [];
     const typeOrder = ['warrior', 'archer', 'shaman', 'horse', 'horseman', 'catapult', 'pikener', 'support', 'mage', 'specialist', 'wisp'];
     
+    // Мапа для конвертації ключів рас (новий → старий)
+        // Мапа для конвертації ключів рас (новий → старий)
+        const raceKeyMap = {
+            'orcs': ['orcs'],
+            'elves': ['elves', 'elf'],
+            'humans': ['humans', 'pipl'],
+            'undead': ['undead', 'beetle'], // Додано beetle
+            'demons': ['demons', 'demon']
+        };
+    
+    // Отримуємо можливі префікси для цієї раси
+    const possiblePrefixes = raceKeyMap[raceKey] || [raceKey];
+    
+    // Список псевдонімів, які потрібно пропустити
+    const specialAliases = [
+        'orcs:specialist', 'orcs:support', 'orcs:mage',
+        'elves:specialist', 'elves:support',
+        'humans:specialist', 'humans:support', 
+        'demons:specialist', 'demons:support',
+        'undead:specialist', 'undead:support'
+    ];
+    
     // Проходимо по всіх зареєстрованих юнітах
-        // Список псевдонімів, які потрібно пропустити
-        const specialAliases = [
-            'orcs:specialist', 'orcs:support', 'orcs:mage',
-            'elves:specialist', 'elves:support',
-            'humans:specialist', 'humans:support', 
-            'demons:specialist', 'demons:support',
-            'undead:specialist', 'undead:support'
-        ];
-        
-        // Проходимо по всіх зареєстрованих юнітах
-        for (const [key, unitData] of Object.entries(window.unitsRegistry)) {
-            // Пропускаємо старі unitId (які містять тільки цифри)
-            if (key.includes(':')) {
-                // Пропускаємо псевдоніми для спеціальних юнітів
-                if (specialAliases.includes(key)) {
-                    continue;
-                }
-                
-                const [unitRace, unitType] = key.split(':');
-                
-                if (unitRace === raceKey && unitData.levels && unitData.levels[1]) {
-                    // Беремо юніт 1 рівня
-                    const level1Unit = {
-                        ...unitData.levels[1],
-                        unitId: `${raceKey}:${unitType}:1`,
-                        baseUnitKey: key,
-                        name: unitData.name,
-                        img: unitData.img,
-                        race: unitData.race,
-                        role: unitData.role,
-                        level: 1,
-                        abilities: unitData.abilities ? [...unitData.abilities] : []
-                    };
-                    raceUnits.push(level1Unit);
-                }
+    for (const [key, unitData] of Object.entries(window.unitsRegistry)) {
+        // Пропускаємо старі unitId (які містять тільки цифри)
+        if (key.includes(':')) {
+            // Пропускаємо псевдоніми для спеціальних юнітів
+            if (specialAliases.includes(key)) {
+                continue;
+            }
+            
+            const [unitRace, unitType] = key.split(':');
+            
+            // Перевіряємо чи підходить цей юніт за расою (з урахуванням обох форматів)
+            const matchesRace = possiblePrefixes.some(prefix => unitRace === prefix);
+            
+            if (matchesRace && unitData.levels && unitData.levels[1]) {
+                // Беремо юніт 1 рівня
+                const level1Unit = {
+                    ...unitData.levels[1],
+                    unitId: `${raceKey}:${unitType}:1`,
+                    baseUnitKey: key,
+                    name: unitData.name,
+                    img: unitData.img,
+                    race: unitData.race,
+                    role: unitData.role,
+                    level: 1,
+                    abilities: unitData.abilities ? [...unitData.abilities] : []
+                };
+                raceUnits.push(level1Unit);
             }
         }
-    
-          // Сортуємо юніти за typeOrder
-    raceUnits.sort((a, b) => {
-        const indexA = typeOrder.indexOf(a.role);
-        const indexB = typeOrder.indexOf(b.role);
+    }
+        // Діагностика перед сортуванням
+        console.log(`🔍 Перед сортуванням для ${raceKey}:`);
+        raceUnits.forEach((unit, i) => {
+            console.log(`  ${i}: ${unit.name} - role: "${unit.role}"`);
+        });
         
-        // Якщо role не знайдено в typeOrder - ставимо в кінець
-        const aIndex = indexA !== -1 ? indexA : 999;
-        const bIndex = indexB !== -1 ? indexB : 999;
-        
-        return aIndex - bIndex;
-    });
-    
+        // Сортуємо юніти за typeOrder
+    // Сортуємо юніти за typeOrder
+        // Сортуємо юніти: спочатку стандартні за typeOrder, потім спеціальні, wisp завжди в кінці
+        raceUnits.sort((a, b) => {
+            // wisp завжди в кінці
+            if (a.role === 'wisp') return 1;
+            if (b.role === 'wisp') return -1;
+            
+            const indexA = typeOrder.indexOf(a.role);
+            const indexB = typeOrder.indexOf(b.role);
+            
+            // Якщо role не знайдено в typeOrder - це спеціальний юніт, ставимо в кінець
+            const aIndex = indexA !== -1 ? indexA : 999;
+            const bIndex = indexB !== -1 ? indexB : 999;
+            
+            return aIndex - bIndex;
+        });
+        // Діагностика після сортування
+        console.log(`✅ Після сортування для ${raceKey}:`);
+        raceUnits.forEach((unit, i) => {
+            console.log(`  ${i}: ${unit.name} - role: "${unit.role}", typeOrder index: ${typeOrder.indexOf(unit.role)}`);
+        });
     return raceUnits;
 }
 
@@ -159,7 +189,7 @@ if (loadSlotId) {
                     // console.log(`⚠️ Немає збережених availableUnits, генерую з базових шаблонів для гравця ${player.originalIndex + 1}`);
                     player.availableUnits = [...raceUnitsList];
                     player.availableUnits.sort((a, b) => {
-                        const specialUnits = ['minotaur', 'bear', 'mag', 'witch', 'golem', 'werewolf', 'engineer', 'cerberus', 'spirit', 'scarab', 'uterus', 'darkelf', 'assassin', 'supervisor', 'armored'];
+                        const specialUnits = ['minotaur', 'bear', 'mag', 'witch', 'golem', 'werewolf', 'engineer', 'cerberus', 'spirit', 'scarab', 'uterus', 'darkelf', 'assassin', 'supervisor', 'armored', 'wisp'];
                         
                         const aIsSpecial = specialUnits.some(special => a.baseUnitKey.includes(special));
                         const bIsSpecial = specialUnits.some(special => b.baseUnitKey.includes(special));
@@ -904,7 +934,7 @@ const allPlayers = gameSettings.players.map((p, originalIndex) => {
             
             // Сортуємо спеціальні юніти в кінець (як для збереженої гри)
             units.sort((a, b) => {
-                const specialUnits = ['minotaur', 'bear', 'mag', 'witch', 'golem', 'werewolf', 'engineer', 'cerberus', 'spirit', 'scarab', 'uterus', 'darkelf', 'assassin', 'supervisor', 'armored'];
+                const specialUnits = ['minotaur', 'bear', 'mag', 'witch', 'golem', 'werewolf', 'engineer', 'cerberus', 'spirit', 'scarab', 'uterus', 'darkelf', 'assassin', 'supervisor', 'armored', 'wisp'];
                 
                 const aIsSpecial = specialUnits.some(special => a.baseUnitKey.includes(special));
                 const bIsSpecial = specialUnits.some(special => b.baseUnitKey.includes(special));
@@ -1410,4 +1440,4 @@ if (loadedFromSave) {
     }, 500);
 }
 
-console.log("лоадінгОМ13,13,13,13,13,13,");
+console.log("лоадінгОМ14,14,14");

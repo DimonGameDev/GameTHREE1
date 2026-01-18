@@ -798,10 +798,85 @@ window.getUnitType = function(unit) {
     // Отримуємо тип з baseUnitKey
     if (unit.baseUnitKey) {
         const parts = unit.baseUnitKey.split(':');
-        return parts.length > 1 ? parts[1] : null;
+        if (parts.length > 1) {
+            const unitType = parts[1];
+            
+            // Мапа спеціальних юнітів на стандартні типи
+            const specialUnitTypeMap = {
+                'bear': 'support',
+                'mag': 'mage', 
+                'minotaur': 'specialist',
+                'witch': 'specialist',
+                'golem': 'support',
+                'werewolf': 'specialist',
+                'engineer': 'support',
+                'cerberus': 'specialist',
+                'spirit': 'support',
+                'scarab': 'specialist',
+                'uterus': 'support',
+                'darkelf': 'specialist',
+                'assassin': 'specialist',
+                'supervisor': 'specialist',
+                'armored': 'specialist'
+            };
+            
+            // Якщо це спеціальний юніт, повертаємо стандартний тип
+            return specialUnitTypeMap[unitType] || unitType;
+        }
+        return null;
     }
     
-    // Якщо немає baseUnitKey, повертаємо null
+    // Якщо немає baseUnitKey, спробуємо отримати з unitId
+    if (unit.unitId) {
+        const parts = unit.unitId.split(':');
+        if (parts.length >= 2) {
+            const raceAndType = parts[0];
+            
+            // Конвертуємо старі формати рас
+                       // Конвертуємо старі формати рас
+                       const racePrefixMap = {
+                        'orc': 'orcs',
+                        'elf': 'elves',
+                        'pipl': 'humans',
+                        'undead': 'undead',
+                        'demon': 'demons',
+                        'beetle': 'undead' // Додано beetle
+                    };
+            
+            // Знаходимо расу
+            let foundRace = null;
+            for (const [oldRace, newRace] of Object.entries(racePrefixMap)) {
+                if (raceAndType.startsWith(oldRace)) {
+                    foundRace = newRace;
+                    break;
+                }
+            }
+            
+            if (foundRace) {
+                // Знаходимо тип
+                const typeMap = {
+                    '1': 'warrior',
+                    '2': 'archer',
+                    '3': 'shaman',
+                    '4': 'horse',
+                    '5': 'horseman',
+                    '6': 'catapult',
+                    '7': 'pikener',
+                    '8': 'support',
+                    '9': 'specialist',
+                    '10': 'mage',
+                    '11': 'wisp'
+                };
+                
+                const match = raceAndType.match(/\d+/);
+                if (match) {
+                    const typeCode = match[0];
+                    return typeMap[typeCode] || null;
+                }
+            }
+        }
+    }
+    
     return null;
 };
 

@@ -181,7 +181,7 @@ window.unitsRegistry["orcs:shaman"] = {
   },
 
   abilities: [
-    // { key: "arrowShot", power: 200}
+    { key: "allyHeal", power: 30 },
   ]
 };
   
