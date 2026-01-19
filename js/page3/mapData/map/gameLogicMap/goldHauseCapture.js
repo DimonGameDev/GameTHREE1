@@ -18,10 +18,15 @@ function canCaptureGoldHouse(unit) {
         return true;
     }
     
-    // 2. Для звичайних юнітів
+    // 2. Перевіряємо чи юніт має роль
+    if (unit.role) {
+        // Воїни можуть захоплювати, всі інші - ні
+        return unit.role === "warrior";
+    }
+    
+    // 3. Для сумісності зі старою системою (якщо немає role)
     if (!unit.unitId) return false;
     
-    // 3. Воїни можуть, Віспи не можуть
     const isWarrior = unit.unitId.endsWith('101');
     const isWisp = unit.unitId.endsWith('1101');
     

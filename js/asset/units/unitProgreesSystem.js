@@ -71,11 +71,44 @@ const STANDARD_UPGRADE_SYSTEM = {
                     console.log(`📊 [STANDARD] Оновлюю стати з реєстру:`, nextLevelStats);
                     
                     // Оновлюємо тільки стати, не перезаписуємо abilities та abilityInstances
-                    const statsToUpdate = { ...nextLevelStats };
-                    delete statsToUpdate.abilities; // Не перезаписуємо здібності
+                    // Оновлюємо тільки стати, не перезаписуємо abilities та abilityInstances
+const statsToUpdate = { ...nextLevelStats };
+delete statsToUpdate.abilities; // Не перезаписуємо здібності
+delete statsToUpdate.hp; // 🔴 ВАЖЛИВО: Не перезаписуємо hp!
+
+Object.assign(unit, statsToUpdate);
+
+// 🔴 Оновлюємо HP з новою логікою
+const newMaxHp = nextLevelStats.hp || nextLevelStats.maxHp || 100;
+const currentHp = unit.newhp !== undefined ? unit.newhp : unit.hp;
+const oldMaxHp = unit.maxHp || unit.hp || 100;
+
+// Якщо HP було повне - робимо повне, інакше зберігаємо поточне
+const wasFullHp = Math.abs(currentHp - oldMaxHp) < 0.1; // Перевірка на повне HP
+const newCurrentHp = wasFullHp ? newMaxHp : Math.min(currentHp, newMaxHp);
+
+unit.hp = newCurrentHp;
+unit.newhp = newCurrentHp;
+unit.maxHp = newMaxHp;
+
+console.log(`❤️ [STANDARD] Оновлено HP: ${newCurrentHp}/${newMaxHp} (було ${currentHp}/${oldMaxHp}, повне: ${wasFullHp})`);
+
+// 🔴 ДОДАТИ: Оновлюємо health bar
+if (window.updateUnitHealthBar) {
+    window.updateUnitHealthBar(unit);
+    console.log(`💚 [STANDARD] Оновлено health bar для ${unit.name}`);
+}
+
+if (!unit.baseStats) {
+    unit.baseStats = {};
+}
+unit.baseStats.attack = nextLevelStats.attack || 0;
+unit.baseStats.armor = nextLevelStats.armor || 0;
+unit.baseStats.step = nextLevelStats.step || 0;
+unit.baseStats.range = nextLevelStats.range || 0;
+unit.baseStats.maxHp = newMaxHp; // ← ТУТ ТЕЖ newMaxHp!
                     
-                    Object.assign(unit, statsToUpdate);
-                    
+                    console.log(`📊 [STANDARD] Оновлено baseStats:`, unit.baseStats);
                     // Оновлюємо здібності з unitData
                     if (unitData.abilities) {
                         unit.abilities = [...unitData.abilities];

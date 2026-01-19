@@ -27,7 +27,7 @@ class EffectsManager {
         });
         
         // 2. Оновлюємо аури інших юнітів на movedUnit
-        this.updateAurasForUnit(movedUnit);
+        // this.updateAurasForUnit(movedUnit);
     }
     
     // Застосувати одну ауру на всіх юнітів в радіусі
@@ -116,6 +116,12 @@ console.log('🔍 ability об\'єкт:', {
           
           // Перераховуємо стати
           window.recalcUnitStats(targetUnit);
+          
+          // 🔴 ДОДАТИ: Підсвічування юніта аурою
+          if (typeof ability.highlightUnitWithAura === 'function') {
+              ability.highlightUnitWithAura(targetUnit);
+          }
+          
       });
       
       // Видаляємо аури з юнітів, які вийшли з радіусу
@@ -144,11 +150,16 @@ console.log('🔍 ability об\'єкт:', {
                               (ability.targets === "allies" && targetUnit.playerIndex === sourceUnit.playerIndex) ||
                               (ability.targets === "enemies" && targetUnit.playerIndex !== sourceUnit.playerIndex);
                           
-                          if (isValidTarget) {
-                              // Додаємо/оновлюємо ауру
-                              const effect = ability.createAuraEffect(sourceUnit);
-                              this.addOrUpdateAuraEffect(targetUnit, effect);
-                          }
+                              if (isValidTarget) {
+                                // Додаємо/оновлюємо ауру
+                                const effect = ability.createAuraEffect(sourceUnit);
+                                this.addOrUpdateAuraEffect(targetUnit, effect);
+                                
+                                // 🔴 ДОДАТИ: Підсвічування юніта аурою
+                                if (typeof ability.highlightUnitWithAura === 'function') {
+                                    ability.highlightUnitWithAura(targetUnit);
+                                }
+                            }
                       } else {
                           // Видаляємо ауру якщо вийшли з радіусу
                           this.removeAuraEffect(targetUnit, ability, sourceUnit);
@@ -247,26 +258,20 @@ console.log('🔍 ability об\'єкт:', {
   }
 
     // Застосувати аури для нового юніта
-    static applyAurasForNewUnit(newUnit) {
-      if (!window.unitsOnMap) {
-          console.error('❌ unitsOnMap не знайдено');
-          return;
-      }
-      
-      console.log(`🔍 Застосування аур для нового юніта ${newUnit.name}`);
-      
-      // 1. Інші юніти впливають на нового
-      this.updateAurasForUnit(newUnit);
-      
-      // 2. Новий юніт впливає на інших (якщо має аури)
-      if (newUnit.abilityInstances && Array.isArray(newUnit.abilityInstances)) {
-          newUnit.abilityInstances.forEach(ability => {
-              if (ability.actionType === "aura" && ability.mode === "passive") {
-                  this.applySingleAura(ability, newUnit, window.unitsOnMap);
-              }
-          });
-      }
-  }
+        // Застосувати аури для нового юніта
+        static applyAurasForNewUnit(newUnit) {
+            if (!window.unitsOnMap) {
+                console.error('❌ unitsOnMap не знайдено');
+                return;
+            }
+            
+            console.log(`🔍 Застосування аур для нового юніта ${newUnit.name}`);
+            
+            // 🔴 ВИДАЛИТИ ВСЕ: Новий юніт НЕ отримує і НЕ застосовує аури при купівлі
+            // Аури застосовуються тільки після руху юніта
+            
+            console.log(`✅ ${newUnit.name} не отримує аур при купівлі (тільки при русі)`);
+        }
        
 
 
@@ -472,11 +477,29 @@ window.recalcUnitStats = function(unit) {
               case "step":
                   step += effect.stepBonus || 0;
                   break;
-              case "mixed":
-                  attack += effect.attackBoost || 0;
-                  armor += effect.armorBoost || 0;
-                  // hpRegenPercent обробляється окремо
-                  break;
+                  case "mixed":
+                    attack += effect.attackBoost || 0;
+                    armor += effect.armorBoost || 0;
+                    // hpRegenPercent обробляється окремо
+                    
+                    // 🔴 ДОДАТИ: Регенерація HP
+                    if (effect.hpRegenPercent > 0) {
+                        const oldHp = unit.newhp || unit.hp;
+                        const maxHp = unit.maxHp || unit.hp;
+                        const regenAmount = Math.floor(maxHp * (effect.hpRegenPercent / 100));
+                        const newHp = Math.min(maxHp, oldHp + regenAmount);
+                        
+                        if (newHp > oldHp) {
+                            unit.newhp = newHp;
+                            console.log(`💚 ${unit.name} регенерує HP від аури: ${oldHp} → ${newHp} HP (+${regenAmount})`);
+                            
+                            // Оновлюємо health bar
+                            if (typeof window.updateUnitHealthBar === 'function') {
+                                window.updateUnitHealthBar(unit);
+                            }
+                        }
+                    }
+                    break;
               case "control":
                   if (effect.effectType === "immobilize") {
                       step = Math.max(0, step - (effect.stepReduction || 999));
@@ -564,7 +587,43 @@ if (window.unitsOnMap && window.unitsOnMap.length > 0) {
   }, 1000);
 }
 
-
+// ДОДАТИ в кінець effectsManager.js (після рядка 556):
+window.updateUnitBaseStats = function(unit) {
+    if (!unit.baseStats) {
+        unit.baseStats = {};
+    }
+    
+    // Оновлюємо baseStats з поточних значень (без бонусів від аур)
+    const unitKey = unit.baseUnitKey || unit.unitId;
+    const template = window.unitsRegistry[unitKey];
+    
+    if (template && template.levels) {
+        const level = unit.level || 1;
+        const levelData = template.levels[level];
+        
+        if (levelData) {
+            unit.baseStats.attack = levelData.attack || 0;
+            unit.baseStats.armor = levelData.armor || 0;
+            unit.baseStats.step = levelData.step || 0;
+            unit.baseStats.range = levelData.range || 0;
+            unit.baseStats.maxHp = levelData.hp || levelData.maxHp || 100;
+            
+            console.log(`📊 Оновлено baseStats для ${unit.name} рівень ${level}:`, unit.baseStats);
+        }
+    } else {
+        // Запасний варіант
+        unit.baseStats.attack = unit.attack || 0;
+        unit.baseStats.armor = unit.armor || 0;
+        unit.baseStats.step = unit.step || 0;
+        unit.baseStats.range = unit.range || 0;
+        unit.baseStats.maxHp = unit.maxHp || unit.hp || 100;
+    }
+    
+    // Перераховуємо стати
+    if (window.recalcUnitStats) {
+        window.recalcUnitStats(unit);
+    }
+};
 
 // console.log('✅ effectsManager.js завантажено');
 

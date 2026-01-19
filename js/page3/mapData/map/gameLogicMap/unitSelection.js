@@ -786,14 +786,18 @@ if (daniUnitsArmor) {
     
     // Оновлюємо HP (здоров'я)
 // Оновлюємо HP (здоров'я)
+// Оновлюємо HP (здоров'я)
+// Оновлюємо HP (здоров'я)
 if (daniUnitsHp) {
     const currentHp = unit.newhp !== undefined ? unit.newhp : (unit.hp || unit.health || 0);
-    daniUnitsHp.innerText = currentHp;  // ✅ БЕЗ " /" - воно вже в HTML
+    daniUnitsHp.innerText = currentHp;
 }
 
 if (daniUnitsHpNew) {
-    const maxHp = unit.hp || unit.health || 0;
+    // 🔴 ВИПРАВЛЕННЯ: Спочатку maxHp, потім hp, потім health
+    const maxHp = unit.maxHp || (unit.hp && unit.hp > 100 ? unit.hp : 0) || unit.health || 0;
     daniUnitsHpNew.innerText = maxHp;
+    console.log(`❤️ Табло: maxHp = ${maxHp} (unit.maxHp=${unit.maxHp}, unit.hp=${unit.hp})`);
 }
     
     // Оновлюємо Attack (атака)

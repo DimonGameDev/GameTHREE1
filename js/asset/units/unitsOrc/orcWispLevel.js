@@ -190,8 +190,8 @@ window.unitsRegistry["orcs:wisp"] = {
   maxLevel: 8,
 
   levels: {
-    1: { hp: 1000, armor: 20, attack: 60, step: 6, range: 1, coin: 500, upgradeCost: 200 },
-    2: { hp: 1000, armor: 21, attack: 62, step: 4, range: 1, coin: 500, upgradeCost: 202 },
+    1: { hp: 1000, armor: 11, attack: 60, step: 6, range: 1, coin: 71, upgradeCost: 200 },
+    2: { hp: 1000, armor: 12, attack: 62, step: 4, range: 1, coin: 72, upgradeCost: 202 },
     3: { hp: 165, armor: 22, attack: 65, step: 4, range: 1, coin: 500, upgradeCost: 203 },
     4: { hp: 170, armor: 23, attack: 67, step: 4, range: 1, coin: 500, upgradeCost: 400 },
     5: { hp: 170, armor: 24, attack: 69, step: 4, range: 1, coin: 500, upgradeCost: 400 },
@@ -202,7 +202,7 @@ window.unitsRegistry["orcs:wisp"] = {
 
   abilities: [
     { key: "supportAura", 
-      power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
+      // power: { attackBoost: 11, armorBoost: 3, hpRegenPercent: 20 }
     }
   ]
 };

@@ -199,6 +199,8 @@ window.unitsRegistry["beetle:wisp"] = {
   },
 
   abilities: [
-    // { key: "arrowShot", power: 200}
+    { key: "supportAura", 
+      power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
+    }
   ]
 };

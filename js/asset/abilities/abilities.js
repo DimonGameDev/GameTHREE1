@@ -182,9 +182,9 @@ armorAura: {
     mode: "passive",               // 🟢 постійно діє
     actionType: "aura",
     type: "mixed",                 // Комбінований ефект (атака + броня + хп)
-    attackBoost: 5,         // Буде перезаписано через power
-    armorBoost: 3,                 // Буде перезаписано через power
-    hpRegenPercent: 10,            // Буде перезаписано через power
+    attackBoost: 7,         // Буде перезаписано через power
+    armorBoost: 5,                 // Буде перезаписано через power
+    hpRegenPercent: 20,            // Буде перезаписано через power
     radius: 2,                     // 2 клітинки навколо
     targets: "allies",             // Всі союзники
     duration: 1,                   // Діє 1 хід

@@ -33,22 +33,33 @@ function upgradeUnit(unit) {
         goldNumber.innerText = currentPlayer.gold;
     }
     
-    // Створюємо прокачаного юніта
-    const upgradedUnit = {
-        ...nextLevelData,
-        x: unit.x,
-        y: unit.y,
-        newhp: Math.min((unit.newhp || unit.hp) + 50, nextLevelData.hp),
-        playerIndex: unit.playerIndex,
-        moved: unit.moved,
-        attacked: unit.attacked,
-        id: unit.id,
-        effects: unit.effects || [],
-        // Додаємо abilities з unitData
-        abilities: unitData.abilities ? [...unitData.abilities] : [],
-        baseUnitKey: unit.baseUnitKey,
-        level: nextLevelNum
-    };
+   // Створюємо прокачаного юніта
+// Створюємо прокачаного юніта
+const upgradedUnit = {
+    ...nextLevelData,
+    x: unit.x,
+    y: unit.y,
+    newhp: (() => {
+        const currentHp = unit.newhp !== undefined ? unit.newhp : unit.hp;
+        const oldMaxHp = unit.maxHp || unit.hp || 100;
+        const wasFullHp = Math.abs(currentHp - oldMaxHp) < 0.1;
+        return wasFullHp ? nextLevelData.hp : Math.min(currentHp, nextLevelData.hp);
+    })(), // Зберігаємо поточне HP або робимо повне
+    playerIndex: unit.playerIndex,
+    moved: unit.moved,
+    attacked: unit.attacked,
+    id: unit.id,
+    effects: unit.effects || [],
+    // Додаємо abilities з unitData
+    abilities: unitData.abilities ? [...unitData.abilities] : [],
+    baseUnitKey: unit.baseUnitKey,
+    level: nextLevelNum,
+    maxHp: nextLevelData.hp // ← ЦЕЙ РЯДОК МАЄ БУТИ!
+};
+if (window.updateUnitHealthBar) {
+    window.updateUnitHealthBar(upgradedUnit);
+    console.log(`💚 Оновлено health bar для ${upgradedUnit.name}`);
+}
     
     // Створюємо abilityInstances
     if (window.Ability && window.abilities && upgradedUnit.abilities) {

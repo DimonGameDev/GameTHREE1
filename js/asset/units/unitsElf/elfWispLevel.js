@@ -14,7 +14,7 @@ img: "../../img/units/elf/elfWisp/blue/elfWispBlue.png",
 maxLevel: 8,
 
 levels: {
-  1: { hp: 1000, armor: 7, attack: 60, step: 6, range: 1, coin: 250, upgradeCost: 55 },
+  1: { hp: 1000, armor: 7, attack: 60, step: 6, range: 1, coin: 70, upgradeCost: 55 },
   2: { hp: 1000, armor: 9, attack: 60, step: 6, range: 1, coin: 250, upgradeCost: 68 },
   3: { hp: 134, armor: 11, attack: 54, step: 4, range: 3, coin: 250, upgradeCost: 223 },
   4: { hp: 144, armor: 14, attack: 57, step: 4, range: 3, coin: 250, upgradeCost: 400 },

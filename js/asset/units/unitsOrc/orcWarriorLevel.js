@@ -180,9 +180,9 @@ window.unitsRegistry["orcs:warrior"] = {
   maxLevel: 8,
 
   levels: {
-    1: { hp: 150, armor: 14, attack: 45, step: 6, range: 1, coin: 500, upgradeCost: 60 },
-    2: { hp: 160, armor: 22, attack: 62, step: 6, range: 1, coin: 500, upgradeCost: 70 },
-    3: { hp: 170, armor: 24, attack: 65, step: 6, range: 1, coin: 500, upgradeCost: 80 },
+    1: { hp: 150, armor: 14, attack: 45, step: 6, range: 1, coin: 50, upgradeCost: 60 },
+    2: { hp: 160, armor: 22, attack: 62, step: 6, range: 1, coin: 60, upgradeCost: 70 },
+    3: { hp: 170, armor: 24, attack: 65, step: 6, range: 1, coin: 70, upgradeCost: 80 },
     4: { hp: 180, armor: 26, attack: 67, step: 4, range: 1, coin: 500, upgradeCost: 85 },
     5: { hp: 185, armor: 28, attack: 69, step: 4, range: 1, coin: 500, upgradeCost: 400 },
     6: { hp: 185, armor: 30, attack: 71, step: 4, range: 1, coin: 500, upgradeCost: 400 },

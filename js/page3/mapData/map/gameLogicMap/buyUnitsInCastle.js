@@ -139,7 +139,15 @@ function buyUnit() {
             // ✅ ДОДАНО: Зберігаємо race та upgrades
             race: unit.race || currentPlayer.race,
             upgrades: unit.upgrades || 0,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            // 🔴 ДОДАТИ: Ініціалізація baseStats
+            baseStats: {
+                attack: unit.attack || 0,
+                armor: unit.armor || 0,
+                step: unit.step || 0,
+                range: unit.range || 0,
+                maxHp: unit.hp || unit.maxHp || 100
+            }
         };
         
         console.log(`🔍 Створено новий юніт:`, {
@@ -190,9 +198,9 @@ if (window.Ability && window.abilities) {
     // Додаємо юніта на карту
     unitsOnMap.push(newUnit);
         // ✅ ДОДАНО: Застосовуємо аури для всіх юнітів після покупки нового
-        if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
-            window.EffectsManager.applyAurasForNewUnit(newUnit);
-          }
+        // if (window.EffectsManager && typeof window.EffectsManager.applyAllAuras === 'function') {
+        //     window.EffectsManager.applyAurasForNewUnit(newUnit);
+        //   }
    
     const cellPlayer = createUnitVisual(newUnit);
 

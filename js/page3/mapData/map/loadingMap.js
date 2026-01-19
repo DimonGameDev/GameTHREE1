@@ -1440,4 +1440,4 @@ if (loadedFromSave) {
     }, 500);
 }
 
-console.log("лоадінгОМ14,14,14");
+console.log("лоадінгОМ15,15,15");

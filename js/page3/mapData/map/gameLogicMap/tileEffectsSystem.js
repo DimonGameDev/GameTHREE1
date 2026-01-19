@@ -34,7 +34,7 @@ function getTileBonuses(x, y, unit) {
         const castle = castles.find(c => c.x === x && c.y === y);
         if (castle) {
             const activePlayer = players.find(p => p.originalIndex === castle.playerIndex);
-            tileOwner = activePlayer ? activePlayer.originalIndex : null;
+            tileOwner = activePlayer ? players.indexOf(activePlayer) : null;
         }
     }
     
@@ -42,8 +42,7 @@ function getTileBonuses(x, y, unit) {
     if (tileType === 2 && typeof findGoldHouse === 'function') {
         const capturedHouse = findGoldHouse(x, y);
         if (capturedHouse) {
-            const owner = players[capturedHouse.playerIndex];
-            tileOwner = owner ? owner.originalIndex : null;
+            tileOwner = capturedHouse.playerIndex; // Просто playerIndex хатки
         }
     }
     
@@ -62,7 +61,7 @@ function getTileBonuses(x, y, unit) {
             case "HP":
                 // Для хаток/замків - тільки власнику
                 if (tileType === 1 || tileType === 2) {
-                    if (tileOwner !== null && unit && unit.originalIndex === tileOwner) {
+                    if (tileOwner !== null && unit && unit.playerIndex === tileOwner) {
                         bonuses.regeneration = effect.value;
                     }
                 } else {
@@ -99,29 +98,23 @@ function getTileBonuses(x, y, unit) {
 //     }
 
 
-    function applyTileDefenseBonuses(unit) {
-        if (!unit || unit.x === undefined || unit.y === undefined) {
-            return;
-        }
-        
-        // 🔴 ВИПРАВЛЕННЯ: Якщо юніт вже має tileBonuses, не застосовуємо повторно
-        if (unit.tileBonuses) {
-            console.log(`🛡️ ${unit.name} вже має tileBonuses, пропускаємо`);
-            return;
-        }
-        
-        const bonuses = getTileBonuses(unit.x, unit.y, unit);
-        
-        if (!bonuses || (bonuses.armor === 0 && bonuses.defense === 0)) {
-            // Юніт на звичайній клітинці - скидаємо бонуси
-            if (unit.tileBonuses) {
-                console.log(`⬇️ ${unit.name} покинув особливу клітинку`);
-                unit.tileBonuses = null;
-            }
-            return;
-        }
+function applyTileDefenseBonuses(unit) {
+    if (!unit || unit.x === undefined || unit.y === undefined) {
+        return;
+    }
     
-    // Зберігаємо бонуси в юніті
+    const bonuses = getTileBonuses(unit.x, unit.y, unit);
+    
+    if (!bonuses || (bonuses.armor === 0 && bonuses.defense === 0)) {
+        // Юніт на звичайній клітинці - скидаємо бонуси
+        if (unit.tileBonuses) {
+            console.log(`⬇️ ${unit.name} покинув особливу клітинку`);
+            unit.tileBonuses = null;
+        }
+        return;
+    }
+    
+    // Зберігаємо бонуси в юніті (замінюємо старі, якщо були)
     unit.tileBonuses = bonuses;
     
     // Логуємо
@@ -169,6 +162,44 @@ function regenerateUnitsAtTurnStart(playerIndex) {
                 // Показуємо попап
                 showRegenerationPopup(unit.x, unit.y, unit.newhp - oldHp);
             }
+        }
+    });
+}
+/**
+ * Регенерує HP від аур (supportAura) всім юнітам гравця на початку ходу
+ */
+function regenerateHpFromAuras(playerIndex) {
+    const currentPlayer = players[playerIndex];
+    if (!currentPlayer) return;
+    
+    const playerUnits = unitsOnMap.filter(u => u.playerIndex === playerIndex);
+    
+    playerUnits.forEach(unit => {
+        // Перевіряємо чи є активні ефекти mixed типу з hpRegenPercent
+        if (unit.activeEffects && unit.activeEffects.length > 0) {
+            unit.activeEffects.forEach(effect => {
+                if (effect.type === "mixed" && effect.hpRegenPercent > 0) {
+                    const oldHp = unit.newhp || unit.hp;
+                    const maxHp = unit.maxHp || unit.hp;
+                    
+                    // Розраховуємо регенерацію (відсоток від максимального HP)
+                    const regenAmount = Math.floor(maxHp * (effect.hpRegenPercent / 100));
+                    const newHp = Math.min(maxHp, oldHp + regenAmount);
+                    
+                    if (newHp > oldHp) {
+                        unit.newhp = newHp;
+                        console.log(`💚 ${unit.name} отримав регенерацію від аури: ${oldHp} → ${newHp} HP (+${regenAmount}) від ${effect.sourceName}`);
+                        
+                        // Оновлюємо health bar
+                        if (typeof window.updateUnitHealthBar === 'function') {
+                            window.updateUnitHealthBar(unit);
+                        }
+                        
+                        // Показуємо попап
+                        showRegenerationPopup(unit.x, unit.y, regenAmount);
+                    }
+                }
+            });
         }
     });
 }
@@ -229,5 +260,6 @@ window.applyTileDefenseBonuses = applyTileDefenseBonuses;
 window.regenerateUnitsAtTurnStart = regenerateUnitsAtTurnStart;
 window.calculateFinalArmor = calculateFinalArmor;
 window.getTileBonuses = getTileBonuses;
+window.regenerateHpFromAuras = regenerateHpFromAuras;
 
 console.log('✅ Система ефектів від клітинок ініціалізована');
