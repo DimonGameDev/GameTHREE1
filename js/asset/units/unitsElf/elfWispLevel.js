@@ -25,8 +25,6 @@ levels: {
 },
 
 abilities: [
-  { key: "supportAura", 
-    power: { attackBoost: 3, armorBoost: 2, hpRegenPercent: 20 }
-  }
+  { key: "supportAura" }
 ]
 };

@@ -146,6 +146,10 @@ if (effect.expiresOnRound !== undefined) {
                     unit.step = unit.originalStep;
                     delete unit.originalStep;
                     console.log(`🌱 ${unit.name} звільнено від коріння! Кроки відновлені: ${unit.step}`);
+                                        // 🔴 ДОДАТИ: Оновлюємо табло
+                                        if (typeof updateUnitTablo === 'function') {
+                                            updateUnitTablo(unit);
+                                        }
                 }
             }
         }

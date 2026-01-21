@@ -191,6 +191,12 @@ function getHeroAbilities(hero) {
  * Отримує здібності звичайного юніта
  */
 function getUnitAbilities(unit) {
+    console.log(`🔍 getUnitAbilities для ${unit.name}:`, {
+        hasAbilities: !!unit.abilities,
+        abilities: unit.abilities,
+        abilityInstances: unit.abilityInstances,
+        isHero: unit.isHero
+    });
     if (!unit.abilities || !window.abilities) return [];
     
     const abilities = [];
@@ -1346,6 +1352,52 @@ function initMagicUnitsModal() {
             // ═══════════════════════════════════════════
             // ОБРОБКА ЮНІТІВ (старий код)
             // ═══════════════════════════════════════════
+                        // ═══════════════════════════════════════════
+            // ОБРОБКА ЮНІТІВ (старий код)
+            // ═══════════════════════════════════════════
+            
+            // ✅ ДОДАНО: Логування для діагностики
+            console.log(`🔍 MAGIC MODAL ПЕРЕВІРКА для ${selectedUnitForMove.name}:`, {
+                hasAbilityInstances: !!selectedUnitForMove.abilityInstances,
+                abilityInstances: selectedUnitForMove.abilityInstances,
+                abilityInstancesLength: selectedUnitForMove.abilityInstances ? selectedUnitForMove.abilityInstances.length : 0,
+                hasAbilityFactory: !!window.AbilityFactory,
+                AbilityFactory: window.AbilityFactory,
+                hasAbilities: !!selectedUnitForMove.abilities,
+                abilitiesCount: selectedUnitForMove.abilities ? selectedUnitForMove.abilities.length : 0,
+                abilities: selectedUnitForMove.abilities,
+                isHero: selectedUnitForMove.isHero
+            });
+            
+            if (selectedUnitForMove.abilities && selectedUnitForMove.abilities.length > 0 && 
+                (!selectedUnitForMove.abilityInstances || selectedUnitForMove.abilityInstances.length === 0)) {
+                
+                // Спробувати використати AbilityFactory, якщо він є
+                if (window.Ability && window.abilities) {
+                    selectedUnitForMove.abilityInstances = [];
+                    if (selectedUnitForMove.abilities && Array.isArray(selectedUnitForMove.abilities)) {
+                        selectedUnitForMove.abilities.forEach(abilityRef => {
+                            const abilityKey = typeof abilityRef === 'string' ? abilityRef : abilityRef.key;
+                            const abilityPower = typeof abilityRef === 'object' ? (abilityRef.power || abilityRef.value || 0) : 0;
+                            
+                            const abilityTemplate = window.abilities[abilityKey];
+                            if (abilityTemplate) {
+                                try {
+                                    const fullTemplate = { ...abilityTemplate, power: abilityPower };
+                                    const abilityInstance = new window.Ability(fullTemplate);
+                                    selectedUnitForMove.abilityInstances.push(abilityInstance);
+                                } catch (error) {
+                                    console.error(`❌ Помилка створення здібності ${abilityKey}:`, error);
+                                }
+                            }
+                        });
+                    }
+                    console.log(`✨ Ініціалізовано здібності для ${selectedUnitForMove.name} при спробі використання`);
+                } else {
+                    selectedUnitForMove.abilityInstances = [];
+                    console.log(`⚠️ window.Ability або window.abilities недоступні`);
+                }
+            }
             if (!selectedUnitForMove.abilityInstances || selectedUnitForMove.abilityInstances.length === 0) {
                 alert("❌ У юніта немає здібностей");
                 return;

@@ -25,6 +25,6 @@ window.unitsRegistry["pipl:wisp"] = {
   },
 
   abilities: [
-    // { key: "arrowShot", power: 200}
+    { key: "supportAura" }
   ]
 };

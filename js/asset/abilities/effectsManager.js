@@ -322,9 +322,14 @@ static cleanupExpiredEffects(playerIndex) {
       });
       
       // Якщо щось видалили - перераховуємо стати
-      if (effectsToRemove.length > 0) {
-          window.recalcUnitStats(unit);
-      }
+            // Якщо щось видалили - перераховуємо стати
+            if (effectsToRemove.length > 0) {
+                window.recalcUnitStats(unit);
+                // 🔴 ДОДАТИ: Оновлюємо табло після видалення ефекту
+                if (typeof updateUnitTablo === 'function') {
+                    updateUnitTablo(unit);
+                }
+            }
   });
   
   if (cleanedCount > 0) {
@@ -500,13 +505,23 @@ window.recalcUnitStats = function(unit) {
                         }
                     }
                     break;
-              case "control":
-                  if (effect.effectType === "immobilize") {
-                      step = Math.max(0, step - (effect.stepReduction || 999));
-                  } else if (effect.effectType === "disarm") {
-                      canAttack = false;
-                  }
-                  break;
+                    case "control":
+                        if (effect.effectType === "immobilize") {
+                            step = Math.max(0, step - (effect.stepReduction || 999));
+                        } else if (effect.effectType === "disarm") {
+                            canAttack = false;
+                            // Зберігаємо оригінальні значення атаки та дальності
+                            if (!unit.originalAttack) {
+                                unit.originalAttack = attack;
+                            }
+                            if (!unit.originalRange) {
+                                unit.originalRange = range;
+                            }
+                            // Встановлюємо атаку та дальність в 0
+                            attack = 0;
+                            range = 0;
+                        }
+                        break;
               case "debuff":
                   if (effect.effectType === "attackReduction") {
                       attack = Math.max(0, attack - (effect.attackReduction || 0));
@@ -635,7 +650,7 @@ if (window.EffectsManager) {
     setTimeout(() => {
         if (window.unitsOnMap && window.unitsOnMap.length > 0) {
             console.log('🚀 Автоматичний тест аур...');
-            window.EffectsManager.applyAllAuras();
+            // window.EffectsManager.applyAllAuras();
         }
     }, 2000);
 }

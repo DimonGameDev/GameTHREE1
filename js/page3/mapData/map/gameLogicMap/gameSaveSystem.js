@@ -154,28 +154,13 @@ units: unitsOnMap.map(unit => ({
     unitId: unit.unitId, // ID шаблону юніта
     race: unit.race, // Раса (для регенерації img)
     type: unit.type, // Тип (warrior, archer, тощо)
-    // Зберігаємо базові характеристики
-    baseAttack: getBaseUnitStats(unit).attack,
-    baseArmor: getBaseUnitStats(unit).armor,
-    baseStep: getBaseUnitStats(unit).step,
-    baseRange: getBaseUnitStats(unit).range,
-    // ✅ ДОДАНО: Зберігаємо весь об'єкт baseStats для зручності
-    baseStats: {
-        attack: getBaseUnitStats(unit).attack,
-        armor: getBaseUnitStats(unit).armor,
-        step: getBaseUnitStats(unit).step,
-        range: getBaseUnitStats(unit).range
-    },
-// Також зберігаємо поточні (для сумісності)
-attack: unit.attack,
-armor: unit.armor,
-step: unit.step,
-range: unit.range,
+    // ✅ КЛЮЧОВЕ: Зберігаємо тільки базові дані для перерахунку
+    baseUnitKey: unit.baseUnitKey,
+    level: unit.level || 1,
     coin: unit.coin,
     // ✅ ДОДАНО: Для прогрес-системи
     upgradeCost: unit.upgradeCost,
     // Для героїв
-    level: unit.level,
     LevelAttack: unit.LevelAttack,
     LevelArmor: unit.LevelArmor,
     abilitiesProgress: unit.abilitiesProgress,
@@ -185,6 +170,7 @@ range: unit.range,
     originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
     effects: unit.effects,
     activeEffects: unit.activeEffects,
+    abilities: unit.abilities,
     // ✅ ДОДАНО: Зберігаємо кулдауни здібностей
     abilityCooldowns: unit.abilityInstances ? unit.abilityInstances.map(ability => ({
         key: ability.key || ability.name,
@@ -347,12 +333,11 @@ function saveGameToSlot(slotId, saveName) {
             unitId: unit.unitId,
             race: unit.race,
             type: unit.type,
-            attack: unit.attack,
-            armor: unit.armor,
-            step: unit.step,
-            range: unit.range,
+            // ✅ КЛЮЧОВЕ: Зберігаємо тільки базові дані для перерахунку
+            baseUnitKey: unit.baseUnitKey,
+            level: unit.level || 1,
             coin: unit.coin,
-            level: unit.level,
+            // level: unit.level,
             LevelAttack: unit.LevelAttack,
             LevelArmor: unit.LevelArmor,
             abilitiesProgress: unit.abilitiesProgress,
@@ -362,6 +347,7 @@ function saveGameToSlot(slotId, saveName) {
             originalAttack: unit.originalAttack, // ✅ ДОДАНО: Для ефекту "Наручники"
             originalRange: unit.originalRange, // ✅ ДОДАНО: Для ефекту "Наручники" (дальність)
             activeEffects: unit.activeEffects,
+            abilities: unit.abilities,
             // ✅ ДОДАНО: Зберігаємо кулдауни здібностей
             abilityCooldowns: unit.abilityInstances ? unit.abilityInstances.map(ability => ({
                 key: ability.key || ability.name,

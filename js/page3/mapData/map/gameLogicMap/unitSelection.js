@@ -989,6 +989,77 @@ console.log(`🔍 ДЕТАЛЬНА ПЕРЕВІРКА: ${unit.name}`, {
         daniUnitsAtack.style.fontWeight = '';
     }
 }
+if (unit.activeEffects && unit.activeEffects.length > 0) {
+    // Скидаємо всі кольори
+    // if (daniUnitsStep) daniUnitsStep.style.color = '';
+    // if (daniUnitsAtack) daniUnitsAtack.style.color = '';
+    // if (daniUnitsRange) daniUnitsRange.style.color = '';
+    // if (daniUnitsArmor) daniUnitsArmor.style.color = '';
+    
+    // // Перевіряємо кожен ефект
+    // unit.activeEffects.forEach(effect => {
+    //     // Прискорення - зелений
+    //     if (effect.type === "step" && effect.stepBonus > 0) {
+    //         if (daniUnitsStep) daniUnitsStep.style.color = '#00ff88';
+    //     }
+    //     // Коріння - червоний
+    //     else if (effect.type === "control" && effect.effectType === "immobilize") {
+    //         if (daniUnitsStep) daniUnitsStep.style.color = '#ff4444';
+    //     }
+    //     // Наручники - червоний для атаки та дальності
+    //     else if (effect.type === "control" && effect.effectType === "disarm") {
+    //         if (daniUnitsAtack) daniUnitsAtack.style.color = '#ff4444';
+    //         if (daniUnitsRange) daniUnitsRange.style.color = '#ff4444';
+    //     }
+    //     // Паразит - червоний для атаки
+    //     else if (effect.type === "debuff" && effect.effectType === "attackReduction") {
+    //         if (daniUnitsAtack) daniUnitsAtack.style.color = '#ff4444';
+    //     }
+    //     // Мітка - червоний для броні
+    //     else if (effect.type === "debuff" && effect.effectType === "armorReduction") {
+    //         if (daniUnitsArmor) daniUnitsArmor.style.color = '#ff4444';
+    //     }
+    // });
+        // 🔴 Зміна кольору КЛІТИНОК при ефектах
+        if (unit.activeEffects && unit.activeEffects.length > 0) {
+            // Знаходимо клітинки статистики
+            const attackCell = document.querySelector('.statItem:nth-child(1)');
+            const armorCell = document.querySelector('.statItem:nth-child(2)');
+            const stepCell = document.querySelector('.statItem:nth-child(4)');
+            const rangeCell = document.querySelector('.statItem:nth-child(5)');
+            
+            // Скидаємо всі кольори
+            if (attackCell) attackCell.style.backgroundColor = '';
+            if (armorCell) armorCell.style.backgroundColor = '';
+            if (stepCell) stepCell.style.backgroundColor = '';
+            if (rangeCell) rangeCell.style.backgroundColor = '';
+            
+            // Перевіряємо кожен ефект
+            unit.activeEffects.forEach(effect => {
+                // Прискорення - зелений
+                if (effect.type === "step" && effect.stepBonus > 0 && stepCell) {
+                    stepCell.style.backgroundColor = 'rgba(0, 255, 136, 0.3)';
+                }
+                // Коріння - червоний
+                else if (effect.type === "control" && effect.effectType === "immobilize" && stepCell) {
+                    stepCell.style.backgroundColor = 'rgba(255, 68, 68, 0.3)';
+                }
+                // Наручники - червоний
+                else if (effect.type === "control" && effect.effectType === "disarm") {
+                    if (attackCell) attackCell.style.backgroundColor = 'rgba(255, 68, 68, 0.3)';
+                    if (rangeCell) rangeCell.style.backgroundColor = 'rgba(255, 68, 68, 0.3)';
+                }
+                // Паразит - червоний
+                else if (effect.type === "debuff" && effect.effectType === "attackReduction" && attackCell) {
+                    attackCell.style.backgroundColor = 'rgba(255, 68, 68, 0.3)';
+                }
+                // Мітка - червоний
+                else if (effect.type === "debuff" && effect.effectType === "armorReduction" && armorCell) {
+                    armorCell.style.backgroundColor = 'rgba(255, 68, 68, 0.3)';
+                }
+            });
+        }
+}
 
         }  // ← Закриття if (daniUnitsAtack) з рядка 712
 
@@ -1228,7 +1299,16 @@ console.log(`🔍 ДЕТАЛЬНА ПЕРЕВІРКА: ${unit.name}`, {
             if (unitLevelNow) {
                 unitLevelNow.innerText = "";
             }
-            
+                // 🔴 Очищаємо кольори клітинок
+    const attackCell = document.querySelector('.statItem:nth-child(1)');
+    const armorCell = document.querySelector('.statItem:nth-child(2)');
+    const stepCell = document.querySelector('.statItem:nth-child(4)');
+    const rangeCell = document.querySelector('.statItem:nth-child(5)');
+    
+    if (attackCell) attackCell.style.backgroundColor = '';
+    if (armorCell) armorCell.style.backgroundColor = '';
+    if (stepCell) stepCell.style.backgroundColor = '';
+    if (rangeCell) rangeCell.style.backgroundColor = '';
             // console.log('🧹 Табло юніта очищено');
         }
 

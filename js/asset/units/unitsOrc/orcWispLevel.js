@@ -201,8 +201,6 @@ window.unitsRegistry["orcs:wisp"] = {
   },
 
   abilities: [
-    { key: "supportAura", 
-      // power: { attackBoost: 11, armorBoost: 3, hpRegenPercent: 20 }
-    }
+    { key: "supportAura" }
   ]
 };

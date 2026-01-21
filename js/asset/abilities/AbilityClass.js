@@ -637,7 +637,7 @@ createControlEffect(source) {
       }
       
       // Показуємо візуальний ефект
-      this.showAuraEffect(unit, effect.type);
+      this.highlightUnitWithAura(unit);
     }
 }
 
